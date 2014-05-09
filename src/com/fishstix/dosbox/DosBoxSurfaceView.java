@@ -542,7 +542,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		//final int action = (event.getAction() & MotionEvent.ACTION_MASK);
 		final int pointCnt = mWrap.getPointerCount(event);
 		final int pointerId = mWrap.getPointerId(event, pointerIndex);
-
+		Log.v("onTouch?", "yeah");
 		if (pointCnt <= MAX_POINT_CNT){
 			//if (pointerIndex <= MAX_POINT_CNT - 1){
 			{
@@ -581,7 +581,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        					DosBoxControl.nativeMouse(0, 0, 0, 0, ACTION_DOWN, button);
 			        				else if (mInputMode == INPUT_MODE_JOYSTICK)
 			        					DosBoxControl.nativeJoystick(0, 0, ACTION_DOWN, button);
-			        				//Log.v("Mouse","BUTTON DOWN: " + button);
+			        				Log.v("Mouse","BUTTON DOWN: " + button);
 			        			}
 			        			virtButton[pointerIndex]= true;
 			        			mFilterLongClick = true;
@@ -591,11 +591,11 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 						if (inCircle(screen_width-mJoyRight-mJoyLeft,getHeight()-(mJoyLeft),mJoyRad,x[pointerId],y[pointerId])) {
 							button = BTN_A;
 							DosBoxControl.nativeJoystick(0, 0, ACTION_DOWN, button); // A
-							//Log.v("JOY", "BUTTON A");
+							Log.v("JOY", "BUTTON A");
 						} else if (inCircle(screen_width-mJoyRight,getHeight()-(mJoyLeft),mJoyRad,x[pointerId],y[pointerId])) {
 							button = BTN_B;
 							DosBoxControl.nativeJoystick(0, 0, ACTION_DOWN, button); // B
-							//Log.v("JOY", "BUTTON B");
+							Log.v("JOY", "BUTTON B");
 						}
 					} else if (mInputMode == INPUT_MODE_REAL_JOYSTICK) {
 						button = mWrap.getButtonState(event);
@@ -630,7 +630,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 							moveId = -1;
 						}
 						DosBoxControl.nativeJoystick(0, 0, 1, mButtonDown[pointerId]);
-						//Log.v("JOY","Up cnt:"+pointCnt +"  id: "+pointerId);
+						Log.v("JOY","Up cnt:"+pointCnt +"  id: "+pointerId);
 						return true;
 					} else
 					if (mInputMode == INPUT_MODE_MOUSE){
