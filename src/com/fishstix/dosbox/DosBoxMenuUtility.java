@@ -331,7 +331,7 @@ public class DosBoxMenuUtility {
 		// VOL BUTTONS
 		//context.mPrefHardkeyOn = prefs.getBoolean("confvolbuttons", true);
 
-		if (prefs.getBoolean("confjoyoverlay", false)) {
+		if (prefs.getBoolean("confjoyoverlay", true)) {
 			context.mSurfaceView.mShowJoy = true;
 			context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_JOYSTICK;	// switch to joystick mode
 			SharedPreferences.Editor editor = prefs.edit();
@@ -346,7 +346,7 @@ public class DosBoxMenuUtility {
 			context.mSurfaceView.mShowInfo = false;
 		}
 		// dpad / trackpad emulation
-		context.mSurfaceView.mEnableDpad = prefs.getBoolean("confenabledpad", false);
+		context.mSurfaceView.mEnableDpad = prefs.getBoolean("confenabledpad", true);
 		try {
 			int tmp = Integer.valueOf(prefs.getString("confdpadsensitivity", "7").trim());
 			if ((tmp >= 1) && (tmp <= 25)) {
