@@ -46,8 +46,8 @@ ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
 	LOCAL_CFLAGS += -DC_TARGETCPU=ARMV7LE 
 	LOCAL_ARM_MODE := arm
 	# Enable NEON optimizations for big speed boost
-	# LOCAL_ARM_NEON := true
-	# LOCAL_CFLAGS += -DHAVE_NEON=1
+	LOCAL_ARM_NEON := true
+	LOCAL_CFLAGS += -DHAVE_NEON=1 -mcpu=cortex-a8 -mfloat-abi=softfp -mfpu=neon
 endif
 
 ifeq ($(TARGET_ARCH_ABI),armeabi)
