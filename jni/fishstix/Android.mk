@@ -9,7 +9,7 @@ CG_SUBDIRS := .\
 
 MY_PATH := $(LOCAL_PATH)
 
-LOCAL_PATH := "/home/gene/Downloads/DosBoxTurbo_Source/com.fishstix.dbox/jni/fishstix"
+LOCAL_PATH := $(DEVEL_PATH)/fishstix
 
 CG_SRCDIR := $(LOCAL_PATH)
 LOCAL_CFLAGS :=	-I$(LOCAL_PATH)/include \

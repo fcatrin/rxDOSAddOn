@@ -26,7 +26,7 @@ src/shell \
 MY_PATH := $(LOCAL_PATH)
 
 #Fix me
-LOCAL_PATH := "/home/gene/Downloads/DosBoxTurbo_Source/com.fishstix.dbox/jni/dosbox"
+LOCAL_PATH := $(DEVEL_PATH)/dosbox
 
 CG_SRCDIR := $(LOCAL_PATH)
 LOCAL_CFLAGS :=	-I$(LOCAL_PATH)/include \

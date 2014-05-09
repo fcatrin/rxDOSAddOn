@@ -135,3 +135,4 @@ void INT10_ReloadRomFonts();
 
 void BIOS_SetComPorts (Bit16u baseaddr[]);
 
+#endif

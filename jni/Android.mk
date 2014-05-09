@@ -14,4 +14,8 @@
 # this will make Up/Down/Left/Right key up events with X frames delay,
 # so if application expects you to press and hold button it will process the event correctly.
 #SDL_TRACKBALL_KEYUP_DELAY := 4
+
+DEVEL_PATH := $(call my-dir)
+
 include $(call all-subdir-makefiles)
+
