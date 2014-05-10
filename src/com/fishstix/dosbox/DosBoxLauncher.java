@@ -23,6 +23,7 @@ import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
+import com.fishstix.dosbox.Joystick.Position;
 import com.fishstix.dosbox.library.dosboxprefs.DosBoxPreferences;
 
 import android.app.Activity;
@@ -196,12 +197,14 @@ public class DosBoxLauncher extends Activity {
 	public static final int MAX_BUTTONS = 4;
 	public static final int BUTTONS_ALPHA = 0x70000000;
 	public static final int BUTTONS_ALPHA_PRESSED = 0xC0000000;
-	JoystickButton buttons[] = new JoystickButton[4];
+	public static final int BUTTONS_ALPHA_BALL = 0xA0000000;
 	String buttonNames[] = {"A", "B", "X", "Y"};
 	int buttonColors[] = {0xFF0000, 0xFFFF00, 0x0000FF, 0x00FF00};
 	int buttonKeys[] = {KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_SPACE, KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_1};
 	
 	private void recalculateJoystickOverlay() {
+		JoystickButton buttons[] = new JoystickButton[MAX_BUTTONS];
+
 		int w = mSurfaceView.getWidth();
 		int h = mSurfaceView.getHeight();
 		
@@ -239,7 +242,25 @@ public class DosBoxLauncher extends Activity {
 		}
 		
 		mSurfaceView.joystickButtonsOverlay = buttons ;
+
+		Joystick joystick = new Joystick();
+		joystick.x = margin;
+		joystick.y = h - margin;
+		joystick.radius = (int)(margin * 0.8);
+		joystick.radiusBall = (int)(joystick.radius * 0.6);
+		joystick.color = BUTTONS_ALPHA | 0x777777;
+		joystick.colorBall = BUTTONS_ALPHA_BALL | 0x777777;
+		joystick.keyCodeUp    = KeyEvent.KEYCODE_DPAD_UP;
+		joystick.keyCodeDown  = KeyEvent.KEYCODE_DPAD_DOWN;
+		joystick.keyCodeLeft  = KeyEvent.KEYCODE_DPAD_LEFT;
+		joystick.keyCodeRight = KeyEvent.KEYCODE_DPAD_RIGHT;
+		joystick.axisX = Position.CENTER;
+		joystick.axisY = Position.CENTER;
+		joystick.positionX = 0;
+		joystick.positionY = 0;
+		joystick.threshold = 0.2f;
 		
+		mSurfaceView.joystickOverlay = joystick;
 	}
 	
 	
