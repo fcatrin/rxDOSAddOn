@@ -542,6 +542,90 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		return false;
 	}
 	
+	private void onJoystickOverlayPress(int pointerId) {
+		
+		if (!inCircle(joystickOverlay.x,joystickOverlay.y,joystickOverlay.radius,x[pointerId],y[pointerId])) return;
+		// inside dirpad 
+		moveId = pointerId;
+		double max = 128.0;
+		double xval = x[pointerId] - joystickOverlay.x;
+		double yval = y[pointerId] - joystickOverlay.y;
+		
+		joystickOverlay.positionX = (int)xval;
+		joystickOverlay.positionY = (int)yval;
+		
+		xval *= max / joystickOverlay.radius;
+		yval *= max / joystickOverlay.radius;
+		
+		if (joystickOverlay.type == Type.DIGITAL) {
+			Position axisX = Position.CENTER;
+			Position axisY = Position.CENTER;
+			float threshold = joystickOverlay.threshold;
+			if (xval < max * -threshold) axisX = Position.MIN;
+			else if (xval > max * threshold) axisX = Position.MAX;
+			if (yval < max * -threshold) axisY = Position.MIN;
+			else if (yval > max * threshold) axisY = Position.MAX;
+			
+			if (joystickOverlay.axisX != axisX) {
+				// release keys
+				if (joystickOverlay.axisX != Position.CENTER) {
+					int keyCode = joystickOverlay.axisX == Position.MIN?joystickOverlay.keyCodeLeft:joystickOverlay.keyCodeRight;
+					Log.v("JOY", "Release AXISX " + keyCode);
+					DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
+				}
+				// press keys
+				if (axisX != Position.CENTER) {
+					int keyCode = axisX == Position.MIN?joystickOverlay.keyCodeLeft:joystickOverlay.keyCodeRight;
+					DosBoxControl.nativeKey(keyCode, 1, 0, 0, 0);
+					Log.v("JOY", "Press AXISX " + keyCode);
+				}
+			}
+
+			if (joystickOverlay.axisY != axisY) {
+				// release keys
+				if (joystickOverlay.axisY != Position.CENTER) {
+					int keyCode = joystickOverlay.axisY == Position.MIN?joystickOverlay.keyCodeUp:joystickOverlay.keyCodeDown;
+					DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
+					Log.v("JOY", "Release AXISY " + keyCode);
+				}
+				if (axisY != Position.CENTER) {
+					int keyCode = axisY == Position.MIN?joystickOverlay.keyCodeUp:joystickOverlay.keyCodeDown;
+					DosBoxControl.nativeKey(keyCode, 1, 0, 0, 0);
+					Log.v("JOY", "Press AXISY " + keyCode);
+				}
+			}
+			joystickOverlay.axisX = axisX;
+			joystickOverlay.axisY = axisY;
+		} else {
+			double joymax = 980;
+			xval = ((xval / max ) + 1.0) * joymax;
+			yval = ((yval / max ) + 1.0) * joymax;
+			DosBoxControl.nativeJoystick((int)(xval), (int)(yval), ACTION_MOVE, -1);
+			Log.v("JOY","MOVE X: "+xval + "   Y: "+yval + " ID: "+pointerId);
+		}
+	}
+	
+	public void onJoystickOverlayRelease() {
+		if (joystickOverlay.type == Type.DIGITAL) {
+			if (joystickOverlay.axisX != Position.CENTER) {
+				int keyCode = joystickOverlay.axisX == Position.MIN?joystickOverlay.keyCodeLeft:joystickOverlay.keyCodeRight;
+				Log.v("JOY", "Release AXISX " + keyCode);
+				DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
+			}
+			if (joystickOverlay.axisY != Position.CENTER) {
+				int keyCode = joystickOverlay.axisY == Position.MIN?joystickOverlay.keyCodeUp:joystickOverlay.keyCodeDown;
+				DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
+				Log.v("JOY", "Release AXISY " + keyCode);
+			}
+		} else {
+			DosBoxControl.nativeJoystick(mJoyCenterX, mJoyCenterY, ACTION_MOVE, -1);
+		}
+		joystickOverlay.axisX = Position.CENTER;
+		joystickOverlay.axisY = Position.CENTER;
+		joystickOverlay.positionX = 0;
+		joystickOverlay.positionY = 0;
+	}
+	
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
 		final int pointerIndex = ((event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
@@ -602,6 +686,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        			Log.v("JOY", "Send native key down " + jb.keyCode);
 			        		}
 			        	}
+						onJoystickOverlayPress(pointerId);
+
 					} else if (mInputMode == INPUT_MODE_REAL_JOYSTICK) {
 						button = mWrap.getButtonState(event);
 						DosBoxControl.nativeJoystick(0, 0, ACTION_DOWN, button);
@@ -631,25 +717,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 							}
 						}		
 						if (pointerId == moveId) {
-							// recenter joystick on release
-							if (joystickOverlay.type == Type.DIGITAL) {
-								if (joystickOverlay.axisX != Position.CENTER) {
-									int keyCode = joystickOverlay.axisX == Position.MIN?joystickOverlay.keyCodeLeft:joystickOverlay.keyCodeRight;
-									Log.v("JOY", "Release AXISX " + keyCode);
-									DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
-								}
-								if (joystickOverlay.axisY != Position.CENTER) {
-									int keyCode = joystickOverlay.axisY == Position.MIN?joystickOverlay.keyCodeUp:joystickOverlay.keyCodeDown;
-									DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
-									Log.v("JOY", "Release AXISY " + keyCode);
-								}
-							} else {
-								DosBoxControl.nativeJoystick(mJoyCenterX, mJoyCenterY, ACTION_MOVE, -1);
-							}
-							joystickOverlay.axisX = Position.CENTER;
-							joystickOverlay.axisY = Position.CENTER;
-							joystickOverlay.positionX = 0;
-							joystickOverlay.positionY = 0;
+							onJoystickOverlayRelease();
 							moveId = -1;
 						}
 						
@@ -762,75 +830,11 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 							forceRedraw();
 						break;
 						case INPUT_MODE_JOYSTICK:
-							//screen_width = getWidth(); 
-							//screen_height = getHeight();
 							int newPointerId;
-							//int rad = screen_width/20;
 							for(int i = 0; i < pointCnt; ++i) {
 								newPointerId = mWrap.getPointerId(event,i);
-
-							//canvas.drawCircle(left, screen_height-(left), right, mTextPaint);
-								if (inCircle(joystickOverlay.x,joystickOverlay.y,joystickOverlay.radius,x[newPointerId],y[newPointerId])) {
-									// inside dirpad 
-									moveId = newPointerId;
-									double max = 128.0;
-									double xval = x[newPointerId] - joystickOverlay.x;
-									double yval = y[newPointerId] - joystickOverlay.y;
-									
-									joystickOverlay.positionX = (int)xval;
-									joystickOverlay.positionY = (int)yval;
-									
-									xval *= max / joystickOverlay.radius;
-									yval *= max / joystickOverlay.radius;
-									
-									if (joystickOverlay.type == Type.DIGITAL) {
-										Position axisX = Position.CENTER;
-										Position axisY = Position.CENTER;
-										float threshold = joystickOverlay.threshold;
-										if (xval < max * -threshold) axisX = Position.MIN;
-										else if (xval > max * threshold) axisX = Position.MAX;
-										if (yval < max * -threshold) axisY = Position.MIN;
-										else if (yval > max * threshold) axisY = Position.MAX;
-										
-										if (joystickOverlay.axisX != axisX) {
-											// release keys
-											if (joystickOverlay.axisX != Position.CENTER) {
-												int keyCode = joystickOverlay.axisX == Position.MIN?joystickOverlay.keyCodeLeft:joystickOverlay.keyCodeRight;
-												Log.v("JOY", "Release AXISX " + keyCode);
-												DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
-											}
-											// press keys
-											if (axisX != Position.CENTER) {
-												int keyCode = axisX == Position.MIN?joystickOverlay.keyCodeLeft:joystickOverlay.keyCodeRight;
-												DosBoxControl.nativeKey(keyCode, 1, 0, 0, 0);
-												Log.v("JOY", "Press AXISX " + keyCode);
-											}
-										}
-
-										if (joystickOverlay.axisY != axisY) {
-											// release keys
-											if (joystickOverlay.axisY != Position.CENTER) {
-												int keyCode = joystickOverlay.axisY == Position.MIN?joystickOverlay.keyCodeUp:joystickOverlay.keyCodeDown;
-												DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
-												Log.v("JOY", "Release AXISY " + keyCode);
-											}
-											if (axisY != Position.CENTER) {
-												int keyCode = axisY == Position.MIN?joystickOverlay.keyCodeUp:joystickOverlay.keyCodeDown;
-												DosBoxControl.nativeKey(keyCode, 1, 0, 0, 0);
-												Log.v("JOY", "Press AXISY " + keyCode);
-											}
-										}
-										joystickOverlay.axisX = axisX;
-										joystickOverlay.axisY = axisY;
-									} else {
-										double joymax = 980;
-										xval = ((xval / max ) + 1.0) * joymax;
-										yval = ((yval / max ) + 1.0) * joymax;
-										DosBoxControl.nativeJoystick((int)(xval), (int)(yval), ACTION_MOVE, -1);
-										Log.v("JOY","MOVE X: "+xval + "   Y: "+yval + "  CNT: " +pointCnt + "  ID: "+pointerId);
-									}
-								}
-			    		    }
+								onJoystickOverlayPress(newPointerId);
+							}
 						break;
 						case INPUT_MODE_MOUSE: 
 						case INPUT_MODE_REAL_MOUSE: 
