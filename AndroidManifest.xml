@@ -25,6 +25,11 @@
                 <action android:name="com.fishstix.dosbox.START" />
                 <data android:mimeType="text/*" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="retrobox.dosbox" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
             </activity>
         <activity android:label="@string/app_name" android:name="com.fishstix.dosbox.library.dosboxprefs.DosBoxPreferences"></activity>
     </application>

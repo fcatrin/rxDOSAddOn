@@ -28,6 +28,7 @@ import com.fishstix.dosbox.library.dosboxprefs.DosBoxPreferences;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -382,7 +383,15 @@ public class DosBoxLauncher extends Activity {
 		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_MEMORY_SIZE, mPrefMemorySize);
 		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_SOUND_MODULE_ON, (mPrefSoundModuleOn)?1:0);
 		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_REFRESH_HACK_ON, (mPrefRefreshHackOn)?1:0);
-		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLE_HACK_ON, (mPrefCycleHackOn)?1:0); */ 
+		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLE_HACK_ON, (mPrefCycleHackOn)?1:0); */
+		
+		
+	    Intent intent = getIntent();
+	    String dosBoxConfigFile = intent.getStringExtra("conf");
+	    String dosBoxConfigFileUser =intent.getStringExtra("userconf");
+	    //String userCommandLine = intent.getStringExtra("cmdline");
+
+		
 		String argStartCommand = getIntent().getStringExtra(START_COMMAND_ID);
 		
 		if (argStartCommand == null) {
@@ -390,6 +399,8 @@ public class DosBoxLauncher extends Activity {
 		}
 
 		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_START_COMMAND, 0, argStartCommand, true);
+		if (dosBoxConfigFile!=null) nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_DOSBOX_DEFAULT, 0, dosBoxConfigFile, true);
+		if (dosBoxConfigFileUser!=null) nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_DOSBOX_USER, 0, dosBoxConfigFileUser, true);
 		
 		
 		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_MIXER_HACK_ON, (mPrefMixerHackOn)?1:0,null, true);

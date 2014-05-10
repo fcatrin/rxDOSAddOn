@@ -38,6 +38,8 @@ void CPU_CycleIncrease(bool pressed);
 void CPU_CycleDecrease(bool pressed);
 
 char arg_start_command[256]="";
+char arg_start_conf_default[256]="";
+char arg_start_conf_user[256]="";
 extern struct loader_config myLoader;
 extern struct loader_config *loadf;
 
@@ -45,8 +47,19 @@ extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativeStart(JNIEnv * env
 {
 	Android_Init(env, obj, bitmap, width, height);
 	
-	const char * argv[] = { "dosbox", "-conf", (env)->GetStringUTFChars(confpath,NULL), "-c", arg_start_command  };
-	dosbox_main((!arg_start_command[0])?3:5, argv);
+	if (strlen(arg_start_conf_default)>0) {
+		const char *argv[] = { "dosbox",
+				"-conf", arg_start_conf_default,
+				"-conf", arg_start_conf_user,
+				"-exit" };
+		dosbox_main(6, argv);
+	} else {
+		const char *argv[] = { "dosbox",
+						"-conf", (env)->GetStringUTFChars(confpath,NULL),
+						"-c", arg_start_command };
+		dosbox_main((!arg_start_command[0])?3:5, argv);
+	}
+
 	
 	Android_ShutDown();
 }
@@ -124,6 +137,12 @@ extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativeSetOption(JNIEnv *
 			break;
 		case 50:
 			strcpy(arg_start_command, (env)->GetStringUTFChars((jstring)value2, 0));
+			break;
+		case 51:
+			strcpy(arg_start_conf_default, (env)->GetStringUTFChars((jstring)value2, 0));
+			break;
+		case 52:
+			strcpy(arg_start_conf_user, (env)->GetStringUTFChars((jstring)value2, 0));
 			break;
 	}
 }

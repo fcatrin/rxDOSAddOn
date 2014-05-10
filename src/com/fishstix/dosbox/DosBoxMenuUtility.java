@@ -120,6 +120,8 @@ public class DosBoxMenuUtility {
 	public final static int DOSBOX_OPTION_ID_JOYSTICK_ENABLE = 18;
 	public final static int DOSBOX_OPTION_ID_SWAP_MEDIA = 21;
 	public final static int DOSBOX_OPTION_ID_START_COMMAND = 50;
+	public final static int DOSBOX_OPTION_ID_DOSBOX_DEFAULT = 51;
+	public final static int DOSBOX_OPTION_ID_DOSBOX_USER = 52;
 	
 	static public void loadPreference(DosBoxLauncher context, final SharedPreferences prefs) {	
 		// gracefully handle upgrade from previous versions, fishstix
