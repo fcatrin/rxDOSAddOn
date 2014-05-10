@@ -24,6 +24,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import com.fishstix.dosbox.library.dosboxprefs.DosBoxPreferences;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -39,6 +40,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -180,6 +182,8 @@ public class DosBoxLauncher extends Activity {
 	    		mSurfaceView.mJoyRight = mSurfaceView.getWidth()/10;
 	    		mSurfaceView.mJoyRad = mSurfaceView.getWidth()/20;
 	    		
+	    		recalculateJoystickOverlay();
+	    		
 	            Log.v("DosBoxTurbo",
 	                    String.format("new width=%d; new height=%d", mSurfaceView.getWidth(),
 	                            mSurfaceView.getHeight()));
@@ -188,6 +192,56 @@ public class DosBoxLauncher extends Activity {
 
 	}
 	// splash can go here
+	
+	public static final int MAX_BUTTONS = 4;
+	public static final int BUTTONS_ALPHA = 0x70000000;
+	public static final int BUTTONS_ALPHA_PRESSED = 0xC0000000;
+	JoystickButton buttons[] = new JoystickButton[4];
+	String buttonNames[] = {"A", "B", "X", "Y"};
+	int buttonColors[] = {0xFF0000, 0xFFFF00, 0x0000FF, 0x00FF00};
+	int buttonKeys[] = {KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_SPACE, KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_1};
+	
+	private void recalculateJoystickOverlay() {
+		int w = mSurfaceView.getWidth();
+		int h = mSurfaceView.getHeight();
+		
+		int margin =  w / 8;
+		int marginButton = w / 10;
+		int radius = w / 24;
+		int gap = (int)(radius * 1.5);
+		
+		JoystickButton button = new JoystickButton();
+		button.x = w - marginButton;
+		button.y = h - margin;
+		buttons[0] = button;
+		
+		button = new JoystickButton();
+		button.x = w - marginButton - gap;
+		button.y = h - margin + gap;
+		buttons[1] = button;
+		
+		button = new JoystickButton();
+		button.x = w - marginButton - gap;
+		button.y = h - margin - gap;
+		buttons[2] = button;
+
+		button = new JoystickButton();
+		button.x = w - marginButton - gap*2;
+		button.y = h - margin;
+		buttons[3] = button;
+
+		for(int i=0; i<buttonNames.length; i++) {
+			buttons[i].label = buttonNames[i];
+			buttons[i].color = buttonColors[i] | BUTTONS_ALPHA;
+			buttons[i].colorPressed = buttonColors[i] | BUTTONS_ALPHA_PRESSED;
+			buttons[i].keyCode = buttonKeys[i];
+			buttons[i].radius = radius;
+		}
+		
+		mSurfaceView.joystickButtonsOverlay = buttons ;
+		
+	}
+	
 	
 	@Override
 	protected void onDestroy() {
