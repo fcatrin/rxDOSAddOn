@@ -9,10 +9,10 @@ public class Joystick {
 	int radiusBall;
 	int color;
 	int colorBall;
-	int keyCodeLeft;
-	int keyCodeRight;
-	int keyCodeUp;
-	int keyCodeDown;
+	VirtualKey keyLeft;
+	VirtualKey keyRight;
+	VirtualKey keyUp;
+	VirtualKey keyDown;
 	int maxValue;
 	
 	// percent required to be considered out of center

@@ -454,6 +454,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	}
 	
 	private int[] mButtonDown = new int[MAX_POINT_CNT];
+	private VirtualKey[] vkDown = new VirtualKey[MAX_POINT_CNT];
 	
 	private final static int ONSCREEN_BUTTON_SPECIAL_KEY = 33;
 	private final static int ONSCREEN_BUTTON_HIDE = 34;
@@ -569,29 +570,25 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			if (joystickOverlay.axisX != axisX) {
 				// release keys
 				if (joystickOverlay.axisX != Position.CENTER) {
-					int keyCode = joystickOverlay.axisX == Position.MIN?joystickOverlay.keyCodeLeft:joystickOverlay.keyCodeRight;
-					Log.v("JOY", "Release AXISX " + keyCode);
-					DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
+					VirtualKey key = joystickOverlay.axisX == Position.MIN?joystickOverlay.keyLeft:joystickOverlay.keyRight;
+					key.sendToDosBox(false);
 				}
 				// press keys
 				if (axisX != Position.CENTER) {
-					int keyCode = axisX == Position.MIN?joystickOverlay.keyCodeLeft:joystickOverlay.keyCodeRight;
-					DosBoxControl.nativeKey(keyCode, 1, 0, 0, 0);
-					Log.v("JOY", "Press AXISX " + keyCode);
+					VirtualKey key = axisX == Position.MIN?joystickOverlay.keyLeft:joystickOverlay.keyRight;
+					key.sendToDosBox(true);
 				}
 			}
 
 			if (joystickOverlay.axisY != axisY) {
 				// release keys
 				if (joystickOverlay.axisY != Position.CENTER) {
-					int keyCode = joystickOverlay.axisY == Position.MIN?joystickOverlay.keyCodeUp:joystickOverlay.keyCodeDown;
-					DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
-					Log.v("JOY", "Release AXISY " + keyCode);
+					VirtualKey key = joystickOverlay.axisY == Position.MIN?joystickOverlay.keyUp:joystickOverlay.keyDown;
+					key.sendToDosBox(false);
 				}
 				if (axisY != Position.CENTER) {
-					int keyCode = axisY == Position.MIN?joystickOverlay.keyCodeUp:joystickOverlay.keyCodeDown;
-					DosBoxControl.nativeKey(keyCode, 1, 0, 0, 0);
-					Log.v("JOY", "Press AXISY " + keyCode);
+					VirtualKey key = axisY == Position.MIN?joystickOverlay.keyUp:joystickOverlay.keyDown;
+					key.sendToDosBox(true);
 				}
 			}
 			joystickOverlay.axisX = axisX;
@@ -608,14 +605,12 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	public void onJoystickOverlayRelease() {
 		if (joystickOverlay.type == Type.DIGITAL) {
 			if (joystickOverlay.axisX != Position.CENTER) {
-				int keyCode = joystickOverlay.axisX == Position.MIN?joystickOverlay.keyCodeLeft:joystickOverlay.keyCodeRight;
-				Log.v("JOY", "Release AXISX " + keyCode);
-				DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
+				VirtualKey key = joystickOverlay.axisX == Position.MIN?joystickOverlay.keyLeft:joystickOverlay.keyRight;
+				key.sendToDosBox(false);
 			}
 			if (joystickOverlay.axisY != Position.CENTER) {
-				int keyCode = joystickOverlay.axisY == Position.MIN?joystickOverlay.keyCodeUp:joystickOverlay.keyCodeDown;
-				DosBoxControl.nativeKey(keyCode, 0, 0, 0, 0);
-				Log.v("JOY", "Release AXISY " + keyCode);
+				VirtualKey key = joystickOverlay.axisY == Position.MIN?joystickOverlay.keyUp:joystickOverlay.keyDown;
+				key.sendToDosBox(false);
 			}
 		} else {
 			DosBoxControl.nativeJoystick(mJoyCenterX, mJoyCenterY, ACTION_MOVE, -1);
@@ -680,14 +675,13 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        } else if (mInputMode == INPUT_MODE_JOYSTICK) {
 			        	for(JoystickButton jb : joystickButtonsOverlay) {
 			        		if (inCircle(jb.x, jb.y, jb.radius ,x[pointerId],y[pointerId])) {
-			        			button = jb.keyCode;
 			        			jb.pressed = true;
-			        			DosBoxControl.nativeKey(jb.keyCode, 1, 0, 0, 0);
-			        			Log.v("JOY", "Send native key down " + jb.keyCode);
+			        			button = 0;
+			        			vkDown[pointerId] = jb.key;
+			        			jb.key.sendToDosBox(true);
 			        		}
 			        	}
 						onJoystickOverlayPress(pointerId);
-
 					} else if (mInputMode == INPUT_MODE_REAL_JOYSTICK) {
 						button = mWrap.getButtonState(event);
 						DosBoxControl.nativeJoystick(0, 0, ACTION_DOWN, button);
@@ -721,17 +715,16 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 							moveId = -1;
 						}
 						
-						int pointerButton = mButtonDown[pointerId];
-						for(JoystickButton jb : joystickButtonsOverlay) {
-							if (jb.keyCode == pointerButton) {
-								DosBoxControl.nativeKey(jb.keyCode, 0, 0, 0, 0);
-								jb.pressed = false;
-								Log.v("JOY","Up native key :" + jb.keyCode);
-								pointerButton = -1;
-								break;
+						VirtualKey vk = vkDown[pointerId];
+						if (vk!=null) {
+							for(JoystickButton jb : joystickButtonsOverlay) {
+								if (jb.key == vk) {
+									jb.pressed = false;
+									vk.sendToDosBox(false);
+									break;
+								}
 							}
-						}
-						if (pointerButton>=0) {
+						} else {
 							DosBoxControl.nativeJoystick(0, 0, 1, mButtonDown[pointerId]);
 							Log.v("JOY","Up cnt:"+pointCnt +"  id: "+pointerId);
 						}

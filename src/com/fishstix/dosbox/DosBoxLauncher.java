@@ -23,9 +23,6 @@ import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-import com.fishstix.dosbox.Joystick.Position;
-import com.fishstix.dosbox.library.dosboxprefs.DosBoxPreferences;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -48,9 +45,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+
+import com.fishstix.dosbox.Joystick.Position;
+import com.fishstix.dosbox.library.dosboxprefs.DosBoxPreferences;
 
   
 public class DosBoxLauncher extends Activity {
@@ -90,6 +90,14 @@ public class DosBoxLauncher extends Activity {
 	public int mPrefFrameskip = 2; 
 	public int mPrefMemorySize = 4; 
 	public int mPrefScaleFactor = 100;
+	
+	public static String keyNames[] = { 
+		"UP", "DOWN", "LEFT", "RIGHT", "BTN_A", "BTN_B", "BTN_X", "BTN_Y", "TL", "TR",
+		"SELECT", "START", "EXIT"
+	};
+
+	public static int keyValues[] = new int[keyNames.length];
+	public static boolean useKeyTranslation = false;
     
     // gives the native activity a copy of this object so it can call OnNativeMotion
     //public native int RegisterThis();
@@ -154,6 +162,23 @@ public class DosBoxLauncher extends Activity {
 				DosBoxMenuUtility.mPrefCycleString = "max";			
 			}
 		}
+		
+		
+		
+	    // load key translations from retrobox (linux) to sdl
+		/*
+	    for(int i=0; i<keyNames.length; i++) {
+	    	String keyNameLinux = getIntent().getStringExtra("kmap1" + keyNames[i]); // only 1 player in andriod touchscreen
+	    	if (keyNameLinux!=null) {
+	    		Log.d("REMAP", "Key for " + keyNames[i] + " is " + keyNameLinux);
+	    		useKeyTranslation = true;
+	    		int keyCode = KeyTrans.translate(keyNameLinux);;
+	    		keyValues[i] = sdlKey;
+	    		Log.d("REMAP", "Linux key " + keyNameLinux + " mapped to SDL Key " + SDL_Keys.names[sdlKey] + " value " + sdlKey);
+	    	} else keyValues[i] = 0;
+	    }
+	    */
+		
 		DosBoxMenuUtility.loadPreference(this,prefs);	
 
 		BitmapDrawable splash = (BitmapDrawable) getResources().getDrawable(R.drawable.splash);
@@ -201,7 +226,11 @@ public class DosBoxLauncher extends Activity {
 	public static final int BUTTONS_ALPHA_BALL = 0xA0000000;
 	String buttonNames[] = {"A", "B", "X", "Y"};
 	int buttonColors[] = {0xFF0000, 0xFFFF00, 0x0000FF, 0x00FF00};
-	int buttonKeys[] = {KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_SPACE, KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_1};
+	VirtualKey buttonKeys[] = {
+			new VirtualKey(KeyEvent.KEYCODE_ENTER),
+			new VirtualKey(KeyEvent.KEYCODE_SPACE),
+			new VirtualKey(KeyEvent.KEYCODE_ALT_LEFT), 
+			new VirtualKey(KeyEvent.KEYCODE_CTRL_LEFT)};
 	
 	private void recalculateJoystickOverlay() {
 		JoystickButton buttons[] = new JoystickButton[MAX_BUTTONS];
@@ -238,7 +267,7 @@ public class DosBoxLauncher extends Activity {
 			buttons[i].label = buttonNames[i];
 			buttons[i].color = buttonColors[i] | BUTTONS_ALPHA;
 			buttons[i].colorPressed = buttonColors[i] | BUTTONS_ALPHA_PRESSED;
-			buttons[i].keyCode = buttonKeys[i];
+			buttons[i].key = buttonKeys[i];
 			buttons[i].radius = radius;
 		}
 		
@@ -251,10 +280,10 @@ public class DosBoxLauncher extends Activity {
 		joystick.radiusBall = (int)(joystick.radius * 0.6);
 		joystick.color = BUTTONS_ALPHA | 0x777777;
 		joystick.colorBall = BUTTONS_ALPHA_BALL | 0x777777;
-		joystick.keyCodeUp    = KeyEvent.KEYCODE_DPAD_UP;
-		joystick.keyCodeDown  = KeyEvent.KEYCODE_DPAD_DOWN;
-		joystick.keyCodeLeft  = KeyEvent.KEYCODE_DPAD_LEFT;
-		joystick.keyCodeRight = KeyEvent.KEYCODE_DPAD_RIGHT;
+		joystick.keyUp    = new VirtualKey(KeyEvent.KEYCODE_DPAD_UP);
+		joystick.keyDown  = new VirtualKey(KeyEvent.KEYCODE_DPAD_DOWN);
+		joystick.keyLeft  = new VirtualKey(KeyEvent.KEYCODE_DPAD_LEFT);
+		joystick.keyRight = new VirtualKey(KeyEvent.KEYCODE_DPAD_RIGHT);
 		joystick.axisX = Position.CENTER;
 		joystick.axisY = Position.CENTER;
 		joystick.positionX = 0;
