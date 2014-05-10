@@ -20,6 +20,10 @@ public class VirtualKey {
 		this(keyCode, false, false, false);
 	}
 	
+	public VirtualKey() {
+		this(0);
+	}
+	
 	public void sendToDosBox(boolean down) {
 		DosBoxControl.nativeKey(keyCode, down?1:0, ctrl?1:0, alt?1:0, shift?1:0);
 		Log.d(LOGTAG, "Send " + this);

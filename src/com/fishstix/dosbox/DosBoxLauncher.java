@@ -96,7 +96,7 @@ public class DosBoxLauncher extends Activity {
 		"SELECT", "START", "EXIT"
 	};
 
-	public static int keyValues[] = new int[keyNames.length];
+	public static VirtualKey keyValues[] = new VirtualKey[keyNames.length];
 	public static boolean useKeyTranslation = false;
     
     // gives the native activity a copy of this object so it can call OnNativeMotion
@@ -166,18 +166,17 @@ public class DosBoxLauncher extends Activity {
 		
 		
 	    // load key translations from retrobox (linux) to sdl
-		/*
+		KeyTranslator.init();
 	    for(int i=0; i<keyNames.length; i++) {
 	    	String keyNameLinux = getIntent().getStringExtra("kmap1" + keyNames[i]); // only 1 player in andriod touchscreen
 	    	if (keyNameLinux!=null) {
 	    		Log.d("REMAP", "Key for " + keyNames[i] + " is " + keyNameLinux);
 	    		useKeyTranslation = true;
-	    		int keyCode = KeyTrans.translate(keyNameLinux);;
-	    		keyValues[i] = sdlKey;
-	    		Log.d("REMAP", "Linux key " + keyNameLinux + " mapped to SDL Key " + SDL_Keys.names[sdlKey] + " value " + sdlKey);
-	    	} else keyValues[i] = 0;
+	    		VirtualKey key = KeyTranslator.translate(keyNameLinux);;
+	    		keyValues[i] = key;
+	    		Log.d("REMAP", "Linux key " + keyNameLinux + " mapped to key " + key);
+	    	} else keyValues[i] = null;
 	    }
-	    */
 		
 		DosBoxMenuUtility.loadPreference(this,prefs);	
 
@@ -270,7 +269,7 @@ public class DosBoxLauncher extends Activity {
 			buttons[i].label = buttonNames[i];
 			buttons[i].color = buttonColors[i] | BUTTONS_ALPHA;
 			buttons[i].colorPressed = buttonColors[i] | BUTTONS_ALPHA_PRESSED;
-			buttons[i].key = buttonKeys[i];
+			buttons[i].key = keyValues[4+i];
 			buttons[i].radius = radius;
 		}
 		
@@ -283,10 +282,10 @@ public class DosBoxLauncher extends Activity {
 		joystick.radiusBall = (int)(joystick.radius * 0.6);
 		joystick.color = BUTTONS_ALPHA | 0x777777;
 		joystick.colorBall = BUTTONS_ALPHA_BALL | 0x777777;
-		joystick.keyUp    = new VirtualKey(KeyEvent.KEYCODE_DPAD_UP);
-		joystick.keyDown  = new VirtualKey(KeyEvent.KEYCODE_DPAD_DOWN);
-		joystick.keyLeft  = new VirtualKey(KeyEvent.KEYCODE_DPAD_LEFT);
-		joystick.keyRight = new VirtualKey(KeyEvent.KEYCODE_DPAD_RIGHT);
+		joystick.keyUp    = keyValues[0];
+		joystick.keyDown  = keyValues[1];
+		joystick.keyLeft  = keyValues[2];
+		joystick.keyRight = keyValues[3];
 		joystick.axisX = Position.CENTER;
 		joystick.axisY = Position.CENTER;
 		joystick.positionX = 0;
@@ -303,7 +302,7 @@ public class DosBoxLauncher extends Activity {
 		select.y = h - marginButton - (select.h/2);
 		select.label = "SELECT";
 
-		select.key = new VirtualKey(KeyEvent.KEYCODE_ESCAPE);
+		select.key = keyValues[10];
 		
 		JoystickButtonExtra start = new JoystickButtonExtra();
 		start.w = marginButton;
@@ -312,7 +311,7 @@ public class DosBoxLauncher extends Activity {
 		start.x = w / 2 + 5;
 		start.y = h - marginButton - (start.h/2);
 		start.label = "START";
-		start.key = new VirtualKey(KeyEvent.KEYCODE_ENTER);
+		start.key = keyValues[11];
 		
 		JoystickButtonExtra extraButtons[] = new JoystickButtonExtra[] {select, start};
 		
