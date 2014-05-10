@@ -429,11 +429,26 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			canvas.drawCircle(button.x, button.y, button.radius, mTextPaint);	
 		}
 		
+		for(JoystickButtonExtra button : joystickExtraButtonsOverlay) {
+			mTextPaint.setColor(button.pressed?button.colorPressed:button.color);
+			mButtonRect.set(button.x, button.y, button.x+button.w, button.y + button.h);
+			mButtonRect.inset(5, 5);
+			canvas.drawRoundRect(mButtonRect, 5, 5, mTextPaint);
+		}
+		
 		mTextPaint.setColor(0x70000000);
 		mTextPaint.setAntiAlias(true);
 		for(JoystickButton button: joystickButtonsOverlay) {
 			canvas.drawText(button.label,button.x, button.y+8, mTextPaint);
 		}
+		
+		float textSize = mTextPaint.getTextSize();
+		mTextPaint.setTextSize(textSize * 0.75f);
+		for(JoystickButtonExtra button : joystickExtraButtonsOverlay) {
+			canvas.drawText(button.label, button.x + (button.w/2), button.y+(button.h/2) + 8, mTextPaint);
+		}
+		mTextPaint.setTextSize(textSize);
+		
 		canvas.drawText("+", joystickOverlay.x + joystickOverlay.positionX, joystickOverlay.y + joystickOverlay.positionY+8, mTextPaint);							
 		mTextPaint.setAntiAlias(false);
 	}
@@ -455,7 +470,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	
 	private int[] mButtonDown = new int[MAX_POINT_CNT];
 	private VirtualKey[] vkDown = new VirtualKey[MAX_POINT_CNT];
-	
+	private VirtualKey[] vkExtraDown = new VirtualKey[MAX_POINT_CNT];
+
 	private final static int ONSCREEN_BUTTON_SPECIAL_KEY = 33;
 	private final static int ONSCREEN_BUTTON_HIDE = 34;
 	private final static int BTN_A = 0;
@@ -681,6 +697,14 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        			jb.key.sendToDosBox(true);
 			        		}
 			        	}
+			        	for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
+			        		if (inRect(jb.x, jb.y, jb.w, jb.h, x[pointerId],y[pointerId])) {
+			        			jb.pressed = true;
+			        			button = 0;
+			        			vkExtraDown[pointerId] = jb.key;
+			        			jb.key.sendToDosBox(true);
+			        		}
+			        	}
 						onJoystickOverlayPress(pointerId);
 					} else if (mInputMode == INPUT_MODE_REAL_JOYSTICK) {
 						button = mWrap.getButtonState(event);
@@ -724,9 +748,22 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 									break;
 								}
 							}
+							vkDown[pointerId] = null;
 						} else {
-							DosBoxControl.nativeJoystick(0, 0, 1, mButtonDown[pointerId]);
-							Log.v("JOY","Up cnt:"+pointCnt +"  id: "+pointerId);
+							VirtualKey vke = vkExtraDown[pointerId];
+							if (vke!=null) {
+								for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
+									if (jb.key == vke) {
+										jb.pressed = false;
+										vke.sendToDosBox(false);
+										break;
+									}
+								}
+								vkExtraDown[pointerId] = null;
+							} else {
+								DosBoxControl.nativeJoystick(0, 0, 1, mButtonDown[pointerId]);
+								Log.v("JOY","Up cnt:"+pointCnt +"  id: "+pointerId);
+							}
 						}
 						return true;
 					} else
@@ -1221,6 +1258,10 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		return (square_dist <= radius);
 	}
 
+	private static boolean inRect(int x, int y, int w, int h, float px, float py) {
+		return px > x && px < x+w && py > y && py< y + h;
+	}
+
 	private final void mouseClick(int button) {
  		DosBoxControl.nativeMouse(0, 0, -1, -1, ACTION_DOWN, button);
 		try {
@@ -1264,6 +1305,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	private DosBoxSurfaceView mSurfaceView = this;
 	public JoystickButton[] joystickButtonsOverlay;
 	public Joystick joystickOverlay;
+	public JoystickButtonExtra[] joystickExtraButtonsOverlay;
 	
     class MyGestureDetector extends SimpleOnGestureListener {
     	@Override

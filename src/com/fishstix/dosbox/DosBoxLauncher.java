@@ -226,6 +226,9 @@ public class DosBoxLauncher extends Activity {
 	public static final int BUTTONS_ALPHA_BALL = 0xA0000000;
 	String buttonNames[] = {"A", "B", "X", "Y"};
 	int buttonColors[] = {0xFF0000, 0xFFFF00, 0x0000FF, 0x00FF00};
+	
+	String extraButtonNames[] = {"SELECT", "START"};
+	
 	VirtualKey buttonKeys[] = {
 			new VirtualKey(KeyEvent.KEYCODE_ENTER),
 			new VirtualKey(KeyEvent.KEYCODE_SPACE),
@@ -291,6 +294,36 @@ public class DosBoxLauncher extends Activity {
 		joystick.threshold = 0.2f;
 		
 		mSurfaceView.joystickOverlay = joystick;
+		
+		JoystickButtonExtra select = new JoystickButtonExtra();
+		select.w = marginButton;
+		select.h = marginButton/2;
+
+		select.x = w / 2 - select.w - 5;
+		select.y = h - marginButton - (select.h/2);
+		select.label = "SELECT";
+
+		select.key = new VirtualKey(KeyEvent.KEYCODE_ESCAPE);
+		
+		JoystickButtonExtra start = new JoystickButtonExtra();
+		start.w = marginButton;
+		start.h = marginButton/2;
+
+		start.x = w / 2 + 5;
+		start.y = h - marginButton - (start.h/2);
+		start.label = "START";
+		start.key = new VirtualKey(KeyEvent.KEYCODE_ENTER);
+		
+		JoystickButtonExtra extraButtons[] = new JoystickButtonExtra[] {select, start};
+		
+		for(JoystickButtonExtra extraButton : extraButtons) {
+			extraButton.color = BUTTONS_ALPHA | 0x777777;
+			extraButton.colorPressed = BUTTONS_ALPHA_BALL | 0x777777;
+			Log.d("BUTTONS", extraButton.x + ", " + extraButton.y + " " + extraButton.w + "x" + extraButton.h);
+		}
+		
+		mSurfaceView.joystickExtraButtonsOverlay = extraButtons;
+		
 	}
 	
 	
