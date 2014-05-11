@@ -148,8 +148,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	boolean mModifierShift = false;
 	//private int mKeyboardType = Configuration.KEYBOARD_NOKEYS;
 	 
-	public int mJoyLeft, mJoyRight, mJoyRad;
-	
 	class KeyHandler extends Handler {
 		boolean mReCheck = false;
 		

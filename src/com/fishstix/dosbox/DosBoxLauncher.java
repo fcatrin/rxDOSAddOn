@@ -203,11 +203,6 @@ public class DosBoxLauncher extends Activity {
 		observer.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 
 	        public void onGlobalLayout() {
-	    		// re-calculate joystick constants
-	    		mSurfaceView.mJoyLeft = mSurfaceView.getWidth()/8;
-	    		mSurfaceView.mJoyRight = mSurfaceView.getWidth()/10;
-	    		mSurfaceView.mJoyRad = mSurfaceView.getWidth()/20;
-	    		
 	    		recalculateJoystickOverlay();
 	    		
 	            Log.v("DosBoxTurbo",
