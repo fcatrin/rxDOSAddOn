@@ -89,7 +89,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	public Buffer mVideoBuffer = null;
 	private GestureDetector gestureScanner;
 	
-	boolean mScale = false;   
+	boolean mScale = true;   
 	int mInputMode = INPUT_MODE_MOUSE;
 	boolean	mShowInfo = false;
 	public boolean mInfoHide = false;

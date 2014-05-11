@@ -218,7 +218,7 @@ public class DosBoxMenuUtility {
 			} 
 		}
 		// SCALE SCREEN
-		context.mSurfaceView.mScale = prefs.getBoolean("confscale", false);
+		context.mSurfaceView.mScale = prefs.getBoolean("confscale", true);
 		
 		if (Integer.valueOf(prefs.getString("confscalelocation", "0")) == 0)
 			context.mSurfaceView.mScreenTop = false;
