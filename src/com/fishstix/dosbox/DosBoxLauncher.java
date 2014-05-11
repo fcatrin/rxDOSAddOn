@@ -91,13 +91,13 @@ public class DosBoxLauncher extends Activity {
 	public int mPrefMemorySize = 4; 
 	public int mPrefScaleFactor = 100;
 	
-	public static String keyNames[] = { 
+	private static String keyNames[] = { 
 		"UP", "DOWN", "LEFT", "RIGHT", "BTN_A", "BTN_B", "BTN_X", "BTN_Y", "TL", "TR",
 		"SELECT", "START", "EXIT"
 	};
 
-	public static VirtualKey keyValues[] = new VirtualKey[keyNames.length];
-	public static boolean useKeyTranslation = false;
+	private static VirtualKey keyValues[] = new VirtualKey[keyNames.length];
+	private static boolean useKeyTranslation = false;
     
     // gives the native activity a copy of this object so it can call OnNativeMotion
     //public native int RegisterThis();
@@ -163,8 +163,6 @@ public class DosBoxLauncher extends Activity {
 			}
 		}
 		
-		
-		
 	    // load key translations from retrobox (linux) to sdl
 		KeyTranslator.init();
 	    for(int i=0; i<keyNames.length; i++) {
@@ -223,12 +221,6 @@ public class DosBoxLauncher extends Activity {
 	
 	String extraButtonNames[] = {"SELECT", "START"};
 	
-	VirtualKey buttonKeys[] = {
-			new VirtualKey(KeyEvent.KEYCODE_ENTER),
-			new VirtualKey(KeyEvent.KEYCODE_SPACE),
-			new VirtualKey(KeyEvent.KEYCODE_ALT_LEFT), 
-			new VirtualKey(KeyEvent.KEYCODE_CTRL_LEFT)};
-	
 	private void recalculateJoystickOverlay() {
 		JoystickButton buttons[] = new JoystickButton[MAX_BUTTONS];
 
@@ -286,6 +278,8 @@ public class DosBoxLauncher extends Activity {
 		joystick.positionX = 0;
 		joystick.positionY = 0;
 		joystick.threshold = 0.2f;
+		
+		joystick.hasValidKeys = joystick.keyUp!=null && joystick.keyDown!=null && joystick.keyLeft != null && joystick.keyRight != null;
 		
 		mSurfaceView.joystickOverlay = joystick;
 		

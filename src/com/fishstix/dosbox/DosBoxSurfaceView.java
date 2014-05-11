@@ -416,38 +416,45 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	RectF mButtonRect = new RectF();
 	
 	void drawJoystick(Canvas canvas) {
-		mTextPaint.setColor(joystickOverlay.color);
-		canvas.drawCircle(joystickOverlay.x, joystickOverlay.y, joystickOverlay.radius, mTextPaint);
-		
-		mTextPaint.setColor(joystickOverlay.colorBall);
-		canvas.drawCircle(joystickOverlay.x + joystickOverlay.positionX, joystickOverlay.y + joystickOverlay.positionY, joystickOverlay.radiusBall, mTextPaint);
+		if (joystickOverlay.hasValidKeys) {
+			mTextPaint.setColor(joystickOverlay.color);
+			canvas.drawCircle(joystickOverlay.x, joystickOverlay.y, joystickOverlay.radius, mTextPaint);
+			
+			mTextPaint.setColor(joystickOverlay.colorBall);
+			canvas.drawCircle(joystickOverlay.x + joystickOverlay.positionX, joystickOverlay.y + joystickOverlay.positionY, joystickOverlay.radiusBall, mTextPaint);
+		}
 
 		for(JoystickButton button: joystickButtonsOverlay) {
-			mTextPaint.setColor(button.pressed?button.colorPressed:button.color);
-			canvas.drawCircle(button.x, button.y, button.radius, mTextPaint);	
+			if (button.key!=null) {
+				mTextPaint.setColor(button.pressed?button.colorPressed:button.color);
+				canvas.drawCircle(button.x, button.y, button.radius, mTextPaint);
+			}
 		}
 		
 		for(JoystickButtonExtra button : joystickExtraButtonsOverlay) {
-			mTextPaint.setColor(button.pressed?button.colorPressed:button.color);
-			mButtonRect.set(button.x, button.y, button.x+button.w, button.y + button.h);
-			mButtonRect.inset(5, 5);
-			canvas.drawRoundRect(mButtonRect, 5, 5, mTextPaint);
+			if (button.key!=null) {
+				mTextPaint.setColor(button.pressed?button.colorPressed:button.color);
+				mButtonRect.set(button.x, button.y, button.x+button.w, button.y + button.h);
+				mButtonRect.inset(5, 5);
+				canvas.drawRoundRect(mButtonRect, 5, 5, mTextPaint);
+			}
 		}
 		
 		mTextPaint.setColor(0x70000000);
 		mTextPaint.setAntiAlias(true);
 		for(JoystickButton button: joystickButtonsOverlay) {
-			canvas.drawText(button.label,button.x, button.y+8, mTextPaint);
+			if (button.key!=null) canvas.drawText(button.label,button.x, button.y+8, mTextPaint);
 		}
 		
 		float textSize = mTextPaint.getTextSize();
 		mTextPaint.setTextSize(textSize * 0.75f);
 		for(JoystickButtonExtra button : joystickExtraButtonsOverlay) {
-			canvas.drawText(button.label, button.x + (button.w/2), button.y+(button.h/2) + 8, mTextPaint);
+			if (button.key!=null) canvas.drawText(button.label, button.x + (button.w/2), button.y+(button.h/2) + 8, mTextPaint);
 		}
 		mTextPaint.setTextSize(textSize);
 		
-		canvas.drawText("+", joystickOverlay.x + joystickOverlay.positionX, joystickOverlay.y + joystickOverlay.positionY+8, mTextPaint);							
+		if (joystickOverlay.hasValidKeys) canvas.drawText("+", joystickOverlay.x + joystickOverlay.positionX, joystickOverlay.y + joystickOverlay.positionY+8, mTextPaint);
+		
 		mTextPaint.setAntiAlias(false);
 	}
 	
@@ -559,7 +566,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	
 	private void onJoystickOverlayPress(int pointerId) {
 		
-		if (!inCircle(joystickOverlay.x,joystickOverlay.y,joystickOverlay.radius,x[pointerId],y[pointerId])) return;
+		if (!joystickOverlay.hasValidKeys || !inCircle(joystickOverlay.x,joystickOverlay.y,joystickOverlay.radius,x[pointerId],y[pointerId])) return;
+		
 		// inside dirpad 
 		moveId = pointerId;
 		double max = 128.0;
@@ -689,7 +697,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        } else if (mInputMode == INPUT_MODE_JOYSTICK) {
 
 			        	for(JoystickButton jb : joystickButtonsOverlay) {
-			        		if (inCircle(jb.x, jb.y, jb.radius ,x[pointerId],y[pointerId])) {
+			        		if (jb.key!=null && inCircle(jb.x, jb.y, jb.radius ,x[pointerId],y[pointerId])) {
 			        			jb.pressed = true;
 			        			button = 0;
 			        			vkDown[pointerId] = jb.key;
@@ -697,7 +705,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        		}
 			        	}
 			        	for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
-			        		if (inRect(jb.x, jb.y, jb.w, jb.h, x[pointerId],y[pointerId])) {
+			        		if (jb.key!=null && inRect(jb.x, jb.y, jb.w, jb.h, x[pointerId],y[pointerId])) {
 			        			jb.pressed = true;
 			        			button = 0;
 			        			vkExtraDown[pointerId] = jb.key;

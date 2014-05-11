@@ -13,6 +13,7 @@ public class Joystick {
 	VirtualKey keyRight;
 	VirtualKey keyUp;
 	VirtualKey keyDown;
+	boolean hasValidKeys;
 	int maxValue;
 	
 	// percent required to be considered out of center
