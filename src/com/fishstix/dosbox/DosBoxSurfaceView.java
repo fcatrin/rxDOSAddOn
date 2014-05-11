@@ -689,6 +689,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        		} 
 			        	}
 			        } else if (mInputMode == INPUT_MODE_JOYSTICK) {
+
 			        	for(JoystickButton jb : joystickButtonsOverlay) {
 			        		if (inCircle(jb.x, jb.y, jb.radius ,x[pointerId],y[pointerId])) {
 			        			jb.pressed = true;
@@ -706,6 +707,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        		}
 			        	}
 						onJoystickOverlayPress(pointerId);
+
 					} else if (mInputMode == INPUT_MODE_REAL_JOYSTICK) {
 						button = mWrap.getButtonState(event);
 						DosBoxControl.nativeJoystick(0, 0, ACTION_DOWN, button);
