@@ -227,14 +227,14 @@ public class DosBoxLauncher extends Activity {
 	public static final int EXTRA_BUTTONS_ALPHA = 0x80000000;
 	public static final int EXTRA_BUTTONS_ALPHA_PRESSED = 0xE0000000;
 
-	private JoystickButtonExtra createMouseButton(String name, String key, int w, int h, int size, int margin) {
+	private JoystickButtonExtra createMouseButton(String name, String key, int left, int margin, int h, int size) {
 		boolean isLeftButton = key.equals("MOUSE_LEFT");
 		JoystickButtonExtra mouseButton = new JoystickButtonExtra();
 		mouseButton.w = size;
 		mouseButton.h = (int)(size * 0.4);
 		mouseButton.y = h - margin - mouseButton.h;
 		
-		mouseButton.x = isLeftButton?margin:w - margin - mouseButton.w;
+		mouseButton.x = isLeftButton?margin:left - margin - mouseButton.w;
 		
 		mouseButton.label = name;
 		mouseButton.key = new VirtualKey(isLeftButton?MouseButton.LEFT:MouseButton.RIGHT);
@@ -243,10 +243,10 @@ public class DosBoxLauncher extends Activity {
 		return mouseButton;
 	}
 	
-	private JoystickButtonExtra createExtraButton(String name, String key, int mx, int size, int margin) {
+	private JoystickButtonExtra createExtraButton(String name, String key, int left, int top, int size) {
 		JoystickButtonExtra button = new JoystickButtonExtra();
-		button.x = mx;
-		button.y = margin;
+		button.x = left;
+		button.y = top;
 		button.w = size;
 		button.h = (int)(size * 0.4);
 		button.label = name;
@@ -257,10 +257,6 @@ public class DosBoxLauncher extends Activity {
 	}
 	
 	private void initExtraButtons(String json){
-		if (json == null || json.trim().length() == 0) {
-			mSurfaceView.joystickExtraButtonsOverlay = new JoystickButtonExtra[0];
-			return;
-		}
 		int w = mSurfaceView.getWidth();
 		int h = mSurfaceView.getHeight();
 		int maxButtons = 10;
@@ -269,33 +265,70 @@ public class DosBoxLauncher extends Activity {
 		int margin = (int)(10 * scale);
 		int gap = (int)(4 * scale);
 		int size = (w - (maxButtons-1)*gap + margin*2 ) / maxButtons;
+
+		int left = (w - (2*size) - gap) / 2;
+		int top = h - margin - size;
+
+		JoystickButtonExtra select = null;
+		JoystickButtonExtra start = null;
 		
-		extraButtons.clear();
-		try {
-			int nTopButtons = 0;
-			JSONArray a = new JSONArray(json);
-			for(int i=0; i<a.length(); i++) {
-				JSONObject o = a.getJSONObject(i);
-				String key = o.getString("key");
-				if (!key.startsWith("MOUSE_")) nTopButtons++;
-			}
+		if (!isMouseOnly) {
+			select = createExtraButton("SELECT", "NONE", left, top, size);
+			left += size + gap;
+			start  = createExtraButton("START" , "NONE", left, top, size);
+			select.key = keyValues[10];
+			start.key  = keyValues[11];
 			
-			int mx = nTopButtons == 0 ? 0 : (w - (nTopButtons*size) - (nTopButtons-1) * gap) / 2;
-		
-			for(int i=0; i<a.length(); i++) {
-				JSONObject o = a.getJSONObject(i);
-				String name = o.getString("name");
-				String key = o.getString("key");
-				if (key.startsWith("MOUSE_")) {
-					if (isMouseOnly) extraButtons.add(createMouseButton(name, key, w, h, size, margin));
-				} else {
-					extraButtons.add(createExtraButton(name, key, mx, size, margin));
-					mx += size + gap;
-				}
-			}
-		} catch (JSONException je) {
-			je.printStackTrace();
+			extraButtons.add(select);
+			extraButtons.add(start);
+			Log.d("EXTRA", "Added select and start");
 		}
+
+		
+		if (json != null && json.trim().length() >= 0) {
+			try {
+				int nTopButtons = 0;
+				JSONArray a = new JSONArray(json);
+				for(int i=0; i<a.length(); i++) {
+					JSONObject o = a.getJSONObject(i);
+					String key = o.getString("key");
+					if (!key.startsWith("MOUSE_") && !key.startsWith("BTN_")) nTopButtons++;
+				}
+				
+				left = nTopButtons == 0 ? 0 : (w - (nTopButtons*size) - (nTopButtons-1) * gap) / 2;
+				top = margin;
+				for(int i=0; i<a.length(); i++) {
+					JSONObject o = a.getJSONObject(i);
+					String name = o.getString("name");
+					String key = o.getString("key");
+					if (key.startsWith("MOUSE_")) {
+						if (isMouseOnly) extraButtons.add(createMouseButton(name, key, w, top, h, size));
+					} else if (key.startsWith("BTN_")) {
+						int index = -1;
+						if (key.equals("BTN_A")) index = 0;
+						if (key.equals("BTN_B")) index = 1;
+						if (key.equals("BTN_C")) index = 2;
+						if (key.equals("BTN_D")) index = 3;
+						if (index>=0) mSurfaceView.joystickButtonsOverlay[index].label = name;
+						
+						if (key.equals("BTN_SELECT") && select!=null) {
+							if (name.equals("_hide_")) select.key = null;
+							else select.label = name;
+						}
+						if (key.equals("BTN_START") && start!=null) {
+							if (name.equals("_hide_")) start.key = null;
+							else start.label = name;
+						}
+					} else {
+						extraButtons.add(createExtraButton(name, key, left, top, size));
+						left += size + gap;
+					}
+				}
+			} catch (JSONException je) {
+				je.printStackTrace();
+			}
+		}
+		Log.d("EXTRA", extraButtons.size() + " buttons");
 		mSurfaceView.joystickExtraButtonsOverlay = extraButtons.toArray(new JoystickButtonExtra[0]);
 	}
 	
@@ -306,7 +339,6 @@ public class DosBoxLauncher extends Activity {
 	String buttonNames[] = {"A", "B", "X", "Y"};
 	int buttonColors[] = {0xFF0000, 0xFFFF00, 0x0000FF, 0x00FF00};
 	
-	String extraButtonNames[] = {"SELECT", "START"};
 	List<JoystickButtonExtra> extraButtons = new ArrayList<JoystickButtonExtra>();
 	
 	private void recalculateJoystickOverlay() {
@@ -370,36 +402,6 @@ public class DosBoxLauncher extends Activity {
 		joystick.hasValidKeys = joystick.keyUp!=null && joystick.keyDown!=null && joystick.keyLeft != null && joystick.keyRight != null;
 		
 		mSurfaceView.joystickOverlay = joystick;
-		
-		JoystickButtonExtra select = new JoystickButtonExtra();
-		select.w = marginButton;
-		select.h = marginButton/2;
-
-		select.x = w / 2 - select.w - 5;
-		select.y = h - marginButton - (select.h/2);
-		select.label = "SELECT";
-
-		select.key = keyValues[10];
-		
-		JoystickButtonExtra start = new JoystickButtonExtra();
-		start.w = marginButton;
-		start.h = marginButton/2;
-
-		start.x = w / 2 + 5;
-		start.y = h - marginButton - (start.h/2);
-		start.label = "START";
-		start.key = keyValues[11];
-		
-		if (!isMouseOnly) {
-			extraButtons.add(select);
-			extraButtons.add(start);
-		}
-		
-		for(JoystickButtonExtra extraButton : extraButtons) {
-			extraButton.color = BUTTONS_ALPHA | 0x777777;
-			extraButton.colorPressed = BUTTONS_ALPHA_BALL | 0x777777;
-			Log.d("BUTTONS", extraButton.x + ", " + extraButton.y + " " + extraButton.w + "x" + extraButton.h);
-		}
 		
 	}
 	
