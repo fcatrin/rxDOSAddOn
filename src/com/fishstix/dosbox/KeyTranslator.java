@@ -60,10 +60,11 @@ public class KeyTranslator {
 		
 		String parts[] = name.split("\\+");
 		for (String part: parts) {
+			if (parts.length>1) Log.d(LOGTAG, "Processing part [" + part + "]");
 			if (part.equals("CTRL"))  vk.ctrl = true;
 			if (part.equals("ALT"))   vk.alt = true;
 			if (part.equals("SHIFT")) vk.shift = true;
-			Integer keyCode = keys.get(name);
+			Integer keyCode = keys.get(part);
 			if (keyCode != null) vk.keyCode = keyCode;
 		}
 		if (vk.keyCode!=0) return vk;

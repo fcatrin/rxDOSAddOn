@@ -403,6 +403,9 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				if (mShowJoy) {
 					drawJoystick(canvas);
 				}
+				drawExtraButtons(canvas);
+				
+				ensureMouseCalibration();
 			}
 		} finally {
 			if (canvas != null) {
@@ -431,6 +434,18 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			}
 		}
 		
+		mTextPaint.setColor(0x70000000);
+		mTextPaint.setAntiAlias(true);
+		for(JoystickButton button: joystickButtonsOverlay) {
+			if (button.key!=null) canvas.drawText(button.label,button.x, button.y+8, mTextPaint);
+		}
+		
+		if (joystickOverlay.hasValidKeys) canvas.drawText("+", joystickOverlay.x + joystickOverlay.positionX, joystickOverlay.y + joystickOverlay.positionY+8, mTextPaint);
+		
+		mTextPaint.setAntiAlias(false);
+	}
+
+	void drawExtraButtons(Canvas canvas) {
 		for(JoystickButtonExtra button : joystickExtraButtonsOverlay) {
 			if (button.key!=null) {
 				mTextPaint.setColor(button.pressed?button.colorPressed:button.color);
@@ -442,22 +457,18 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		
 		mTextPaint.setColor(0x70000000);
 		mTextPaint.setAntiAlias(true);
-		for(JoystickButton button: joystickButtonsOverlay) {
-			if (button.key!=null) canvas.drawText(button.label,button.x, button.y+8, mTextPaint);
-		}
-		
+
+		final float scale = getContext().getResources().getDisplayMetrics().density;
 		float textSize = mTextPaint.getTextSize();
-		mTextPaint.setTextSize(textSize * 0.75f);
 		for(JoystickButtonExtra button : joystickExtraButtonsOverlay) {
+			mTextPaint.setTextSize(scale * button.h / 2);
 			if (button.key!=null) canvas.drawText(button.label, button.x + (button.w/2), button.y+(button.h/2) + 8, mTextPaint);
 		}
 		mTextPaint.setTextSize(textSize);
 		
-		if (joystickOverlay.hasValidKeys) canvas.drawText("+", joystickOverlay.x + joystickOverlay.positionX, joystickOverlay.y + joystickOverlay.positionY+8, mTextPaint);
-		
 		mTextPaint.setAntiAlias(false);
 	}
-	
+
 	void drawButton(Canvas canvas, int left, int top, int right, int bottom, String text) {
 		int x = (right + left) /2;
 		int y = (bottom + top) /2;
@@ -538,7 +549,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 							    
 							//} 
 							if (mAbsolute) {
-								//DosBoxControl.nativeMouseWarp((int)x[pointerId], (int)y[pointerId], mWarpX, mWarpY, mScreenData.src_left, mScreenData.src_right, mScreenData.src_top, mScreenData.src_bottom, mScreenData.dst_left, mScreenData.dst_right, mScreenData.dst_top, mScreenData.dst_bottom);
+								ensureMouseCalibration();
 								DosBoxControl.nativeMouseWarp(x[pointerId], y[pointerId], mScreenRect.left, mScreenRect.top, mScreenRect.width(), mScreenRect.height());
 							} else {
 								DosBoxControl.nativeMouse((int) (x[pointerId]*mMouseSensitivity), (int) (y[pointerId]*mMouseSensitivity), (int) (x_last[pointerId]*mMouseSensitivity), (int) (y_last[pointerId]*mMouseSensitivity), 2, -1);
@@ -646,7 +657,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
 		final int pointerIndex = ((event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-		//final int action = (event.getAction() & MotionEvent.ACTION_MASK);
 		final int pointCnt = mWrap.getPointerCount(event);
 		final int pointerId = mWrap.getPointerId(event, pointerIndex);
 		//Log.v("onTouch?", "yeah");
@@ -658,8 +668,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 					if (id < MAX_POINT_CNT) {
 						x_last[id] = x[id];
 						y_last[id] = y[id];
-						//isTouch_last[id] = isTouch[id];
-						//virtButton[id]=false;
 						x[id] = mWrap.getX(event, i);
 						y[id] = mWrap.getY(event, i);
 					}
@@ -667,10 +675,23 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				switch (event.getAction() & MotionEvent.ACTION_MASK) {
 				case MotionEvent.ACTION_DOWN:
 				case TouchEventWrapper.ACTION_POINTER_DOWN:
-					//isTouch[pointerId] = true;
+
+					for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
+		        		if (jb.key!=null && inRect(jb.x, jb.y, jb.w, jb.h, x[pointerId],y[pointerId])) {
+		        			jb.pressed = true;
+		        			vkExtraDown[pointerId] = jb.key;
+		        			if (jb.key.isMouseButton()) {
+		        				jb.key.sendToDosBox((int)x[pointerId], (int)y[pointerId], ACTION_DOWN);
+		        			} else {
+		        				jb.key.sendToDosBox(true);
+		        			}
+		        			return true;
+		        		}
+		        	}
+					
 					int button = -1;
-			        // Save the ID of this pointer
 			        if (mInputMode == INPUT_MODE_MOUSE) {
+			        	Log.d("MOUSE", "ACTION_POINTER_DOWN");
 			        	if (mShowInfo) {
 			        		bottomrow = (int)((float)getHeight() * 0.8);
 			        		//int toprow = (int)((float)getHeight() * 0.2);
@@ -704,14 +725,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        			jb.key.sendToDosBox(true);
 			        		}
 			        	}
-			        	for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
-			        		if (jb.key!=null && inRect(jb.x, jb.y, jb.w, jb.h, x[pointerId],y[pointerId])) {
-			        			jb.pressed = true;
-			        			button = 0;
-			        			vkExtraDown[pointerId] = jb.key;
-			        			jb.key.sendToDosBox(true);
-			        		}
-			        	}
 						onJoystickOverlayPress(pointerId);
 
 					} else if (mInputMode == INPUT_MODE_REAL_JOYSTICK) {
@@ -731,8 +744,23 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				break;
 				case MotionEvent.ACTION_UP: 
 				case TouchEventWrapper.ACTION_POINTER_UP:
-					//isTouch[pointerId] = false;
-					//isTouch_last[pointerId] = false;
+					VirtualKey vke = vkExtraDown[pointerId];
+					if (vke!=null) {
+						for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
+							if (jb.key == vke) {
+								jb.pressed = false;
+			        			if (jb.key.isMouseButton()) {
+			        				jb.key.sendToDosBox((int)x[pointerId], (int)y[pointerId], ACTION_UP);
+			        			} else {
+			        				jb.key.sendToDosBox(false);
+			        			}
+								break;
+							}
+						}
+						vkExtraDown[pointerId] = null;
+						return true;
+					}
+					
 					long diff = event.getEventTime() - event.getDownTime();
 					if (mInputMode == INPUT_MODE_JOYSTICK) {
 						if (diff < BUTTON_TAP_DELAY) {
@@ -756,22 +784,9 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 									break;
 								}
 							}
-							vkDown[pointerId] = null;
 						} else {
-							VirtualKey vke = vkExtraDown[pointerId];
-							if (vke!=null) {
-								for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
-									if (jb.key == vke) {
-										jb.pressed = false;
-										vke.sendToDosBox(false);
-										break;
-									}
-								}
-								vkExtraDown[pointerId] = null;
-							} else {
-								DosBoxControl.nativeJoystick(0, 0, 1, mButtonDown[pointerId]);
-								Log.v("JOY","Up cnt:"+pointCnt +"  id: "+pointerId);
-							}
+							DosBoxControl.nativeJoystick(0, 0, 1, mButtonDown[pointerId]);
+							Log.v("JOY","Up cnt:"+pointCnt +"  id: "+pointerId);
 						}
 						return true;
 					} else
@@ -875,38 +890,28 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 							}
 						break;
 						case INPUT_MODE_MOUSE: 
-						case INPUT_MODE_REAL_MOUSE: 
+						case INPUT_MODE_REAL_MOUSE:
+							Log.d("MOUSE", "ACTION_MOVE");
 							if (event.getEventTime()+EVENT_THRESHOLD_DECAY < SystemClock.uptimeMillis()) {
 								Log.i("DosBoxTurbo","eventtime: "+event.getEventTime() + " systemtime: "+SystemClock.uptimeMillis());
 								return true;	// get rid of old events
 							}
 							int idx = (!virtButton[0]) ? 0:1;
-							//if (!virtButton[pointCnt-1]) {
-								/*if (mMouseBusy) {
-									// fishstix, events coming too fast, consume extra events.
-									return true;
-								}
-								mMouseBusy = true;*/
-
-								if (mAbsolute) {
-									//Log.d("DosBoxTurbo","  getActionIndex()="+event.getActionIndex() + "   getPointerCount()="+pointCnt + "   pointerId: "+ pointerId);
-									//DosBoxControl.nativeMouseWarp((int)x[pointCnt-1], (int)y[pointCnt-1], mWarpX, mWarpY, mScreenData.src_left, mScreenData.src_right, mScreenData.src_top, mScreenData.src_bottom, mScreenData.dst_left, mScreenData.dst_right, mScreenData.dst_top, mScreenData.dst_bottom);
-									DosBoxControl.nativeMouseWarp(x[idx], y[idx], mScreenRect.left, mScreenRect.top, mScreenRect.width(), mScreenRect.height());
-								} else {
-									DosBoxControl.nativeMouse((int) (x[idx]*mMouseSensitivity), (int) (y[idx]*mMouseSensitivity), (int) (x_last[idx]*mMouseSensitivity), (int) (y_last[idx]*mMouseSensitivity), ACTION_MOVE, -1);
-								}
-								/*if (mDebug) { 
-									Log.d("DosBoxTurbo", "mAbsolute="+mAbsolute+" MotionEvent MOVE("+pointerId+")"+" x[pointerId]="+x[pointerId] + " y[pointerId]"+y[pointerId]);
-									Log.d("DosBoxTurbo", "mAbsolute="+mAbsolute+" MotionEvent MOVE("+(pointCnt-1)+")"+" x[pointCnt-1]="+x[pointerId] + " y[pointCnt-1]"+y[pointerId]);
-								}*/
-								//	Log.i("MOUSE MOVE","x: " + x[pointerId] + "  y: " + y[pointerId] + "  |  xL: "+ x_last[pointerId] + "  yL: "+ y_last[pointerId]);
-								try {
-							    	if (!mInputLowLatency) 
-							    		Thread.sleep(95);
-							    	else
-							    		Thread.sleep(65);  
-								} catch (InterruptedException e) {
-								}
+							if (mAbsolute) {
+								ensureMouseCalibration();
+								Log.d("MOUSE", "nativeMouseWarp " + x[idx] + ", " + y[idx] + " (" + mScreenRect.left + ", " + mScreenRect.top + ") - (" + mScreenRect.width() + "x" + mScreenRect.height() + ")");
+								DosBoxControl.nativeMouseWarp(x[idx], y[idx], mScreenRect.left, mScreenRect.top, mScreenRect.width(), mScreenRect.height());
+							} else {
+								Log.d("MOUSE", "nativeMouse " + (int) (x[idx]*mMouseSensitivity) + ", " +  (int) (y[idx]*mMouseSensitivity) + ", " + (int) (x_last[idx]*mMouseSensitivity) + ", " +  (int) (y_last[idx]*mMouseSensitivity));
+								DosBoxControl.nativeMouse((int) (x[idx]*mMouseSensitivity), (int) (y[idx]*mMouseSensitivity), (int) (x_last[idx]*mMouseSensitivity), (int) (y_last[idx]*mMouseSensitivity), ACTION_MOVE, -1);
+							}
+							try {
+						    	if (!mInputLowLatency) 
+						    		Thread.sleep(95);
+						    	else
+						    		Thread.sleep(65);  
+							} catch (InterruptedException e) {
+							}
 
 						break;
 						default:
@@ -1315,14 +1320,48 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	public Joystick joystickOverlay;
 	public JoystickButtonExtra[] joystickExtraButtonsOverlay;
 	
+	public int lastCalibrationOriginX = -1;
+	public int lastCalibrationOriginY = -1;
+	
+	private void ensureMouseCalibration() {
+		if (mScreenRect.left == lastCalibrationOriginX && mScreenRect.top == lastCalibrationOriginY) return;
+		Log.i("DosBoxTurbo","nativeMouseWarp init");
+		lastCalibrationOriginX = mScreenRect.left;
+		lastCalibrationOriginY = mScreenRect.top;
+		
+		Thread t = new Thread() {
+			@Override
+			public void run() {
+				try {Thread.sleep(1000);} catch (InterruptedException e) {}
+				int x = mScreenRect.left;
+				int y = mScreenRect.top;
+				DosBoxControl.nativeMouseWarp(x, y, x, y, mScreenRect.width(), mScreenRect.height());
+
+				try {Thread.sleep(1000);} catch (InterruptedException e) {}
+				x += mScreenRect.width();
+				y += mScreenRect.height();
+				DosBoxControl.nativeMouseWarp(x, y, x, y, mScreenRect.width(), mScreenRect.height());
+				
+				try {Thread.sleep(1000);} catch (InterruptedException e) {}
+				x = mScreenRect.left;
+				y = mScreenRect.top;
+				DosBoxControl.nativeMouseWarp(x, y, x, y, mScreenRect.width(), mScreenRect.height());
+			}
+		};
+		
+		t.start();
+	}
+	
     class MyGestureDetector extends SimpleOnGestureListener {
     	@Override
     	public boolean onDown(MotionEvent event) {
-			//Log.i("DosBoxTurbo","onDown()");
+			Log.i("DosBoxTurbo","onDown()");
 			if (mInputMode == INPUT_MODE_MOUSE) {
 				if (mAbsolute) {
+					ensureMouseCalibration();
    	       			final int pointerId = mWrap.getPointerId(event, ((event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT));
    	       			DosBoxControl.nativeMouseWarp(x[pointerId], y[pointerId], mScreenRect.left, mScreenRect.top, mScreenRect.width(), mScreenRect.height());
+   	       			Log.i("DosBoxTurbo","nativeMouseWarp " + x[pointerId] + ", " +  y[pointerId]);
    	       			try {
    	       				Thread.sleep(85);
    	       			} catch (InterruptedException e) {
@@ -1398,7 +1437,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
         
         @Override
     	public boolean onDoubleTap(MotionEvent event) {
-			//Log.i("DosBoxTurbo","onDoubleTap()");
+			Log.i("DosBoxTurbo","onDoubleTap()");
 			if (mInputMode == INPUT_MODE_MOUSE) {
         		switch (mGestureDoubleClick) {
         		case GESTURE_LEFT_CLICK:
@@ -1423,7 +1462,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
         
         @Override
     	public boolean onSingleTapConfirmed(MotionEvent event) {
-			//Log.i("DosBoxTurbo","onSingleTapConfirmed()");
+			Log.i("DosBoxTurbo","onSingleTapConfirmed()");
         	if (mInputMode == INPUT_MODE_MOUSE) {
         		//pointerIndex = ((event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
        			//final int pointerId = mWrap.getPointerId(event, ((event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT));
@@ -1437,7 +1476,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
         
         @Override
         public boolean onSingleTapUp(MotionEvent event) {
-        	//Log.i("DosBoxTurbo","onSingleTapUp()");
+        	Log.i("DosBoxTurbo","onSingleTapUp()");
         	if (mInputMode == INPUT_MODE_MOUSE) {
         		if ((mGestureDoubleClick == GESTURE_NONE)&&(mGestureSingleClick != GESTURE_NONE)) {	// fishstix,fire only when doubleclick gesture is disabled
         			mouseClick(mGestureSingleClick-GESTURE_LEFT_CLICK);
@@ -1450,7 +1489,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
         
         @Override
         public void onLongPress(MotionEvent event) {
-			//Log.i("DosBoxTurbo","onLongPress()");
+			Log.i("DosBoxTurbo","onLongPress()");
 			if (mInputMode == INPUT_MODE_MOUSE)  {
 				if (!mFilterLongClick && mLongPress && !mDoubleLong && !mTwoFingerAction) {
 					mLongClick = true;

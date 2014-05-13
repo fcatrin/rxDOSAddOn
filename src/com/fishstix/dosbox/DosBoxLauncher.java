@@ -22,6 +22,8 @@ package com.fishstix.dosbox;
 import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -50,6 +52,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.fishstix.dosbox.Joystick.Position;
+import com.fishstix.dosbox.VirtualKey.MouseButton;
 import com.fishstix.dosbox.library.dosboxprefs.DosBoxPreferences;
 
   
@@ -90,6 +93,7 @@ public class DosBoxLauncher extends Activity {
 	public int mPrefFrameskip = 2; 
 	public int mPrefMemorySize = 4; 
 	public int mPrefScaleFactor = 100;
+	private boolean isMouseOnly = false;
 	
 	private static String keyNames[] = { 
 		"UP", "DOWN", "LEFT", "RIGHT", "BTN_A", "BTN_B", "BTN_X", "BTN_Y", "TL", "TR",
@@ -163,6 +167,8 @@ public class DosBoxLauncher extends Activity {
 			}
 		}
 		
+		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
+		
 	    // load key translations from retrobox (linux) to sdl
 		KeyTranslator.init();
 	    for(int i=0; i<keyNames.length; i++) {
@@ -202,6 +208,7 @@ public class DosBoxLauncher extends Activity {
 
 	        public void onGlobalLayout() {
 	    		recalculateJoystickOverlay();
+	    		createExtraButtons();
 	    		
 	            Log.v("DosBoxTurbo",
 	                    String.format("new width=%d; new height=%d", mSurfaceView.getWidth(),
@@ -220,6 +227,7 @@ public class DosBoxLauncher extends Activity {
 	int buttonColors[] = {0xFF0000, 0xFFFF00, 0x0000FF, 0x00FF00};
 	
 	String extraButtonNames[] = {"SELECT", "START"};
+	List<JoystickButtonExtra> extraButtons = new ArrayList<JoystickButtonExtra>();
 	
 	private void recalculateJoystickOverlay() {
 		JoystickButton buttons[] = new JoystickButton[MAX_BUTTONS];
@@ -302,7 +310,10 @@ public class DosBoxLauncher extends Activity {
 		start.label = "START";
 		start.key = keyValues[11];
 		
-		JoystickButtonExtra extraButtons[] = new JoystickButtonExtra[] {select, start};
+		if (!isMouseOnly) {
+			extraButtons.add(select);
+			extraButtons.add(start);
+		}
 		
 		for(JoystickButtonExtra extraButton : extraButtons) {
 			extraButton.color = BUTTONS_ALPHA | 0x777777;
@@ -310,8 +321,71 @@ public class DosBoxLauncher extends Activity {
 			Log.d("BUTTONS", extraButton.x + ", " + extraButton.y + " " + extraButton.w + "x" + extraButton.h);
 		}
 		
-		mSurfaceView.joystickExtraButtonsOverlay = extraButtons;
 		
+	}
+	
+	private String extraButtonsLabels[] = {"ESC", "LOAD", "SAVE", "TEXT", "YES", "NO", "QUIT"};
+	private VirtualKey extraButtonsKeys[] = {
+			new VirtualKey(KeyEvent.KEYCODE_ESCAPE),
+			new VirtualKey(KeyEvent.KEYCODE_F1),
+			new VirtualKey(KeyEvent.KEYCODE_F5),
+			new VirtualKey(KeyEvent.KEYCODE_T, false, true, false),
+			new VirtualKey(KeyEvent.KEYCODE_Y),
+			new VirtualKey(KeyEvent.KEYCODE_N),
+			new VirtualKey(KeyEvent.KEYCODE_X, true, false, false)
+	};
+
+	public static final int EXTRA_BUTTONS_ALPHA = 0x80000000;
+	public static final int EXTRA_BUTTONS_ALPHA_PRESSED = 0xE0000000;
+
+	private void createExtraButtons() {
+		int w = mSurfaceView.getWidth();
+		int h = mSurfaceView.getHeight();
+		
+		int margin = 10;
+		int size = (w-margin*2) / 10;
+
+		int mx = margin;
+		for(int i=0; i<extraButtonsLabels.length; i++) {
+			JoystickButtonExtra key = new JoystickButtonExtra();
+			key.x = mx;
+			key.y = margin;
+			key.w = size;
+			key.h = (int)(size * 0.4);
+			key.label = extraButtonsLabels[i];
+			key.key = extraButtonsKeys[i];
+			key.color = EXTRA_BUTTONS_ALPHA | 0xFFFFFF;
+			key.colorPressed = EXTRA_BUTTONS_ALPHA_PRESSED | 0xFFFFFF;
+			extraButtons.add(key);
+			mx += key.w +margin;
+		}
+		
+		if (isMouseOnly) {
+			JoystickButtonExtra mouseLeft = new JoystickButtonExtra();
+			mouseLeft.w = size;
+			mouseLeft.h = (int)(size * 0.4);
+			mouseLeft.x = margin;
+			mouseLeft.y = h - margin - mouseLeft.h;
+			mouseLeft.label = "LEFT";
+			mouseLeft.key = new VirtualKey(MouseButton.LEFT);
+			mouseLeft.color = EXTRA_BUTTONS_ALPHA | 0xFFFFFF;
+			mouseLeft.colorPressed = EXTRA_BUTTONS_ALPHA_PRESSED | 0xFFFFFF;
+			extraButtons.add(mouseLeft);
+			
+			JoystickButtonExtra mouseRight = new JoystickButtonExtra();
+			mouseRight.w = size;
+			mouseRight.h = (int)(size * 0.4);
+			mouseRight.x = w - margin - mouseRight.w;
+			mouseRight.y = h - margin - mouseRight.h;
+			mouseRight.label = "RIGHT";
+			mouseRight.key = new VirtualKey(MouseButton.RIGHT);
+			mouseRight.color = EXTRA_BUTTONS_ALPHA | 0xFFFFFF;
+			mouseRight.colorPressed = EXTRA_BUTTONS_ALPHA_PRESSED | 0xFFFFFF;
+			extraButtons.add(mouseRight);
+		}
+		
+		mSurfaceView.joystickExtraButtonsOverlay = extraButtons.toArray(new JoystickButtonExtra[0]);
+
 	}
 	
 	

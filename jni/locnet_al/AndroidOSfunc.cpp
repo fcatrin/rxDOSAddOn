@@ -33,12 +33,12 @@
 #include "keycodes.h"
 //#include <android/log.h>
 #include <queue>
-/*
-#define LOGD(LOG_TAG, ...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define LOGV(LOG_TAG, ...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
-#define LOGE(LOG_TAG, ...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
+#define LOGD(LOG_TAG, ...) printf(__VA_ARGS__)
+//#define LOGV(LOG_TAG, ...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
+//#define LOGE(LOG_TAG, ...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #define LOG_TAG "DosBoxTurbo"
-*/
+
 std::queue<struct locnet_al_event> eventQueue;
 
 struct loader_config myLoader;
@@ -386,12 +386,12 @@ extern "C" void Java_com_fishstix_dosbox_DosBoxControl_nativeMouse(JNIEnv * env,
 			event.down_x = down_x;
 			event.down_y = down_y;
 			event.keycode = button;
-			//LOGD(LOG_TAG, "mouseDown ->  action: %d  button: %d", action,button);
+			LOGD(LOG_TAG, "mouseDown ->  action: %d  button: %d", action,button);
 			break;
 		case 1:
 			event.eventType = SDL_MOUSEBUTTONUP;
 			event.keycode = button;
-			//LOGD(LOG_TAG, "mouseUp ->  action: %d  button: %d", action,button);
+			LOGD(LOG_TAG, "mouseUp ->  action: %d  button: %d", action,button);
 			break;
 		case 2:
 			event.eventType = SDL_MOUSEMOTION;
@@ -416,6 +416,10 @@ extern "C" void Java_com_fishstix_dosbox_DosBoxControl_nativeMouseWarp(JNIEnv * 
 
 	if (abs_x < 0) {
 		abs_x = 0;
+	}
+
+	if (abs_y < 0) {
+		abs_y = 0;
 	}
 
 	event.eventType = SDL_MOUSEMOTION_ABSOLUTE;

@@ -266,8 +266,16 @@ public class DosBoxMenuUtility {
 		//context.mPrefAutoCPUOn = prefs.getBoolean("dosautocpu", false);  
 		//DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_AUTO_CPU_ON, context.mPrefAutoCPUOn?1:0,null,DosBoxLauncher.getLicResult());
 		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_AUTO_CPU_ON, 0,null,true);
+		
 		// INPUT MODE
-		switch (Integer.valueOf(prefs.getString("confinputmode", "0"))) { 
+		
+		int inputMode = Integer.valueOf(prefs.getString("confinputmode", "0"));
+		boolean isMouseOnly = context.getIntent().getBooleanExtra("mouseOnly", false);
+		if (isMouseOnly) inputMode =INPUT_MOUSE;
+		
+		Log.d("MOUSE", "isMouseOnly " + isMouseOnly);
+		
+		switch (inputMode) { 
 		case INPUT_MOUSE:
 			context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_MOUSE;
 			DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_JOYSTICK_ENABLE, 0 ,null, true);
@@ -294,7 +302,7 @@ public class DosBoxMenuUtility {
 			// absolute tracking
 			context.mSurfaceView.mAbsolute = true;
 		} else {
-			context.mSurfaceView.mAbsolute = false;
+			context.mSurfaceView.mAbsolute = true;
 		}
 		// Joystick Center
 		context.mSurfaceView.mJoyCenterX = (prefs.getInt("confjoyx", 100)-100)+JOYSTICK_CENTER_X;
@@ -333,7 +341,7 @@ public class DosBoxMenuUtility {
 		// VOL BUTTONS
 		//context.mPrefHardkeyOn = prefs.getBoolean("confvolbuttons", true);
 
-		if (prefs.getBoolean("confjoyoverlay", true)) {
+		if (prefs.getBoolean("confjoyoverlay", true) && !isMouseOnly) {
 			context.mSurfaceView.mShowJoy = true;
 			context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_JOYSTICK;	// switch to joystick mode
 			SharedPreferences.Editor editor = prefs.edit();
