@@ -54,7 +54,7 @@ public class KeyTranslator {
 	}
 	
 	public static VirtualKey translate(String name) {
-		if (name == null) return null;
+		if (name == null || name.equals("NONE")) return null;
 		
 		VirtualKey vk = new VirtualKey();
 		
