@@ -556,8 +556,9 @@ public class DosBoxMenuUtility {
 				break;
 
 			case MENU_KEYBOARD_SPECIAL:
-				context.mSurfaceView.mContextMenu = CONTEXT_MENU_SPECIAL_KEYS;				
-				context.openContextMenu(context.mSurfaceView);
+				toggleExtraButtons(context);
+				//context.mSurfaceView.mContextMenu = CONTEXT_MENU_SPECIAL_KEYS;				
+				//context.openContextMenu(context.mSurfaceView);
 				break;
 			case MENU_KEYBOARD:
 				doShowKeyboard(context);
@@ -589,6 +590,10 @@ public class DosBoxMenuUtility {
 				break;
 		  }
 		  return true;
+	}
+	
+	static private void toggleExtraButtons(DosBoxLauncher context) {
+		context.mSurfaceView.toggleExtraButtons();
 	}
 	
 	static public void doCreateContextMenu(DosBoxLauncher context, ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {

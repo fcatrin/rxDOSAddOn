@@ -403,7 +403,9 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				if (mShowJoy) {
 					drawJoystick(canvas);
 				}
-				drawExtraButtons(canvas);
+				if (showExtraButtons) {
+					drawExtraButtons(canvas);
+				}
 				
 				ensureMouseCalibration();
 			}
@@ -676,18 +678,20 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				case MotionEvent.ACTION_DOWN:
 				case TouchEventWrapper.ACTION_POINTER_DOWN:
 
-					for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
-		        		if (jb.key!=null && inRect(jb.x, jb.y, jb.w, jb.h, x[pointerId],y[pointerId])) {
-		        			jb.pressed = true;
-		        			vkExtraDown[pointerId] = jb.key;
-		        			if (jb.key.isMouseButton()) {
-		        				jb.key.sendToDosBox((int)x[pointerId], (int)y[pointerId], ACTION_DOWN);
-		        			} else {
-		        				jb.key.sendToDosBox(true);
-		        			}
-		        			return true;
-		        		}
-		        	}
+					if (showExtraButtons) {
+						for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
+			        		if (jb.key!=null && inRect(jb.x, jb.y, jb.w, jb.h, x[pointerId],y[pointerId])) {
+			        			jb.pressed = true;
+			        			vkExtraDown[pointerId] = jb.key;
+			        			if (jb.key.isMouseButton()) {
+			        				jb.key.sendToDosBox((int)x[pointerId], (int)y[pointerId], ACTION_DOWN);
+			        			} else {
+			        				jb.key.sendToDosBox(true);
+			        			}
+			        			return true;
+			        		}
+			        	}
+					}
 					
 					int button = -1;
 			        if (mInputMode == INPUT_MODE_MOUSE) {
@@ -744,21 +748,23 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				break;
 				case MotionEvent.ACTION_UP: 
 				case TouchEventWrapper.ACTION_POINTER_UP:
-					VirtualKey vke = vkExtraDown[pointerId];
-					if (vke!=null) {
-						for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
-							if (jb.key == vke) {
-								jb.pressed = false;
-			        			if (jb.key.isMouseButton()) {
-			        				jb.key.sendToDosBox((int)x[pointerId], (int)y[pointerId], ACTION_UP);
-			        			} else {
-			        				jb.key.sendToDosBox(false);
-			        			}
-								break;
+					if (showExtraButtons) {
+						VirtualKey vke = vkExtraDown[pointerId];
+						if (vke!=null) {
+							for(JoystickButtonExtra jb : joystickExtraButtonsOverlay) {
+								if (jb.key == vke) {
+									jb.pressed = false;
+				        			if (jb.key.isMouseButton()) {
+				        				jb.key.sendToDosBox((int)x[pointerId], (int)y[pointerId], ACTION_UP);
+				        			} else {
+				        				jb.key.sendToDosBox(false);
+				        			}
+									break;
+								}
 							}
+							vkExtraDown[pointerId] = null;
+							return true;
 						}
-						vkExtraDown[pointerId] = null;
-						return true;
 					}
 					
 					long diff = event.getEventTime() - event.getDownTime();
@@ -1253,6 +1259,11 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		VideoRedraw(mBitmap, mSrc_width, mSrc_height, 0, mSrc_height);		
 	}
 	
+	public void toggleExtraButtons() {
+		showExtraButtons = !showExtraButtons;
+		forceRedraw();
+	}
+	
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		resetScreen(true);
@@ -1322,6 +1333,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	
 	public int lastCalibrationOriginX = -1;
 	public int lastCalibrationOriginY = -1;
+	public boolean showExtraButtons = true;
 	
 	private void ensureMouseCalibration() {
 		if (mScreenRect.left == lastCalibrationOriginX && mScreenRect.top == lastCalibrationOriginY) return;
