@@ -9,4 +9,5 @@ public class JoystickButton {
 	public int color;
 	public int colorPressed;
 	public boolean pressed;
+	public float textSize;
 }

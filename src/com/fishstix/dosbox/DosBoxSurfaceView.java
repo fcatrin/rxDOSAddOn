@@ -439,7 +439,10 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		mTextPaint.setColor(0x70000000);
 		mTextPaint.setAntiAlias(true);
 		for(JoystickButton button: joystickButtonsOverlay) {
-			if (button.key!=null) canvas.drawText(button.label,button.x, button.y+8, mTextPaint);
+			if (button.key!=null) {
+				mTextPaint.setTextSize(button.textSize);
+				canvas.drawText(button.label,button.x, button.y+8, mTextPaint);
+			}
 		}
 		
 		if (joystickOverlay.hasValidKeys) canvas.drawText("+", joystickOverlay.x + joystickOverlay.positionX, joystickOverlay.y + joystickOverlay.positionY+8, mTextPaint);
@@ -460,10 +463,9 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		mTextPaint.setColor(0x70000000);
 		mTextPaint.setAntiAlias(true);
 
-		final float scale = getContext().getResources().getDisplayMetrics().density;
 		float textSize = mTextPaint.getTextSize();
 		for(JoystickButtonExtra button : joystickExtraButtonsOverlay) {
-			mTextPaint.setTextSize(scale * button.h / 2);
+			mTextPaint.setTextSize(button.textSize);
 			if (button.key!=null) canvas.drawText(button.label, button.x + (button.w/2), button.y+(button.h/2) + 8, mTextPaint);
 		}
 		mTextPaint.setTextSize(textSize);

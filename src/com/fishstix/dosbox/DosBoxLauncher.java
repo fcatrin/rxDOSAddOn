@@ -332,7 +332,12 @@ public class DosBoxLauncher extends Activity {
 				je.printStackTrace();
 			}
 		}
+		
 		Log.d("EXTRA", extraButtons.size() + " buttons");
+		for (JoystickButtonExtra button : extraButtons) {
+			button.textSize = scale * button.h / 2;
+		}
+		
 		mSurfaceView.joystickExtraButtonsOverlay = extraButtons.toArray(new JoystickButtonExtra[0]);
 	}
 	
@@ -351,6 +356,7 @@ public class DosBoxLauncher extends Activity {
 		int w = mSurfaceView.getWidth();
 		int h = mSurfaceView.getHeight();
 		
+		final float scale = getResources().getDisplayMetrics().density;
 		int margin =  w / 8;
 		int marginButton = w / 10;
 		int radius = w / 24;
@@ -382,6 +388,7 @@ public class DosBoxLauncher extends Activity {
 			buttons[i].colorPressed = buttonColors[i] | BUTTONS_ALPHA_PRESSED;
 			buttons[i].key = keyValues[4+i];
 			buttons[i].radius = radius;
+			buttons[i].textSize = scale * radius / 2;
 		}
 		
 		mSurfaceView.joystickButtonsOverlay = buttons ;
