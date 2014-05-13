@@ -307,9 +307,13 @@ public class DosBoxLauncher extends Activity {
 						int index = -1;
 						if (key.equals("BTN_A")) index = 0;
 						if (key.equals("BTN_B")) index = 1;
-						if (key.equals("BTN_C")) index = 2;
-						if (key.equals("BTN_D")) index = 3;
-						if (index>=0) mSurfaceView.joystickButtonsOverlay[index].label = name;
+						if (key.equals("BTN_X")) index = 2;
+						if (key.equals("BTN_Y")) index = 3;
+						if (index>=0) {
+							JoystickButton btn = mSurfaceView.joystickButtonsOverlay[index];
+							if (name.equals("_hide_")) btn.key = null;
+							else btn.label = name;
+						}
 						
 						if (key.equals("BTN_SELECT") && select!=null) {
 							if (name.equals("_hide_")) select.key = null;
