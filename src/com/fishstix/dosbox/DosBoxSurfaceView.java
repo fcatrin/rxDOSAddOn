@@ -67,6 +67,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	private final static int BUTTON_TAP_DELAY = 200;	
 	private final static int BUTTON_REPEAT_DELAY = 100;	
 	private final static int EVENT_THRESHOLD_DECAY = 100;
+	private final static int EVENT_THRESHOLD_FINGER_MOVE = 200;
 	
 	public final static int INPUT_MODE_MOUSE = 0xf1;
 	public final static int INPUT_MODE_SCROLL = 0xf2;
@@ -104,6 +105,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	private static final int CLICK_DELAY = 125;	// in ms (170)
     private boolean mDoubleLong = false;
     public float mMouseSensitivity = 1.0f;
+    public float warpX = 1;
+    public float warpY = 1;
     public boolean mScreenTop = false;
 
 	
@@ -554,7 +557,10 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 							//} 
 							if (mAbsolute) {
 								ensureMouseCalibration();
-								DosBoxControl.nativeMouseWarp(x[pointerId], y[pointerId], mScreenRect.left, mScreenRect.top, mScreenRect.width(), mScreenRect.height());
+								Log.d("MOUSE", "nativeMouseWarp " + 
+										((x[pointerId] - mScreenRect.left) /  mScreenRect.width()) + ", " +
+										((y[pointerId] - mScreenRect.top) /  mScreenRect.height()));
+								DosBoxControl.nativeMouseWarp(x[pointerId], y[pointerId], mScreenRect.left, mScreenRect.top, (int)(mScreenRect.width() * warpX), (int)(mScreenRect.height() * warpY));
 							} else {
 								DosBoxControl.nativeMouse((int) (x[pointerId]*mMouseSensitivity), (int) (y[pointerId]*mMouseSensitivity), (int) (x_last[pointerId]*mMouseSensitivity), (int) (y_last[pointerId]*mMouseSensitivity), 2, -1);
 							}
@@ -904,11 +910,22 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 								Log.i("DosBoxTurbo","eventtime: "+event.getEventTime() + " systemtime: "+SystemClock.uptimeMillis());
 								return true;	// get rid of old events
 							}
+							
+							// ignore natural move triggered by finger when clicking
+							if (event.getEventTime() - event.getDownTime() < EVENT_THRESHOLD_FINGER_MOVE) {
+								Log.i("DosBoxTurbo", "Discarding move");
+								return true;
+							}
+							
 							int idx = (!virtButton[0]) ? 0:1;
 							if (mAbsolute) {
 								ensureMouseCalibration();
-								Log.d("MOUSE", "nativeMouseWarp " + x[idx] + ", " + y[idx] + " (" + mScreenRect.left + ", " + mScreenRect.top + ") - (" + mScreenRect.width() + "x" + mScreenRect.height() + ")");
-								DosBoxControl.nativeMouseWarp(x[idx], y[idx], mScreenRect.left, mScreenRect.top, mScreenRect.width(), mScreenRect.height());
+								// Log.d("MOUSE", "nativeMouseWarp " + x[idx] + ", " + y[idx] + " (" + mScreenRect.left + ", " + mScreenRect.top + ") - (" + mScreenRect.width() + "x" + mScreenRect.height() + ")");
+								Log.d("MOUSE", "nativeMouseWarp " + 
+										((x[pointerId] - mScreenRect.left) /  mScreenRect.width()) + ", " +
+										((y[pointerId] - mScreenRect.top) /  mScreenRect.height()));
+
+								DosBoxControl.nativeMouseWarp(x[idx], y[idx], mScreenRect.left, mScreenRect.top, (int)(mScreenRect.width()*warpX), (int)(mScreenRect.height()*warpY));
 							} else {
 								Log.d("MOUSE", "nativeMouse " + (int) (x[idx]*mMouseSensitivity) + ", " +  (int) (y[idx]*mMouseSensitivity) + ", " + (int) (x_last[idx]*mMouseSensitivity) + ", " +  (int) (y_last[idx]*mMouseSensitivity));
 								DosBoxControl.nativeMouse((int) (x[idx]*mMouseSensitivity), (int) (y[idx]*mMouseSensitivity), (int) (x_last[idx]*mMouseSensitivity), (int) (y_last[idx]*mMouseSensitivity), ACTION_MOVE, -1);
@@ -1346,20 +1363,20 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		Thread t = new Thread() {
 			@Override
 			public void run() {
-				try {Thread.sleep(1000);} catch (InterruptedException e) {}
+				try {Thread.sleep(250);} catch (InterruptedException e) {}
 				int x = mScreenRect.left;
 				int y = mScreenRect.top;
-				DosBoxControl.nativeMouseWarp(x, y, x, y, mScreenRect.width(), mScreenRect.height());
+				DosBoxControl.nativeMouseWarp(x, y, x, y, (int)(mScreenRect.width() * warpX), (int)(mScreenRect.height() * warpY));
 
-				try {Thread.sleep(1000);} catch (InterruptedException e) {}
+				try {Thread.sleep(250);} catch (InterruptedException e) {}
 				x += mScreenRect.width();
 				y += mScreenRect.height();
-				DosBoxControl.nativeMouseWarp(x, y, x, y, mScreenRect.width(), mScreenRect.height());
+				DosBoxControl.nativeMouseWarp(x, y, x, y, (int)(mScreenRect.width() * warpX), (int)(mScreenRect.height() * warpY));
 				
-				try {Thread.sleep(1000);} catch (InterruptedException e) {}
+				try {Thread.sleep(250);} catch (InterruptedException e) {}
 				x = mScreenRect.left;
 				y = mScreenRect.top;
-				DosBoxControl.nativeMouseWarp(x, y, x, y, mScreenRect.width(), mScreenRect.height());
+				DosBoxControl.nativeMouseWarp(x, y, x, y,(int)( mScreenRect.width() * warpX/2), (int)(mScreenRect.height() * warpY / 2));
 			}
 		};
 		
@@ -1374,7 +1391,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				if (mAbsolute) {
 					ensureMouseCalibration();
    	       			final int pointerId = mWrap.getPointerId(event, ((event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT));
-   	       			DosBoxControl.nativeMouseWarp(x[pointerId], y[pointerId], mScreenRect.left, mScreenRect.top, mScreenRect.width(), mScreenRect.height());
+   	       			DosBoxControl.nativeMouseWarp(x[pointerId], y[pointerId], mScreenRect.left, mScreenRect.top, (int)(mScreenRect.width() * warpX), (int)(mScreenRect.height() * warpY));
    	       			Log.i("DosBoxTurbo","nativeMouseWarp " + x[pointerId] + ", " +  y[pointerId]);
    	       			try {
    	       				Thread.sleep(85);

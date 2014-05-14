@@ -172,6 +172,10 @@ public class DosBoxLauncher extends Activity {
 		}
 		
 		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
+		int mouseWarpX = getIntent().getIntExtra("warpX", 100);
+		int mouseWarpY = getIntent().getIntExtra("warpY", 100);
+		if (mouseWarpX>0) mSurfaceView.warpX = mouseWarpX / 100.0f;
+		if (mouseWarpY>0) mSurfaceView.warpY = mouseWarpY / 100.0f;
 		
 	    // load key translations from retrobox (linux) to sdl
 		KeyTranslator.init();
