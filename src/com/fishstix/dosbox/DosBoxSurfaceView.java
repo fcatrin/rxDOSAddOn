@@ -608,12 +608,12 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				// release keys
 				if (joystickOverlay.axisX != Position.CENTER) {
 					VirtualKey key = joystickOverlay.axisX == Position.MIN?joystickOverlay.keyLeft:joystickOverlay.keyRight;
-					key.sendToDosBox(false);
+					if (key!=null) key.sendToDosBox(false);
 				}
 				// press keys
 				if (axisX != Position.CENTER) {
 					VirtualKey key = axisX == Position.MIN?joystickOverlay.keyLeft:joystickOverlay.keyRight;
-					key.sendToDosBox(true);
+					if (key!=null) key.sendToDosBox(true);
 				}
 			}
 
@@ -621,11 +621,11 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				// release keys
 				if (joystickOverlay.axisY != Position.CENTER) {
 					VirtualKey key = joystickOverlay.axisY == Position.MIN?joystickOverlay.keyUp:joystickOverlay.keyDown;
-					key.sendToDosBox(false);
+					if (key!=null) key.sendToDosBox(false);
 				}
 				if (axisY != Position.CENTER) {
 					VirtualKey key = axisY == Position.MIN?joystickOverlay.keyUp:joystickOverlay.keyDown;
-					key.sendToDosBox(true);
+					if (key!=null) key.sendToDosBox(true);
 				}
 			}
 			joystickOverlay.axisX = axisX;
@@ -643,11 +643,11 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		if (joystickOverlay.type == Type.DIGITAL) {
 			if (joystickOverlay.axisX != Position.CENTER) {
 				VirtualKey key = joystickOverlay.axisX == Position.MIN?joystickOverlay.keyLeft:joystickOverlay.keyRight;
-				key.sendToDosBox(false);
+				if (key!=null) key.sendToDosBox(false);
 			}
 			if (joystickOverlay.axisY != Position.CENTER) {
 				VirtualKey key = joystickOverlay.axisY == Position.MIN?joystickOverlay.keyUp:joystickOverlay.keyDown;
-				key.sendToDosBox(false);
+				if (key!=null) key.sendToDosBox(false);
 			}
 		} else {
 			DosBoxControl.nativeJoystick(mJoyCenterX, mJoyCenterY, ACTION_MOVE, -1);

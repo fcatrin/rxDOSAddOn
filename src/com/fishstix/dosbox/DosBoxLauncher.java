@@ -313,6 +313,23 @@ public class DosBoxLauncher extends Activity {
 							JoystickButton btn = mSurfaceView.joystickButtonsOverlay[index];
 							if (name.equals("_hide_")) btn.key = null;
 							else btn.label = name;
+							continue;
+						}
+						
+						if (key.equals("BTN_UP")) index = 0;
+						if (key.equals("BTN_DOWN")) index = 1;
+						if (key.equals("BTN_LEFT")) index = 2;
+						if (key.equals("BTN_RIGHT")) index = 3;
+						if (index>=0 && name.equals("_hide_")) {
+							Joystick joystickOverlay = mSurfaceView.joystickOverlay;
+							switch(index) {
+							case 0 : joystickOverlay.keyUp = null; break;
+							case 1 : joystickOverlay.keyDown = null; break;
+							case 2 : joystickOverlay.keyLeft = null; break;
+							case 3 : joystickOverlay.keyRight = null; break;
+							}
+							joystickOverlay.hasValidKeys = joystickOverlay.keyUp!=null || joystickOverlay.keyDown!=null || joystickOverlay.keyLeft != null || joystickOverlay.keyRight != null;
+							continue;
 						}
 						
 						if (key.equals("BTN_SELECT") && select!=null) {
@@ -410,8 +427,7 @@ public class DosBoxLauncher extends Activity {
 		joystick.positionY = 0;
 		joystick.threshold = 0.2f;
 		
-		joystick.hasValidKeys = joystick.keyUp!=null && joystick.keyDown!=null && joystick.keyLeft != null && joystick.keyRight != null;
-		
+
 		mSurfaceView.joystickOverlay = joystick;
 		
 	}
