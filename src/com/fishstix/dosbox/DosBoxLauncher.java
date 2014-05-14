@@ -332,7 +332,6 @@ public class DosBoxLauncher extends Activity {
 							case 2 : joystickOverlay.keyLeft = null; break;
 							case 3 : joystickOverlay.keyRight = null; break;
 							}
-							joystickOverlay.hasValidKeys = joystickOverlay.keyUp!=null || joystickOverlay.keyDown!=null || joystickOverlay.keyLeft != null || joystickOverlay.keyRight != null;
 							continue;
 						}
 						
@@ -354,6 +353,9 @@ public class DosBoxLauncher extends Activity {
 			}
 		}
 		
+		Joystick joystickOverlay = mSurfaceView.joystickOverlay;
+		joystickOverlay.hasValidKeys = joystickOverlay.keyUp!=null || joystickOverlay.keyDown!=null || joystickOverlay.keyLeft != null || joystickOverlay.keyRight != null;
+
 		Log.d("EXTRA", extraButtons.size() + " buttons");
 		for (JoystickButtonExtra button : extraButtons) {
 			button.textSize = scale * button.h / 2;
