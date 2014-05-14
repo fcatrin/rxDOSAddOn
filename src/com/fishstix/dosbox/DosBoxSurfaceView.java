@@ -31,6 +31,7 @@ import com.fishstix.dosbox.touchevent.TouchEventWrapper;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Paint.FontMetricsInt;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -441,10 +442,11 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		
 		mTextPaint.setColor(0x70000000);
 		mTextPaint.setAntiAlias(true);
+		mTextPaint.setTextSize(JoystickButton.textSize);
+		float descent = mTextPaint.descent();
 		for(JoystickButton button: joystickButtonsOverlay) {
 			if (button.key!=null) {
-				mTextPaint.setTextSize(button.textSize);
-				canvas.drawText(button.label,button.x, button.y+8, mTextPaint);
+				canvas.drawText(button.label,button.x, button.y + (JoystickButton.textSize - descent)/2.0f, mTextPaint);
 			}
 		}
 		
@@ -467,10 +469,13 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		mTextPaint.setAntiAlias(true);
 
 		float textSize = mTextPaint.getTextSize();
+		
+		mTextPaint.setTextSize(JoystickButtonExtra.textSize);
+		float descent = mTextPaint.descent();
 		for(JoystickButtonExtra button : joystickExtraButtonsOverlay) {
-			mTextPaint.setTextSize(button.textSize);
-			if (button.key!=null) canvas.drawText(button.label, button.x + (button.w/2), button.y+(button.h/2) + 8, mTextPaint);
+			if (button.key!=null) canvas.drawText(button.label, button.x + (button.w/2.0f), button.y + button.h/2.0f + (JoystickButtonExtra.textSize - descent)/2.0f , mTextPaint);
 		}
+		
 		mTextPaint.setTextSize(textSize);
 		
 		mTextPaint.setAntiAlias(false);
@@ -1363,20 +1368,20 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		Thread t = new Thread() {
 			@Override
 			public void run() {
-				try {Thread.sleep(250);} catch (InterruptedException e) {}
+				try {Thread.sleep(400);} catch (InterruptedException e) {}
 				int x = mScreenRect.left;
 				int y = mScreenRect.top;
 				DosBoxControl.nativeMouseWarp(x, y, x, y, (int)(mScreenRect.width() * warpX), (int)(mScreenRect.height() * warpY));
 
-				try {Thread.sleep(250);} catch (InterruptedException e) {}
+				try {Thread.sleep(400);} catch (InterruptedException e) {}
 				x += mScreenRect.width();
 				y += mScreenRect.height();
 				DosBoxControl.nativeMouseWarp(x, y, x, y, (int)(mScreenRect.width() * warpX), (int)(mScreenRect.height() * warpY));
 				
-				try {Thread.sleep(250);} catch (InterruptedException e) {}
-				x = mScreenRect.left;
-				y = mScreenRect.top;
-				DosBoxControl.nativeMouseWarp(x, y, x, y,(int)( mScreenRect.width() * warpX/2), (int)(mScreenRect.height() * warpY / 2));
+				try {Thread.sleep(400);} catch (InterruptedException e) {}
+				x = mScreenRect.left + mScreenRect.width()/2;
+				y = mScreenRect.top + mScreenRect.height()/2;
+				DosBoxControl.nativeMouseWarp(x, y, x, y,(int)(mScreenRect.width() * warpX), (int)(mScreenRect.height() * warpY));
 			}
 		};
 		
