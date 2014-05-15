@@ -271,7 +271,7 @@ public class DosBoxMenuUtility {
 		
 		int inputMode = Integer.valueOf(prefs.getString("confinputmode", "0"));
 		boolean isMouseOnly = context.getIntent().getBooleanExtra("mouseOnly", false);
-		if (isMouseOnly) inputMode =INPUT_MOUSE;
+		if (isMouseOnly) inputMode = INPUT_MOUSE;
 		
 		Log.d("MOUSE", "isMouseOnly " + isMouseOnly);
 		

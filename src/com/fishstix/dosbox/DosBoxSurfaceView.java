@@ -698,6 +698,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        			vkExtraDown[pointerId] = jb.key;
 			        			if (jb.key.isMouseButton()) {
 			        				jb.key.sendToDosBox((int)x[pointerId], (int)y[pointerId], ACTION_DOWN);
+			        			} else if (jb.key.isKeyboardMouseToggle()) {
+			        				toggleMouseJoystick();
 			        			} else {
 			        				jb.key.sendToDosBox(true);
 			        			}
@@ -769,6 +771,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 									jb.pressed = false;
 				        			if (jb.key.isMouseButton()) {
 				        				jb.key.sendToDosBox((int)x[pointerId], (int)y[pointerId], ACTION_UP);
+				        			} else if (jb.key.isKeyboardMouseToggle()) {
+				        				// just ignore
 				        			} else {
 				        				jb.key.sendToDosBox(false);
 				        			}
@@ -1310,6 +1314,22 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		return px > x && px < x+w && py > y && py< y + h;
 	}
 
+	private final void toggleMouseJoystick() {
+		switch (mInputMode) { 
+		case DosBoxSurfaceView.INPUT_MODE_JOYSTICK:
+			mShowJoy = false;
+			mInputMode = DosBoxSurfaceView.INPUT_MODE_MOUSE;
+			DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_JOYSTICK_ENABLE, 0 ,null, true);
+			break;
+		case DosBoxSurfaceView.INPUT_MODE_MOUSE:
+			mShowJoy = true;
+			mInputMode = DosBoxSurfaceView.INPUT_MODE_JOYSTICK;
+			DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_JOYSTICK_ENABLE, 1 ,null, true);
+			break;
+		}
+		forceRedraw();
+	}
+	
 	private final void mouseClick(int button) {
  		DosBoxControl.nativeMouse(0, 0, -1, -1, ACTION_DOWN, button);
 		try {

@@ -1,6 +1,7 @@
 package com.fishstix.dosbox;
 
 import android.util.Log;
+import android.view.KeyEvent;
 
 public class VirtualKey {
 	enum MouseButton {LEFT, RIGHT};
@@ -32,14 +33,14 @@ public class VirtualKey {
 	}
 	
 	public void sendToDosBox(boolean down) {
-		if (mouseButton==null) {
+		if (mouseButton==null && keyCode!= KeyEvent.KEYCODE_BUTTON_MODE) {
 			DosBoxControl.nativeKey(keyCode, down?1:0, ctrl?1:0, alt?1:0, shift?1:0);
 		}
 		Log.d(LOGTAG, "Send " + this);
 	}
 
 	public void sendToDosBox(int x, int y, int action) {
-		if (mouseButton!=null) {
+		if (mouseButton!=null  && keyCode!= KeyEvent.KEYCODE_BUTTON_MODE) {
 			DosBoxControl.nativeMouse(x, y, x, y, action, mouseButton.ordinal());
 		}
 		Log.d(LOGTAG, "Send " + this);
@@ -48,6 +49,10 @@ public class VirtualKey {
 	public boolean isMouseButton() {
 		return mouseButton!=null;
 	}
+	
+	public boolean isKeyboardMouseToggle() {
+		return keyCode == KeyEvent.KEYCODE_BUTTON_MODE;
+	}
 
 	@Override
 	public String toString() {
@@ -55,6 +60,8 @@ public class VirtualKey {
 		s.append("VK ");
 		if (mouseButton!=null) {
 			s.append("MOUSE BUTTON ").append(mouseButton.name());
+		} else if (isKeyboardMouseToggle()) {
+			s.append("KEYB/MOUSE TOGGLE");
 		} else {
 			if (ctrl)  s.append("CTRL+");
 			if (alt)   s.append("ALT+");

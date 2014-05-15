@@ -49,6 +49,9 @@ public class KeyTranslator {
 		keys.put("KEY_BACKSPACE", KeyEvent.KEYCODE_BACK);
 		keys.put("KEY_DOT", KeyEvent.KEYCODE_PERIOD);
 		keys.put("KEY_ESC", KeyEvent.KEYCODE_ESCAPE);
+		
+		keys.put("KEY_MOUSE_TOGGLE", KeyEvent.KEYCODE_BUTTON_MODE);
+		
 		for(int i=0; i<10; i++)	keys.put("KEY_KP" + i, KeyEvent.KEYCODE_NUMPAD_0 + i);
 
 	}
