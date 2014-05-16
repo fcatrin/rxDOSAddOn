@@ -44,7 +44,7 @@ public class KeyTranslator {
 
 		keys.put("KEY_PAGEDOWN", KeyEvent.KEYCODE_PAGE_DOWN);
 		keys.put("KEY_PAGEUP", KeyEvent.KEYCODE_PAGE_UP);
-		keys.put("KEY_PAGEUP", KeyEvent.KEYCODE_PLUS);
+		keys.put("KEY_KPPLUS", KeyEvent.KEYCODE_PLUS);
 
 		keys.put("KEY_BACKSPACE", KeyEvent.KEYCODE_BACK);
 		keys.put("KEY_DOT", KeyEvent.KEYCODE_PERIOD);
