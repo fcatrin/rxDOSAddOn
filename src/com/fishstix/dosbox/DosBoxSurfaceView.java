@@ -404,13 +404,14 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 					}
 				}
 				
-				if (mShowJoy) {
-					drawJoystick(canvas);
+				if (mInputMode != INPUT_MODE_REAL_JOYSTICK) {
+					if (mShowJoy) {
+						drawJoystick(canvas);
+					}
+					if (showExtraButtons) {
+						drawExtraButtons(canvas);
+					}
 				}
-				if (showExtraButtons) {
-					drawExtraButtons(canvas);
-				}
-				
 				ensureMouseCalibration();
 			}
 		} finally {
@@ -1067,11 +1068,27 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		}
 	}
 	
+	private boolean handleVirtualJoystick(int keyCode, boolean down) {
+		if (mDebug) Log.d("JSTICK", "Handle keyCode " + keyCode);
+		for(int i=0; i<DosBoxLauncher.virtualJoystick.length; i++) {
+			VirtualJoystick vj = DosBoxLauncher.virtualJoystick[i];
+			if (vj!=null && vj.keyCode == keyCode) {
+				VirtualKey vk = DosBoxLauncher.keyValues[i];
+				if (mDebug) Log.d("JSTICK", "keyCode " + keyCode + ", VK:" + vk);
+				if (vk!=null) vk.sendToDosBox(down);
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	@Override
 	public boolean onKeyDown(int keyCode, final KeyEvent event) {
 		mMapCapture = false;
 		if (mDebug)
 			Log.d("DosBoxTurbo", "onKeyDown keyCode="+keyCode + " mEnableDpad=" + mEnableDpad);
+		
+		if (mInputMode == INPUT_MODE_REAL_JOYSTICK && handleVirtualJoystick(keyCode, true)) return true;
 
 		if (mEnableDpad) {
 			switch (keyCode) {
@@ -1135,6 +1152,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		if (mDebug)
 			Log.d("DosBoxTurbo", "onKeyUp keyCode="+keyCode);
 
+		if (mInputMode == INPUT_MODE_REAL_JOYSTICK && handleVirtualJoystick(keyCode, false)) return true;
+		
 		if (mEnableDpad) {
 			switch (keyCode) {
 				// 	DPAD / TRACKBALL

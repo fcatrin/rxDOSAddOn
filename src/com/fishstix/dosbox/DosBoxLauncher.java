@@ -83,7 +83,7 @@ public class DosBoxLauncher extends Activity {
 	public DosBoxAudio mAudioDevice = null;
 	public DosBoxThread mDosBoxThread = null;
 	public SharedPreferences prefs;
-	private static DosBoxLauncher mDosBoxLauncher = null;
+	public static DosBoxLauncher mDosBoxLauncher = null;
 	
 	public boolean mPrefRefreshHackOn = false;
 	public boolean mPrefCycleHackOn = true;
@@ -98,14 +98,17 @@ public class DosBoxLauncher extends Activity {
 	public int mPrefFrameskip = 2; 
 	public int mPrefMemorySize = 4; 
 	public int mPrefScaleFactor = 100;
-	private boolean isMouseOnly = false;
+	public boolean isMouseOnly = false;
+	public boolean useRealJoystick = false;
 	
 	private static String keyNames[] = { 
 		"UP", "DOWN", "LEFT", "RIGHT", "BTN_A", "BTN_B", "BTN_X", "BTN_Y", "TL", "TR",
-		"SELECT", "START", "EXIT"
+		"SELECT", "START", "EXIT", "BTN_TL2", "BTN_TR2"
 	};
 
-	private static VirtualKey keyValues[] = new VirtualKey[keyNames.length];
+	public static VirtualKey keyValues[] = new VirtualKey[keyNames.length];
+	public static VirtualJoystick virtualJoystick[] = new VirtualJoystick[keyNames.length];
+	
 	private static boolean useKeyTranslation = false;
     
     // gives the native activity a copy of this object so it can call OnNativeMotion
@@ -115,10 +118,10 @@ public class DosBoxLauncher extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i("DosBoxTurbo", "onCreate()");
-		// Touchpad stuff
-		//getWindow().takeSurface(null);
-		//RegisterThis();
 		
+		useRealJoystick = getIntent().getBooleanExtra("realJoystick", false);
+		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
+
 		mSurfaceView = new DosBoxSurfaceView(this);
 		setContentView(mSurfaceView);
 		registerForContextMenu(mSurfaceView); 
@@ -171,8 +174,22 @@ public class DosBoxLauncher extends Activity {
 				DosBoxMenuUtility.mPrefCycleString = "max";			
 			}
 		}
+
+		// load real joystick translation
+		Log.d("JSTICK", "useRealJoystick is " + useRealJoystick);
+		if (useRealJoystick) {
+			for(int i=0; i<keyNames.length; i++) {
+				Integer keyCode = getIntent().getIntExtra("j1" + keyNames[i], 0);
+				Log.d("JSTICK", "keyCode for " + keyNames[i] + ":" + keyCode);
+				VirtualJoystick vj = null;
+				if (keyCode>0) {
+					vj = new VirtualJoystick();
+					vj.keyCode = keyCode;
+				}
+				virtualJoystick[i] = vj;
+			}
+		}
 		
-		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
 		int mouseWarpX = getIntent().getIntExtra("warpX", 100);
 		int mouseWarpY = getIntent().getIntExtra("warpY", 100);
 		if (mouseWarpX>0) mSurfaceView.warpX = mouseWarpX / 100.0f;
@@ -190,7 +207,6 @@ public class DosBoxLauncher extends Activity {
 	    		Log.d("REMAP", "Linux key " + keyNameLinux + " mapped to key " + key);
 	    	} else keyValues[i] = null;
 	    }
-		
 	    
 		DosBoxMenuUtility.loadPreference(this,prefs);	
 

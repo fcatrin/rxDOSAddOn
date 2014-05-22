@@ -269,12 +269,16 @@ public class DosBoxMenuUtility {
 		
 		// INPUT MODE
 		
-		int inputMode = Integer.valueOf(prefs.getString("confinputmode", "0"));
-		boolean isMouseOnly = context.getIntent().getBooleanExtra("mouseOnly", false);
+		int inputMode = INPUT_JOYSTICK; // Integer.valueOf(prefs.getString("confinputmode", "0"));
+		boolean isMouseOnly = DosBoxLauncher.mDosBoxLauncher.isMouseOnly;
+		boolean useRealJoystick = DosBoxLauncher.mDosBoxLauncher.useRealJoystick;
 		if (isMouseOnly) inputMode = INPUT_MOUSE;
+		if (useRealJoystick) inputMode = INPUT_REAL_JOYSTICK;
 		
-		Log.d("MOUSE", "isMouseOnly " + isMouseOnly);
-		
+		Log.d("JSTICK", "setting Input Mode " + inputMode);
+		Log.d("JSTICK", "isMouseOnly " + isMouseOnly);
+		Log.d("JSTICK", "useRealJoystick " + useRealJoystick);
+
 		switch (inputMode) { 
 		case INPUT_MOUSE:
 			context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_MOUSE;
@@ -290,7 +294,7 @@ public class DosBoxMenuUtility {
 			break;
 		case INPUT_REAL_JOYSTICK:
 			context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_REAL_JOYSTICK;
-			DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_JOYSTICK_ENABLE, 1 ,null, true);
+			DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_JOYSTICK_ENABLE, 0 ,null, true);
 			break;
 		case INPUT_SCROLL:
 			context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_SCROLL;
@@ -343,7 +347,7 @@ public class DosBoxMenuUtility {
 
 		if (prefs.getBoolean("confjoyoverlay", true) && !isMouseOnly) {
 			context.mSurfaceView.mShowJoy = true;
-			context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_JOYSTICK;	// switch to joystick mode
+			//context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_JOYSTICK;	// switch to joystick mode
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.putString("confinputmode", String.valueOf(INPUT_JOYSTICK));
 			editor.commit();
