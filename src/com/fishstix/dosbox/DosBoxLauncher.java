@@ -103,7 +103,7 @@ public class DosBoxLauncher extends Activity {
 	
 	private static String keyNames[] = { 
 		"UP", "DOWN", "LEFT", "RIGHT", "BTN_A", "BTN_B", "BTN_X", "BTN_Y", "TL", "TR",
-		"SELECT", "START", "EXIT", "BTN_TL2", "BTN_TR2"
+		"SELECT", "START", "EXIT", "TL2", "TR2"
 	};
 
 	public static VirtualKey keyValues[] = new VirtualKey[keyNames.length];
