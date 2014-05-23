@@ -170,7 +170,7 @@ void Android_ShutDown() {
 void getKeyFromUnicode(int unicode, struct locnet_al_event *event);
 void getKeyFromKeyCode(int keyCode, struct locnet_al_event *event);
 
-extern "C" jint Java_com_fishstix_dosbox_DosBoxControl_nativeKey(JNIEnv * env, jobject obj, jint keyCode, jint down, jint ctrl, jint alt, jint shift)
+extern "C" jint Java_xtvapps_retrobox_dosbox_DosBoxControl_nativeKey(JNIEnv * env, jobject obj, jint keyCode, jint down, jint ctrl, jint alt, jint shift)
 {
 	if (keyCode == AKEYCODE_INVALID)
 		return 0;
@@ -348,7 +348,7 @@ extern "C" jint Java_com_fishstix_dosbox_DosBoxControl_nativeKey(JNIEnv * env, j
 	}
 }
 
-extern "C" void Java_com_fishstix_dosbox_DosBoxControl_nativeJoystick(JNIEnv * env, jobject obj, jint x, jint y, jint action, jint button)
+extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxControl_nativeJoystick(JNIEnv * env, jobject obj, jint x, jint y, jint action, jint button)
 {
 	struct locnet_al_event	event;
 
@@ -374,7 +374,7 @@ extern "C" void Java_com_fishstix_dosbox_DosBoxControl_nativeJoystick(JNIEnv * e
 		eventQueue.push(event);
 }
 
-extern "C" void Java_com_fishstix_dosbox_DosBoxControl_nativeMouse(JNIEnv * env, jobject obj, jint x, jint y, jint down_x, jint down_y, jint action, jint button)
+extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxControl_nativeMouse(JNIEnv * env, jobject obj, jint x, jint y, jint down_x, jint down_y, jint action, jint button)
 {
 	struct locnet_al_event	event;
 
@@ -409,7 +409,7 @@ extern "C" void Java_com_fishstix_dosbox_DosBoxControl_nativeMouse(JNIEnv * env,
 }
 
 
-extern "C" void Java_com_fishstix_dosbox_DosBoxControl_nativeMouseWarp(JNIEnv * env, jobject obj, jfloat x, jfloat y, jint dst_left, jint dst_top, jint width, jint height) {
+extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxControl_nativeMouseWarp(JNIEnv * env, jobject obj, jfloat x, jfloat y, jint dst_left, jint dst_top, jint width, jint height) {
 	struct locnet_al_event	event;
 	float abs_x = (x - dst_left) / (float)(width);
 	float abs_y = (y - dst_top) / (float)(height);

@@ -16,7 +16,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-package com.fishstix.dosbox.touchevent;
+package xtvapps.retrobox.dosbox.touchevent;
 
 import android.annotation.SuppressLint;
 import android.view.InputDevice;

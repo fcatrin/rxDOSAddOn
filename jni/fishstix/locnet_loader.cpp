@@ -43,7 +43,7 @@ char arg_start_conf_user[256]="";
 extern struct loader_config myLoader;
 extern struct loader_config *loadf;
 
-extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativeStart(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint height, jstring confpath)
+extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeStart(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint height, jstring confpath)
 {
 	Android_Init(env, obj, bitmap, width, height);
 	
@@ -76,7 +76,7 @@ extern Bit32s CPU_CyclePercUsed;
 extern Bitu CPU_AutoDetermineMode;
 extern bool ticksLocked;
 
-extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativeSetOption(JNIEnv * env, jobject obj, jint option, jint value, jobject value2, jboolean extra)
+extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeSetOption(JNIEnv * env, jobject obj, jint option, jint value, jobject value2, jboolean extra)
 {
 	switch (option) {
 		case 1:
@@ -147,18 +147,18 @@ extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativeSetOption(JNIEnv *
 	}
 }
 
-extern "C" jint Java_com_fishstix_dosbox_DosBoxControl_nativeGetCycleCount(JNIEnv * env, jobject obj) {
+extern "C" jint Java_xtvapps_retrobox_dosbox_DosBoxControl_nativeGetCycleCount(JNIEnv * env, jobject obj) {
 	if (CPU_CycleAutoAdjust) {
 		return CPU_CyclePercUsed;
 	}
 	return CPU_CycleMax;
 }
 
-extern "C" jboolean Java_com_fishstix_dosbox_DosBoxControl_nativeGetAutoAdjust(JNIEnv * env, jobject obj) {
+extern "C" jboolean Java_xtvapps_retrobox_dosbox_DosBoxControl_nativeGetAutoAdjust(JNIEnv * env, jobject obj) {
 	return (jboolean)CPU_CycleAutoAdjust;
 }
 
-extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativeInit(JNIEnv * env, jobject obj, jobject ctx)
+extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeInit(JNIEnv * env, jobject obj, jobject ctx)
 {
 	loadf = 0;
 	myLoader.memsize = 2;
@@ -177,7 +177,7 @@ extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativeInit(JNIEnv * env,
 	//myLoader.autoCPU = 1;
 }
 
-extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativePause(JNIEnv * env, jobject obj, jint state)
+extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativePause(JNIEnv * env, jobject obj, jint state)
 {
 	if ((state == 0) || (state == 1))
 		myLoader.pause = state;
@@ -185,12 +185,12 @@ extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativePause(JNIEnv * env
 		myLoader.pause = (myLoader.pause)?0:1;
 }
 
-extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativeStop(JNIEnv * env, jobject obj)
+extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeStop(JNIEnv * env, jobject obj)
 {
 	myLoader.abort = 1;
 }
 
-extern "C" void Java_com_fishstix_dosbox_DosBoxLauncher_nativeShutDown(JNIEnv * env, jobject obj)
+extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeShutDown(JNIEnv * env, jobject obj)
 {
 	myLoader.bmph = 0;
 	myLoader.videoBuffer = 0;
