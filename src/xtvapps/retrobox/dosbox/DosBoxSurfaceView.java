@@ -1101,11 +1101,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		VideoRedraw(mBitmap, mSrc_width, mSrc_height, 0, mSrc_height);		
 	}
 	
-	public void toggleExtraButtons() {
-		showExtraButtons = !showExtraButtons;
-		forceRedraw();
-	}
-	
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		resetScreen(true);
@@ -1179,7 +1174,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	
 	public int lastCalibrationOriginX = -1;
 	public int lastCalibrationOriginY = -1;
-	public boolean showExtraButtons = true;
+	public boolean showExtraButtons = false;
 	
 	private void ensureMouseCalibration() {
 		if (mScreenRect.left == lastCalibrationOriginX && mScreenRect.top == lastCalibrationOriginY) return;

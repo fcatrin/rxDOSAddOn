@@ -82,17 +82,20 @@ public class DosBoxLauncher extends Activity {
 	public static DosBoxLauncher mDosBoxLauncher = null;
 	public boolean testingMode = true;
 	
-	public boolean mPrefRefreshHackOn = false;
-	public boolean mPrefCycleHackOn = true;
 	// TODO manejar desde config de video en RetroBox
 	public boolean mPrefScaleFilterOn = false;
 	
 	// TODO manejar desde config de videojuego (ej. Commander Keen)
 	public boolean mPrefFullScreenUpdate = false;
 	public boolean mPrefSoundModuleOn = true;
-	//public boolean mPrefAutoCPUOn = true;
-	public boolean mPrefMixerHackOn = true;
+	public boolean mPrefAutoCPUOn = true;
 	public boolean mTurboOn = false;
+	
+	static boolean turboCycles = true;
+	static boolean turboVGA = true;
+	static boolean turboAudio = true;
+
+	
 	public String mPID = null;
 	//public String mPrefKeyMapping = "abc";
 	public int mPrefCycles = 3000; 
@@ -117,9 +120,7 @@ public class DosBoxLauncher extends Activity {
 		Log.i("DosBoxTurbo", "onCreate()");
 		
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        requestWindowFeature(Window.FEATURE_PROGRESS);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
 		
 		useRealJoystick = getIntent().getBooleanExtra("realJoystick", false);
 		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
@@ -268,6 +269,7 @@ public class DosBoxLauncher extends Activity {
 	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);			
 		}
 
+		/*
 		if (mTurboOn) {
 			Toast.makeText(this, "Fast Forward", Toast.LENGTH_SHORT).show();
 		} else {			
@@ -277,6 +279,7 @@ public class DosBoxLauncher extends Activity {
 				Toast.makeText(this, "DosBox Cycles: "+DosBoxControl.nativeGetCycleCount(), Toast.LENGTH_SHORT).show();
 			}
 		}
+		*/
 		
 		Log.i("DosBoxTurbo","onResume");
 	}
@@ -320,13 +323,6 @@ public class DosBoxLauncher extends Activity {
 
 		nativeInit(mDosBoxLauncher); 
 
-		/*nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLES, mPrefCycles);
-		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_FRAMESKIP, mPrefFrameskip);
-		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_MEMORY_SIZE, mPrefMemorySize);
-		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_SOUND_MODULE_ON, (mPrefSoundModuleOn)?1:0);
-		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_REFRESH_HACK_ON, (mPrefRefreshHackOn)?1:0);
-		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLE_HACK_ON, (mPrefCycleHackOn)?1:0); */
-		
 	    Intent intent = getIntent();
 	    String dosBoxConfigFile = intent.getStringExtra("conf");
 	    String dosBoxConfigFileUser =intent.getStringExtra("userconf");
@@ -343,13 +339,49 @@ public class DosBoxLauncher extends Activity {
 		if (dosBoxConfigFile!=null) nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_DOSBOX_DEFAULT, 0, dosBoxConfigFile, true);
 		if (dosBoxConfigFileUser!=null) nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_DOSBOX_USER, 0, dosBoxConfigFileUser, true);
 		
-		
-		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_MIXER_HACK_ON, (mPrefMixerHackOn)?1:0,null, true);
-		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_SOUND_MODULE_ON, (mPrefSoundModuleOn)?1:0,null, true);
-		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_AUTO_CPU_ON, 0,null, true);
-		
+		DosBoxCustomConfig.init(dosBoxConfigFile);
+		DosBoxCustomConfig.init(dosBoxConfigFileUser);
+		loadCustomPreferences();
 
 		mDosBoxThread = new DosBoxThread(this);
+	}
+	
+	void loadCustomPreferences() {
+		// SCREEN SCALE FACTOR
+		mPrefScaleFactor = 100;
+		
+		// Test mode
+		testingMode = DosBoxCustomConfig.getBoolean("testmode", false);
+		
+		// Full Screen update
+		mPrefFullScreenUpdate = DosBoxCustomConfig.getBoolean("fsupdate", mPrefFullScreenUpdate);
+		
+		// SCALE MODE
+		mPrefScaleFilterOn = DosBoxCustomConfig.getBoolean("videofilter", mPrefScaleFilterOn);
+		 
+		// ASPECT Ratio 
+		mSurfaceView.mMaintainAspect = DosBoxCustomConfig.getBoolean("keepaspect", mSurfaceView.mMaintainAspect);
+		
+		mPrefFrameskip = DosBoxCustomConfig.getInt("frameskip", mPrefFrameskip);
+		turboCycles = DosBoxCustomConfig.getBoolean("turboCycle", turboCycles);
+		turboVGA    = DosBoxCustomConfig.getBoolean("turboVGA", turboCycles);
+		turboAudio  = DosBoxCustomConfig.getBoolean("turboAudio", turboCycles);
+		mPrefAutoCPUOn = DosBoxCustomConfig.getBoolean("autocpu", mPrefAutoCPUOn);
+		
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLES, mPrefCycles, null, true);
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_FRAMESKIP, mPrefFrameskip ,null, true);		
+		
+		// TURBO CYCLE
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLE_HACK_ON, turboCycles?1:0,null,true);
+		// TURBO VGA
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_REFRESH_HACK_ON, turboVGA?1:0,null,true);
+		// TURBO AUDIO
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_MIXER_HACK_ON, turboAudio?1:0,null,true);
+
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_SOUND_MODULE_ON, mPrefSoundModuleOn?1:0,null,true);
+		// AUTO CPU 
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_AUTO_CPU_ON, mPrefAutoCPUOn?1:0,null,true);
+
 	}
 	
 	void shutDownDosBox() {
@@ -598,7 +630,8 @@ public class DosBoxLauncher extends Activity {
 	}
 	
 	protected void uiToggleButtons() {
-		mSurfaceView.toggleExtraButtons();
+		mSurfaceView.showExtraButtons = !mSurfaceView.showExtraButtons;
+		mSurfaceView.forceRedraw();
 	}
 	
 	protected void uiToggleFilter() {
@@ -609,6 +642,7 @@ public class DosBoxLauncher extends Activity {
 	protected void uiToggleFullScreenUpdate() {
 		mPrefFullScreenUpdate = !mPrefFullScreenUpdate;
 		mSurfaceView.forceRedraw();
+		toastMessage("Fullscreen update is " + (mPrefFullScreenUpdate?"on":"off"));
 	}
 	
 	protected void uiFrameskipMore() {
@@ -650,10 +684,6 @@ public class DosBoxLauncher extends Activity {
 		toastMessage("CPU Cycles: " + mPrefCycles);
 	}
 	
-	static boolean turboCycles = false;
-	static boolean turboVGA = false;
-	static boolean turboAudio = false;
-	
 	protected void uiTurboCycles() {
 		turboCycles = !turboCycles;
 		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLE_HACK_ON, turboCycles?1:0,null,true);
@@ -667,7 +697,7 @@ public class DosBoxLauncher extends Activity {
 	protected void uiTurboAudio() {
 		turboAudio = !turboAudio;
 		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_MIXER_HACK_ON, turboAudio?1:0,null,true);
-		toastMessage("Turbo Audio is " + (turboCycles?"on":"off"));
+		toastMessage("Turbo Audio is " + (turboAudio?"on":"off"));
 	}
 	
     protected void uiQuit() {

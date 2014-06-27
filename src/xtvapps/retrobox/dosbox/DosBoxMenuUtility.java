@@ -51,6 +51,16 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 public class DosBoxMenuUtility {
+	
+	/* settings from dosbox.conf
+	 * 
+	 * frameskip=0
+	 * cycles=auto
+	 * 
+	 * 
+	 * 
+	 */
+	
 	public static String mPrefCycleString = "max";	// default slow system
 	private static final Uri CONTENT_URI=Uri.parse("content://com.fishstix.dosboxlauncher.files/");
 	private final static int JOYSTICK_CENTER_X = 0;
@@ -230,47 +240,6 @@ public class DosBoxMenuUtility {
 		else 
 			context.mSurfaceView.mScreenTop = true;
 		
-		// SCREEN SCALE FACTOR
-		context.mPrefScaleFactor = prefs.getInt("confresizefactor", 100);
-		
-		// SCALE MODE
-		if (Integer.valueOf(prefs.getString("confscalemode", "0"))==0) {
-			context.mPrefScaleFilterOn = false;
-		} else {
-			context.mPrefScaleFilterOn = true;
-		}
-		 
-		// ASPECT Ratio 
-		context.mSurfaceView.mMaintainAspect = prefs.getBoolean("confkeepaspect", true);
-		  
-		// SET Cycles
-		if (!prefs.getString("doscycles", "auto").contains("auto") && !prefs.getBoolean("dosmanualconf", false)) {
-			try {
-				DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLES, Integer.valueOf(prefs.getString("doscycles", "5000")),null, true);
-			} catch (NumberFormatException e) {
-				// set default to 5000 cycles on exception
-				DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLES, 5000 ,null, true);
-			}
-		}
-		
-		
-		// Set Frameskip
-		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_FRAMESKIP, Integer.valueOf(prefs.getString("dosframeskip", "2")),null, true);		
-		
-		// TURBO CYCLE
-		DosBoxLauncher.nativeSetOption(DOSBOX_OPTION_ID_CYCLE_HACK_ON, prefs.getBoolean("confturbocycle", true)?1:0,null,true);
-		// TURBO VGA
-		DosBoxLauncher.nativeSetOption(DOSBOX_OPTION_ID_REFRESH_HACK_ON, prefs.getBoolean("confturbovga", true)?1:0,null,true);
-		// TURBO AUDIO
-		context.mPrefMixerHackOn = prefs.getBoolean("confturbomixer", true);
-		DosBoxLauncher.nativeSetOption(DOSBOX_OPTION_ID_MIXER_HACK_ON, context.mPrefMixerHackOn?1:0,null,true);
-		// SOUND
-		context.mPrefSoundModuleOn = prefs.getBoolean("confsound", true);
-		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_SOUND_MODULE_ON, context.mPrefSoundModuleOn?1:0,null,true);
-		// AUTO CPU 
-		//context.mPrefAutoCPUOn = prefs.getBoolean("dosautocpu", false);  
-		//DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_AUTO_CPU_ON, context.mPrefAutoCPUOn?1:0,null,DosBoxLauncher.getLicResult());
-		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_AUTO_CPU_ON, 0,null,true);
 		
 		// INPUT MODE
 		
@@ -352,6 +321,7 @@ public class DosBoxMenuUtility {
 
 		if (prefs.getBoolean("confjoyoverlay", true) && !isMouseOnly) {
 			context.mSurfaceView.mShowJoy = true;
+			context.mSurfaceView.showExtraButtons = true;
 			//context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_JOYSTICK;	// switch to joystick mode
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.putString("confinputmode", String.valueOf(INPUT_JOYSTICK));
@@ -551,7 +521,7 @@ public class DosBoxMenuUtility {
 		context.mSurfaceView.forceRedraw();
 	}
 	
-	static public boolean doOptionsItemSelected(DosBoxLauncher context, MenuItem item)
+	static private boolean doOptionsItemSelected(DosBoxLauncher context, MenuItem item)
 	{
 		switch(item.getItemId()){
 			case MENU_QUIT:
@@ -566,7 +536,7 @@ public class DosBoxMenuUtility {
 				break;
 
 			case MENU_KEYBOARD_SPECIAL:
-				toggleExtraButtons(context);
+				//toggleExtraButtons(context);
 				//context.mSurfaceView.mContextMenu = CONTEXT_MENU_SPECIAL_KEYS;				
 				//context.openContextMenu(context.mSurfaceView);
 				break;
@@ -600,10 +570,6 @@ public class DosBoxMenuUtility {
 				break;
 		  }
 		  return true;
-	}
-	
-	static private void toggleExtraButtons(DosBoxLauncher context) {
-		context.mSurfaceView.toggleExtraButtons();
 	}
 	
 	static public void doCreateContextMenu(DosBoxLauncher context, ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
