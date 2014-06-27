@@ -50,6 +50,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -79,8 +80,9 @@ public class DosBoxLauncher extends Activity {
 	public DosBoxThread mDosBoxThread = null;
 	public SharedPreferences prefs;
 	public static DosBoxLauncher mDosBoxLauncher = null;
+	public boolean testingMode = true;
 	
-	public boolean mPrefRefreshHackOn = true;
+	public boolean mPrefRefreshHackOn = false;
 	public boolean mPrefCycleHackOn = true;
 	// TODO manejar desde config de video en RetroBox
 	public boolean mPrefScaleFilterOn = false;
@@ -114,8 +116,14 @@ public class DosBoxLauncher extends Activity {
 		super.onCreate(savedInstanceState);
 		Log.i("DosBoxTurbo", "onCreate()");
 		
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        requestWindowFeature(Window.FEATURE_PROGRESS);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		
 		useRealJoystick = getIntent().getBooleanExtra("realJoystick", false);
 		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
+		//testingMode = getIntent().getBooleanExtra("testingMode", false);
 
 		mSurfaceView = new DosBoxSurfaceView(this);
 		setContentView(mSurfaceView);
@@ -277,25 +285,6 @@ public class DosBoxLauncher extends Activity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);		
-		return DosBoxMenuUtility.doCreateOptionsMenu(menu);
-	}
-	
-	@Override
-	public boolean onPrepareOptionsMenu (Menu menu) {
-		super.onPrepareOptionsMenu(menu);
-		return DosBoxMenuUtility.doPrepareOptionsMenu(this, menu);
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)	{
-		if (DosBoxMenuUtility.doOptionsItemSelected(this, item))
-			return true;
-	    return super.onOptionsItemSelected(item);	    
-	}	
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -531,6 +520,160 @@ public class DosBoxLauncher extends Activity {
 		}*/
 	//}
 	
+	protected void toastMessage(String message) {
+    	Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+    
+	@Override
+	public void onBackPressed() {
+		uiQuit();
+	}
+	
+    static final private int TOGGLE_BUTTONS_ID = Menu.FIRST +1;
+    static final private int TOGGLE_FILTER_ID = Menu.FIRST +2;
+    static final private int MORE_CYCLES_ID = Menu.FIRST +3;
+    static final private int AUTO_CYCLES_ID = Menu.FIRST +4;
+    static final private int LESS_CYCLES_ID = Menu.FIRST +5;
+    static final private int MORE_FRAMESKIP_ID = Menu.FIRST +6;
+    static final private int LESS_FRAMESKIP_ID = Menu.FIRST +7;
+    static final private int QUIT_ID = Menu.FIRST +8;
+    static final private int TURBO_VGA_ID = Menu.FIRST +9;
+    static final private int TURBO_CYCLES_ID = Menu.FIRST +10;
+    static final private int TURBO_AUDIO_ID = Menu.FIRST +11;
+    static final private int FULLSCREEN_UPDATE_ID = Menu.FIRST +12;
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        menu.add(0, TOGGLE_BUTTONS_ID, 0, "Toggle Buttons");
+        if (testingMode) {
+	        menu.add(0, TOGGLE_FILTER_ID, 0, "Toggle Video Filter");
+	        menu.add(0, MORE_FRAMESKIP_ID, 0, "More Frameskip");
+	        menu.add(0, LESS_FRAMESKIP_ID, 0, "Less Frameskip");
+	        menu.add(0, MORE_CYCLES_ID, 0, "More Cycles");
+	        menu.add(0, AUTO_CYCLES_ID, 0, "Auto Cycles");
+	        menu.add(0, LESS_CYCLES_ID, 0, "Less Cycles");
+	        menu.add(0, TURBO_VGA_ID, 0, "Toggle Turbo VGA");
+	        menu.add(0, TURBO_CYCLES_ID, 0, "Toggle Turbo Cycles");
+	        menu.add(0, TURBO_AUDIO_ID, 0, "Toggle Turbo Audio");
+	        menu.add(0, FULLSCREEN_UPDATE_ID, 0, "Toggle FullScreen Update");
+        }
+        menu.add(0, QUIT_ID, 0, "Quit");
+        
+        return true;
+    }
+    
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+    	if (item != null) {
+	        switch (item.getItemId()) {
+	        case TOGGLE_BUTTONS_ID : uiToggleButtons(); return true;
+	        case TOGGLE_FILTER_ID : uiToggleFilter(); return true;
+	        case MORE_FRAMESKIP_ID : uiFrameskipMore(); return true;
+	        case LESS_FRAMESKIP_ID : uiFrameskipLess(); return true;
+	        case MORE_CYCLES_ID : uiCyclesMore(); return true;
+	        case AUTO_CYCLES_ID : uiCyclesAuto(); return true;
+	        case LESS_CYCLES_ID : uiCyclesLess(); return true;
+	        case TURBO_VGA_ID : uiTurboVGA(); return true;
+	        case TURBO_CYCLES_ID : uiTurboCycles(); return true;
+	        case TURBO_AUDIO_ID : uiTurboAudio(); return true;
+	        case FULLSCREEN_UPDATE_ID : uiToggleFullScreenUpdate(); return true;
+	        case QUIT_ID : uiQuit(); return true;
+	        }
+    	}
+        return super.onMenuItemSelected(featureId, item);
+    }
+    
+    @Override
+	public boolean onMenuOpened(int featureId, Menu menu) {
+		onPause();
+		return super.onMenuOpened(featureId, menu);
+	}
+
+	@Override
+	public void onOptionsMenuClosed(Menu menu) {
+		onResume();
+		super.onOptionsMenuClosed(menu);
+	}
+	
+	protected void uiToggleButtons() {
+		mSurfaceView.toggleExtraButtons();
+	}
+	
+	protected void uiToggleFilter() {
+		mPrefScaleFilterOn = !mPrefScaleFilterOn;
+		mSurfaceView.forceRedraw();
+	}
+
+	protected void uiToggleFullScreenUpdate() {
+		mPrefFullScreenUpdate = !mPrefFullScreenUpdate;
+		mSurfaceView.forceRedraw();
+	}
+	
+	protected void uiFrameskipMore() {
+		mPrefFrameskip++;
+		uiUpdateFrameskip();
+	}
+
+	protected void uiFrameskipLess() {
+		if (mPrefFrameskip == 0) return;
+		
+		mPrefFrameskip--;
+		uiUpdateFrameskip();
+	}
+	
+	protected void uiUpdateFrameskip() {
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_FRAMESKIP, mPrefFrameskip ,null, true);
+		toastMessage("Frameskip: " + mPrefFrameskip);
+	}
+
+	protected void uiCyclesMore() {
+		mPrefCycles += 1000; 
+		uiUpdateCycles();
+	}
+
+	protected void uiCyclesAuto() {
+		mPrefCycles = 3000; 
+		uiUpdateCycles();
+	}
+
+	protected void uiCyclesLess() {
+		if (mPrefCycles<=1000) return;
+		
+		mPrefCycles -= 1000; 
+		uiUpdateCycles();
+	}
+	
+	protected void uiUpdateCycles() {
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLES, mPrefCycles,null,true);
+		toastMessage("CPU Cycles: " + mPrefCycles);
+	}
+	
+	static boolean turboCycles = false;
+	static boolean turboVGA = false;
+	static boolean turboAudio = false;
+	
+	protected void uiTurboCycles() {
+		turboCycles = !turboCycles;
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLE_HACK_ON, turboCycles?1:0,null,true);
+		toastMessage("Turbo Cycles is " + (turboCycles?"on":"off"));
+	}
+	protected void uiTurboVGA() {
+		turboVGA = !turboVGA;
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_REFRESH_HACK_ON, turboVGA?1:0,null,true);
+		toastMessage("Turbo VGA is " + (turboVGA?"on":"off"));
+	}
+	protected void uiTurboAudio() {
+		turboAudio = !turboAudio;
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_MIXER_HACK_ON, turboAudio?1:0,null,true);
+		toastMessage("Turbo Audio is " + (turboCycles?"on":"off"));
+	}
+	
+    protected void uiQuit() {
+    	stopDosBox();
+    }
+
 	
 	class VirtualInputDispatcher implements VirtualEventDispatcher {
 
@@ -548,8 +691,12 @@ public class DosBoxLauncher extends Activity {
 
 		@Override
 		public boolean handleShortcut(ShortCut shortcut, boolean down) {
-			// TODO Auto-generated method stub
-			return false;
+			switch(shortcut) {
+			case EXIT: if (!down) uiQuit(); return true;
+			case MENU : if (!down) openOptionsMenu(); return true;
+			default:
+				return false;
+			}
 		}
 		
 	}

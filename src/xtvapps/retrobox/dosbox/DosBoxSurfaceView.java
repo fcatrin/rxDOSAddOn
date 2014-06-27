@@ -407,9 +407,9 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 					if (mShowJoy) {
 						Overlay.drawJoystick(canvas, mTextPaint);
 					}
-					if (showExtraButtons) {
-						Overlay.drawExtraButtons(canvas, mTextPaint);
-					}
+				}
+				if (showExtraButtons) {
+					Overlay.drawExtraButtons(canvas, mTextPaint);
 				}
 				ensureMouseCalibration();
 			}

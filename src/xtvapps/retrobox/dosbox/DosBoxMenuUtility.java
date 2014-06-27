@@ -123,7 +123,12 @@ public class DosBoxMenuUtility {
 	public final static int DOSBOX_OPTION_ID_DOSBOX_DEFAULT = 51;
 	public final static int DOSBOX_OPTION_ID_DOSBOX_USER = 52;
 	
+	private static boolean initialized = false;
+	
 	static public void loadPreference(DosBoxLauncher context, final SharedPreferences prefs) {	
+		if (initialized) return;
+		initialized = true;
+		
 		// gracefully handle upgrade from previous versions, fishstix
 		if (Integer.valueOf(prefs.getString("confcontroller", "-1")) >= 0) {
 			DosBoxPreferences.upgrade(prefs);
@@ -352,6 +357,7 @@ public class DosBoxMenuUtility {
 			editor.putString("confinputmode", String.valueOf(INPUT_JOYSTICK));
 			editor.commit();
 		} else {
+			context.mSurfaceView.showExtraButtons = false;
 			context.mSurfaceView.mShowJoy = false;	
 		}
 		if (prefs.getBoolean("confbuttonoverlay", false)) {
