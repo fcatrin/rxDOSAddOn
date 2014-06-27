@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Fishstix - Based upon DosBox & anDosBox by Locnet
+  *  Copyright (C) 2013 Fishstix - Based upon DosBox & anDosBox by Locnet
  *  
  *  Copyright (C) 2011 Locnet (android.locnet@gmail.com)
  *  This program is free software; you can redistribute it and/or modify
@@ -22,16 +22,13 @@ package xtvapps.retrobox.dosbox;
 import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import xtvapps.retrobox.dosbox.R;
-import xtvapps.retrobox.dosbox.Joystick.Position;
-import xtvapps.retrobox.dosbox.VirtualKey.MouseButton;
+import retrobox.vinput.ExtraButtons;
+import retrobox.vinput.JoystickEventDispatcher;
+import retrobox.vinput.Mapper;
+import retrobox.vinput.Mapper.ShortCut;
+import retrobox.vinput.Overlay;
+import retrobox.vinput.VirtualEvent.MouseButton;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import android.app.Activity;
 import android.content.Context;
@@ -49,7 +46,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,7 +53,6 @@ import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.Toast;
 
   
@@ -101,13 +96,9 @@ public class DosBoxLauncher extends Activity {
 	public boolean isMouseOnly = false;
 	public boolean useRealJoystick = false;
 	
-	private static String keyNames[] = { 
-		"UP", "DOWN", "LEFT", "RIGHT", "BTN_A", "BTN_B", "BTN_X", "BTN_Y", "TL", "TR",
-		"SELECT", "START", "EXIT", "TL2", "TR2"
-	};
-
-	public static VirtualKey keyValues[] = new VirtualKey[keyNames.length];
-	public static VirtualJoystick virtualJoystick[] = new VirtualJoystick[keyNames.length];
+	static Mapper mapper;
+	private VirtualEventDispatcher virtualEventDispatcher;
+	
 	
 	private static boolean useKeyTranslation = false;
     
@@ -177,37 +168,14 @@ public class DosBoxLauncher extends Activity {
 
 		// load real joystick translation
 		Log.d("JSTICK", "useRealJoystick is " + useRealJoystick);
-		if (useRealJoystick) {
-			for(int i=0; i<keyNames.length; i++) {
-				Integer keyCode = getIntent().getIntExtra("j1" + keyNames[i], 0);
-				Log.d("JSTICK", "keyCode for " + keyNames[i] + ":" + keyCode);
-				VirtualJoystick vj = null;
-				if (keyCode>0) {
-					vj = new VirtualJoystick();
-					vj.keyCode = keyCode;
-				}
-				virtualJoystick[i] = vj;
-			}
-		}
+		virtualEventDispatcher = new VirtualEventDispatcher();
+		mapper = new Mapper(getIntent(), virtualEventDispatcher);
 		
 		int mouseWarpX = getIntent().getIntExtra("warpX", 100);
 		int mouseWarpY = getIntent().getIntExtra("warpY", 100);
 		if (mouseWarpX>0) mSurfaceView.warpX = mouseWarpX / 100.0f;
 		if (mouseWarpY>0) mSurfaceView.warpY = mouseWarpY / 100.0f;
 		
-	    // load key translations from retrobox (linux) to sdl
-		KeyTranslator.init();
-	    for(int i=0; i<keyNames.length; i++) {
-	    	String keyNameLinux = getIntent().getStringExtra("kmap1" + keyNames[i]); // only 1 player in andriod touchscreen
-	    	if (keyNameLinux!=null) {
-	    		Log.d("REMAP", "Key for " + keyNames[i] + " is " + keyNameLinux);
-	    		useKeyTranslation = true;
-	    		VirtualKey key = KeyTranslator.translate(keyNameLinux);;
-	    		keyValues[i] = key;
-	    		Log.d("REMAP", "Linux key " + keyNameLinux + " mapped to key " + key);
-	    	} else keyValues[i] = null;
-	    }
-	    
 		DosBoxMenuUtility.loadPreference(this,prefs);	
 
 		BitmapDrawable splash = (BitmapDrawable) getResources().getDrawable(R.drawable.splash);
@@ -232,9 +200,10 @@ public class DosBoxLauncher extends Activity {
 		observer.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 
 	        public void onGlobalLayout() {
-	    		extraButtons.clear();
-	    		recalculateJoystickOverlay();
-	    	    initExtraButtons(getIntent().getStringExtra("buttons"));
+	        	int w = mSurfaceView.getWidth();
+	        	int h = mSurfaceView.getHeight();
+	        	Overlay.initJoystickOverlay(w, h);
+	    	    ExtraButtons.initExtraButtons(DosBoxLauncher.this, getIntent().getStringExtra("buttons"), mSurfaceView.getWidth(), mSurfaceView.getHeight(), isMouseOnly);
 	    		
 	            Log.v("DosBoxTurbo",
 	                    String.format("new width=%d; new height=%d", mSurfaceView.getWidth(),
@@ -245,214 +214,6 @@ public class DosBoxLauncher extends Activity {
 	}
 	// splash can go here
 
-	public static final int EXTRA_BUTTONS_ALPHA = 0x80000000;
-	public static final int EXTRA_BUTTONS_ALPHA_PRESSED = 0xE0000000;
-
-	private JoystickButtonExtra createMouseButton(String name, String key, int left, int margin, int h, int size) {
-		boolean isLeftButton = key.equals("MOUSE_LEFT");
-		JoystickButtonExtra mouseButton = new JoystickButtonExtra();
-		mouseButton.w = size;
-		mouseButton.h = (int)(size * 0.4);
-		mouseButton.y = h - margin - mouseButton.h;
-		
-		mouseButton.x = isLeftButton?margin:left - margin - mouseButton.w;
-		
-		mouseButton.label = name;
-		mouseButton.key = new VirtualKey(isLeftButton?MouseButton.LEFT:MouseButton.RIGHT);
-		mouseButton.color = EXTRA_BUTTONS_ALPHA | 0xFFFFFF;
-		mouseButton.colorPressed = EXTRA_BUTTONS_ALPHA_PRESSED | 0xFFFFFF;
-		return mouseButton;
-	}
-	
-	private JoystickButtonExtra createExtraButton(String name, String key, int left, int top, int size) {
-		JoystickButtonExtra button = new JoystickButtonExtra();
-		button.x = left;
-		button.y = top;
-		button.w = size;
-		button.h = (int)(size * 0.4);
-		button.label = name;
-		button.key = KeyTranslator.translate(key);
-		button.color = EXTRA_BUTTONS_ALPHA | 0xFFFFFF;
-		button.colorPressed = EXTRA_BUTTONS_ALPHA_PRESSED | 0xFFFFFF;
-		return button;
-	}
-	
-	private void initExtraButtons(String json){
-		int w = mSurfaceView.getWidth();
-		int h = mSurfaceView.getHeight();
-		int maxButtons = 10;
-		
-		final float scale = getResources().getDisplayMetrics().density;
-		int margin = (int)(10 * scale);
-		int gap = (int)(4 * scale);
-		int size = (w - (maxButtons-1)*gap + margin*2 ) / maxButtons;
-
-		int left = (w - (2*size) - gap) / 2;
-		int top = h - margin - size;
-
-		JoystickButtonExtra select = null;
-		JoystickButtonExtra start = null;
-		
-		if (!isMouseOnly) {
-			select = createExtraButton("SELECT", "NONE", left, top, size);
-			left += size + gap;
-			start  = createExtraButton("START" , "NONE", left, top, size);
-			select.key = keyValues[10];
-			start.key  = keyValues[11];
-			
-			extraButtons.add(select);
-			extraButtons.add(start);
-			Log.d("EXTRA", "Added select and start");
-		}
-
-		
-		if (json != null && json.trim().length() >= 0) {
-			try {
-				int nTopButtons = 0;
-				JSONArray a = new JSONArray(json);
-				for(int i=0; i<a.length(); i++) {
-					JSONObject o = a.getJSONObject(i);
-					String key = o.getString("key");
-					if (!key.startsWith("MOUSE_") && !key.startsWith("BTN_")) nTopButtons++;
-				}
-				
-				left = nTopButtons == 0 ? 0 : (w - (nTopButtons*size) - (nTopButtons-1) * gap) / 2;
-				top = margin;
-				for(int i=0; i<a.length(); i++) {
-					JSONObject o = a.getJSONObject(i);
-					String name = o.getString("name");
-					String key = o.getString("key");
-					if (key.startsWith("MOUSE_")) {
-						if (isMouseOnly) extraButtons.add(createMouseButton(name, key, w, top, h, size));
-					} else if (key.startsWith("BTN_")) {
-						int index = -1;
-						if (key.equals("BTN_A")) index = 0;
-						if (key.equals("BTN_B")) index = 1;
-						if (key.equals("BTN_X")) index = 2;
-						if (key.equals("BTN_Y")) index = 3;
-						if (index>=0) {
-							JoystickButton btn = mSurfaceView.joystickButtonsOverlay[index];
-							if (name.equals("_hide_")) btn.key = null;
-							else btn.label = name;
-							continue;
-						}
-						
-						if (key.equals("BTN_UP")) index = 0;
-						if (key.equals("BTN_DOWN")) index = 1;
-						if (key.equals("BTN_LEFT")) index = 2;
-						if (key.equals("BTN_RIGHT")) index = 3;
-						if (index>=0 && name.equals("_hide_")) {
-							Joystick joystickOverlay = mSurfaceView.joystickOverlay;
-							switch(index) {
-							case 0 : joystickOverlay.keyUp = null; break;
-							case 1 : joystickOverlay.keyDown = null; break;
-							case 2 : joystickOverlay.keyLeft = null; break;
-							case 3 : joystickOverlay.keyRight = null; break;
-							}
-							continue;
-						}
-						
-						if (key.equals("BTN_SELECT") && select!=null) {
-							if (name.equals("_hide_")) select.key = null;
-							else select.label = name;
-						}
-						if (key.equals("BTN_START") && start!=null) {
-							if (name.equals("_hide_")) start.key = null;
-							else start.label = name;
-						}
-					} else {
-						extraButtons.add(createExtraButton(name, key, left, top, size));
-						left += size + gap;
-					}
-				}
-			} catch (JSONException je) {
-				je.printStackTrace();
-			}
-		}
-		
-		Joystick joystickOverlay = mSurfaceView.joystickOverlay;
-		joystickOverlay.hasValidKeys = joystickOverlay.keyUp!=null || joystickOverlay.keyDown!=null || joystickOverlay.keyLeft != null || joystickOverlay.keyRight != null;
-
-		Log.d("EXTRA", extraButtons.size() + " buttons");
-		if (extraButtons.size()>0)	JoystickButtonExtra.textSize = extraButtons.get(0).h / 2;
-		
-		mSurfaceView.joystickExtraButtonsOverlay = extraButtons.toArray(new JoystickButtonExtra[0]);
-	}
-	
-	public static final int MAX_BUTTONS = 4;
-	public static final int BUTTONS_ALPHA = 0x70000000;
-	public static final int BUTTONS_ALPHA_PRESSED = 0xC0000000;
-	public static final int BUTTONS_ALPHA_BALL = 0xA0000000;
-	String buttonNames[] = {"A", "B", "X", "Y"};
-	int buttonColors[] = {0xFF0000, 0xFFFF00, 0x0000FF, 0x00FF00};
-	
-	List<JoystickButtonExtra> extraButtons = new ArrayList<JoystickButtonExtra>();
-	
-	private void recalculateJoystickOverlay() {
-		JoystickButton buttons[] = new JoystickButton[MAX_BUTTONS];
-
-		int w = mSurfaceView.getWidth();
-		int h = mSurfaceView.getHeight();
-		
-		int margin =  w / 8;
-		int marginButton = w / 10;
-		int radius = w / 24;
-		int gap = (int)(radius * 1.5);
-		
-		JoystickButton button = new JoystickButton();
-		button.x = w - marginButton;
-		button.y = h - margin;
-		buttons[0] = button;
-		
-		button = new JoystickButton();
-		button.x = w - marginButton - gap;
-		button.y = h - margin + gap;
-		buttons[1] = button;
-		
-		button = new JoystickButton();
-		button.x = w - marginButton - gap;
-		button.y = h - margin - gap;
-		buttons[2] = button;
-
-		button = new JoystickButton();
-		button.x = w - marginButton - gap*2;
-		button.y = h - margin;
-		buttons[3] = button;
-
-		for(int i=0; i<buttonNames.length; i++) {
-			buttons[i].label = buttonNames[i];
-			buttons[i].color = buttonColors[i] | BUTTONS_ALPHA;
-			buttons[i].colorPressed = buttonColors[i] | BUTTONS_ALPHA_PRESSED;
-			buttons[i].key = keyValues[4+i];
-			buttons[i].radius = radius;
-		}
-		
-		JoystickButton.textSize = radius / 2;
-		
-		mSurfaceView.joystickButtonsOverlay = buttons ;
-
-		Joystick joystick = new Joystick();
-		joystick.x = margin;
-		joystick.y = h - margin;
-		joystick.radius = (int)(margin * 0.8);
-		joystick.radiusBall = (int)(joystick.radius * 0.6);
-		joystick.color = BUTTONS_ALPHA | 0x777777;
-		joystick.colorBall = BUTTONS_ALPHA_BALL | 0x777777;
-		joystick.keyUp    = keyValues[0];
-		joystick.keyDown  = keyValues[1];
-		joystick.keyLeft  = keyValues[2];
-		joystick.keyRight = keyValues[3];
-		joystick.axisX = Position.CENTER;
-		joystick.axisY = Position.CENTER;
-		joystick.positionX = 0;
-		joystick.positionY = 0;
-		joystick.threshold = 0.2f;
-		
-
-		mSurfaceView.joystickOverlay = joystick;
-		
-	}
-	
 	@Override
 	protected void onDestroy() {
 		Log.i("DosBoxTurbo", "onDestroy()");
@@ -766,6 +527,29 @@ public class DosBoxLauncher extends Activity {
 			mGLSurfaceView.dispatchTouchEvent(motionEvent);
 		}*/
 	//}
+	
+	
+	class VirtualEventDispatcher implements JoystickEventDispatcher {
+
+		@Override
+		public void sendKey(int keyCode, boolean down) {
+			DosBoxControl.sendNativeKey(keyCode, down, false, false, false);
+		}
+
+		@Override
+		public void sendMouseButton(MouseButton button, boolean down) {
+			int action = down?DosBoxSurfaceView.ACTION_DOWN:DosBoxSurfaceView.ACTION_UP;
+			int btn = button == MouseButton.LEFT?DosBoxSurfaceView.BTN_A:DosBoxSurfaceView.BTN_B;
+			DosBoxControl.nativeMouse(0, 0, 0, 0, action, btn);
+		}
+
+		@Override
+		public boolean handleShortcut(ShortCut shortcut, boolean down) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
+	}
 	
 }
 
