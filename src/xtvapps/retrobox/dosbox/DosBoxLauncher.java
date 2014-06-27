@@ -31,7 +31,9 @@ import retrobox.vinput.overlay.ExtraButtons;
 import retrobox.vinput.overlay.Overlay;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -558,7 +560,7 @@ public class DosBoxLauncher extends Activity {
     
 	@Override
 	public void onBackPressed() {
-		uiQuit();
+		uiQuitConfirm();
 	}
 	
     static final private int TOGGLE_BUTTONS_ID = Menu.FIRST +1;
@@ -703,6 +705,20 @@ public class DosBoxLauncher extends Activity {
     protected void uiQuit() {
     	stopDosBox();
     }
+    
+	public void uiQuitConfirm() {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	builder.setTitle("Quit Game");
+		builder.setMessage("Confirm that you want to Quit this game");
+		
+		builder.setPositiveButton("Yes, Quit", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface arg0, int arg1) {
+				uiQuit();
+			}
+		});
+		builder.setNegativeButton("No", null);				
+		builder.create().show();		
+	}
 
 	
 	class VirtualInputDispatcher implements VirtualEventDispatcher {
@@ -722,7 +738,7 @@ public class DosBoxLauncher extends Activity {
 		@Override
 		public boolean handleShortcut(ShortCut shortcut, boolean down) {
 			switch(shortcut) {
-			case EXIT: if (!down) uiQuit(); return true;
+			case EXIT: if (!down) uiQuitConfirm(); return true;
 			case MENU : if (!down) openOptionsMenu(); return true;
 			default:
 				return false;

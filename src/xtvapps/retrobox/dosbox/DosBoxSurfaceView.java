@@ -977,6 +977,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			Log.d("DosBoxTurbo", "handleKey keyCode="+keyCode);
 		int tKeyCode = 0;
 
+		if (keyCode == KeyEvent.KEYCODE_BACK) return false;
+
 		// check for xperia play back case
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.isAltPressed()) {
 			int backval = customMap.get(DosBoxPreferences.XPERIA_BACK_BUTTON);
@@ -1012,14 +1014,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			}
 		}
 		
-		if (keyCode == KeyEvent.KEYCODE_BACK) { 
-			// fishstix, allow remap of Android back button
-			// catch no mapping
-			if (event.getAction() == KeyEvent.ACTION_UP) {
-				DosBoxMenuUtility.doConfirmQuit(mParent);
-			}
-			return true;					
-		}
 
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_UNKNOWN:

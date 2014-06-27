@@ -321,7 +321,7 @@ public class DosBoxMenuUtility {
 
 		if (prefs.getBoolean("confjoyoverlay", true) && !isMouseOnly) {
 			context.mSurfaceView.mShowJoy = true;
-			context.mSurfaceView.showExtraButtons = true;
+			context.mSurfaceView.showExtraButtons = true && context.mSurfaceView.mInputMode != DosBoxSurfaceView.INPUT_MODE_REAL_JOYSTICK;
 			//context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_JOYSTICK;	// switch to joystick mode
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.putString("confinputmode", String.valueOf(INPUT_JOYSTICK));
@@ -330,6 +330,10 @@ public class DosBoxMenuUtility {
 			context.mSurfaceView.showExtraButtons = false;
 			context.mSurfaceView.mShowJoy = false;	
 		}
+		
+		Log.d("EXTRA", "showExtraButtons " + context.mSurfaceView.showExtraButtons);
+		Log.d("EXTRA", "mShowJoy " + context.mSurfaceView.mShowJoy);
+		
 		if (prefs.getBoolean("confbuttonoverlay", false)) {
 			context.mSurfaceView.mShowInfo = true;
 		} else {
@@ -492,20 +496,6 @@ public class DosBoxMenuUtility {
 			imm.hideSoftInputFromWindow(context.mSurfaceView.getWindowToken(),0);
 	}
 	
-	static public void doConfirmQuit(final DosBoxLauncher context) {
-    	AlertDialog.Builder builder = new AlertDialog.Builder(context);
-    	builder.setTitle(R.string.app_name);
-		builder.setMessage("Exit DosBox?");
-		
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface arg0, int arg1) {
-				context.stopDosBox();
-			}
-		});
-		builder.setNegativeButton("Cancel", null);				
-		builder.create().show();		
-	}
-	
 	static public void doShowTextDialog(final DosBoxLauncher context, String message) {
     	AlertDialog.Builder builder = new AlertDialog.Builder(context);
     	builder.setTitle(R.string.app_name);
@@ -525,7 +515,7 @@ public class DosBoxMenuUtility {
 	{
 		switch(item.getItemId()){
 			case MENU_QUIT:
-				doConfirmQuit(context);
+				//doConfirmQuit(context);
 			    break;
 			case MENU_INPUT_INPUT_METHOD:
 			{
