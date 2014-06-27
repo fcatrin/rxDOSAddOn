@@ -23,12 +23,12 @@ import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-import retrobox.vinput.ExtraButtons;
-import retrobox.vinput.JoystickEventDispatcher;
 import retrobox.vinput.Mapper;
 import retrobox.vinput.Mapper.ShortCut;
-import retrobox.vinput.Overlay;
 import retrobox.vinput.VirtualEvent.MouseButton;
+import retrobox.vinput.VirtualEventDispatcher;
+import retrobox.vinput.overlay.ExtraButtons;
+import retrobox.vinput.overlay.Overlay;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import android.app.Activity;
 import android.content.Context;
@@ -168,7 +168,7 @@ public class DosBoxLauncher extends Activity {
 
 		// load real joystick translation
 		Log.d("JSTICK", "useRealJoystick is " + useRealJoystick);
-		virtualEventDispatcher = new VirtualEventDispatcher();
+		virtualEventDispatcher = new VirtualInputDispatcher();
 		mapper = new Mapper(getIntent(), virtualEventDispatcher);
 		
 		int mouseWarpX = getIntent().getIntExtra("warpX", 100);
@@ -529,7 +529,7 @@ public class DosBoxLauncher extends Activity {
 	//}
 	
 	
-	class VirtualEventDispatcher implements JoystickEventDispatcher {
+	class VirtualInputDispatcher implements VirtualEventDispatcher {
 
 		@Override
 		public void sendKey(int keyCode, boolean down) {

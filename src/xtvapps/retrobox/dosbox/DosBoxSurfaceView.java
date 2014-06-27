@@ -20,26 +20,23 @@
 
 package xtvapps.retrobox.dosbox;
 
-import java.nio.Buffer; 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import retrobox.vinput.Mapper;
-import retrobox.vinput.Overlay;
+import retrobox.vinput.overlay.Overlay;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.retrobox.dosbox.touchevent.TouchEventWrapper;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Paint.FontMetricsInt;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.util.FloatMath;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.GestureDetector;
