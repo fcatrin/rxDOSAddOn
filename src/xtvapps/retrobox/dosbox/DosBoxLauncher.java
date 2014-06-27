@@ -80,9 +80,13 @@ public class DosBoxLauncher extends Activity {
 	public SharedPreferences prefs;
 	public static DosBoxLauncher mDosBoxLauncher = null;
 	
-	public boolean mPrefRefreshHackOn = false;
+	public boolean mPrefRefreshHackOn = true;
 	public boolean mPrefCycleHackOn = true;
+	// TODO manejar desde config de video en RetroBox
 	public boolean mPrefScaleFilterOn = false;
+	
+	// TODO manejar desde config de videojuego (ej. Commander Keen)
+	public boolean mPrefFullScreenUpdate = false;
 	public boolean mPrefSoundModuleOn = true;
 	//public boolean mPrefAutoCPUOn = true;
 	public boolean mPrefMixerHackOn = true;
@@ -334,6 +338,7 @@ public class DosBoxLauncher extends Activity {
 		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_REFRESH_HACK_ON, (mPrefRefreshHackOn)?1:0);
 		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLE_HACK_ON, (mPrefCycleHackOn)?1:0); */
 		
+		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_REFRESH_HACK_ON, 1, "", true);
 		
 	    Intent intent = getIntent();
 	    String dosBoxConfigFile = intent.getStringExtra("conf");

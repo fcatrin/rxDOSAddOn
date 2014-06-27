@@ -289,8 +289,10 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				isLandscape = (dst_width > dst_height);
 	
 				//if (mShowInfo)
-				if (mShowInfo || mShowJoy)
+				if (mShowInfo || mParent.mPrefFullScreenUpdate  || Overlay.requiresRedraw) {
 					mDirtyCount = 0;
+					Overlay.requiresRedraw = false;
+				}
 					
 				if (mDirtyCount < 3) {
 					mDirtyCount++;
@@ -364,10 +366,9 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				
 				if (isDirty) {
 					canvas = surfaceHolder.lockCanvas(null);
-					//canvas.drawColor(0xff202020);
 					canvas.drawColor(0xff000000);
 				}
-				else { 
+				else {
 					canvas = surfaceHolder.lockCanvas(mDirtyRect);
 				}
 				
