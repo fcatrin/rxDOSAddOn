@@ -338,8 +338,6 @@ public class DosBoxLauncher extends Activity {
 		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_REFRESH_HACK_ON, (mPrefRefreshHackOn)?1:0);
 		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLE_HACK_ON, (mPrefCycleHackOn)?1:0); */
 		
-		nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_REFRESH_HACK_ON, 1, "", true);
-		
 	    Intent intent = getIntent();
 	    String dosBoxConfigFile = intent.getStringExtra("conf");
 	    String dosBoxConfigFileUser =intent.getStringExtra("userconf");
