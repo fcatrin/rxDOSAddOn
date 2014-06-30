@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="xtvapps.retrobox.dosbox"  
-      android:versionCode="70"
-      android:versionName="2.2.1"
+      android:versionCode="221001"
+      android:versionName="2.2.1-1"
       android:installLocation="auto"
       android:sharedUserId="psychoworld.retrobox"
       > 
