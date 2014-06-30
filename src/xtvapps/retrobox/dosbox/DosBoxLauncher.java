@@ -25,15 +25,15 @@ import java.nio.ByteBuffer;
 
 import retrobox.vinput.Mapper;
 import retrobox.vinput.Mapper.ShortCut;
+import retrobox.vinput.QuitHandler;
+import retrobox.vinput.QuitHandler.QuitHandlerCallback;
 import retrobox.vinput.VirtualEvent.MouseButton;
 import retrobox.vinput.VirtualEventDispatcher;
 import retrobox.vinput.overlay.ExtraButtons;
 import retrobox.vinput.overlay.Overlay;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -52,8 +52,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -707,17 +707,12 @@ public class DosBoxLauncher extends Activity {
     }
     
 	public void uiQuitConfirm() {
-    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	builder.setTitle("Quit Game");
-		builder.setMessage("Confirm that you want to Quit this game");
-		
-		builder.setPositiveButton("Yes, Quit", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface arg0, int arg1) {
+		QuitHandler.askForQuit(this, new QuitHandlerCallback() {
+			@Override
+			public void onQuit() {
 				uiQuit();
 			}
 		});
-		builder.setNegativeButton("No", null);				
-		builder.create().show();		
 	}
 
 	
