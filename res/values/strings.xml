@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RetroBox MS-DOS Support</string>
+    <string name="app_name">RetroboxTv MS-DOS Support</string>
     <string name="debug">WARNING: DEBUG Mode is Enabled</string>
 
 <!--    <string name="absdefault">Absolute Tracking Calibration Reset</string>

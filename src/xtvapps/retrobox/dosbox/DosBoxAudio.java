@@ -23,7 +23,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
  
-public class DosBoxAudio 
+public class DosBoxAudio
 {
 	private boolean mAudioRunning=true;
 	private AudioTrack mAudio = null;
