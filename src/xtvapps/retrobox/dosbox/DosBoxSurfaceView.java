@@ -24,7 +24,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import retrobox.vinput.Mapper;
-import retrobox.vinput.overlay.Overlay;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.retrobox.dosbox.touchevent.TouchEventWrapper;
 import android.graphics.Bitmap;

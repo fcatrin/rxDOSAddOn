@@ -34,7 +34,6 @@ import retrobox.vinput.overlay.ExtraButtonsController;
 import retrobox.vinput.overlay.ExtraButtonsView;
 import retrobox.vinput.overlay.GamepadController;
 import retrobox.vinput.overlay.GamepadView;
-import retrobox.vinput.overlay.Overlay;
 import retrobox.vinput.overlay.OverlayNew;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import android.app.Activity;
@@ -641,7 +640,7 @@ public class DosBoxLauncher extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
-        if (Overlay.hasExtraButtons()) {
+        if (OverlayNew.hasExtraButtons()) {
         	menu.add(0, TOGGLE_BUTTONS_ID, 0, "Extra Buttons");
         }
         
