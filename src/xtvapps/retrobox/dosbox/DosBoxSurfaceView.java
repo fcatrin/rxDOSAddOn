@@ -91,7 +91,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	int mInputMode = INPUT_MODE_MOUSE;
 	boolean	mShowInfo = false;
 	public boolean mInfoHide = false;
-	boolean mShowJoy = false;
 	//boolean mEmulateClick = false; 
 	boolean mEnableDpad = false;
 	boolean mAbsolute = true;
@@ -289,9 +288,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				isLandscape = (dst_width > dst_height);
 	
 				//if (mShowInfo)
-				if (mShowInfo || mParent.mPrefFullScreenUpdate  || Overlay.requiresRedraw) {
+				if (mShowInfo || mParent.mPrefFullScreenUpdate) {
 					mDirtyCount = 0;
-					Overlay.requiresRedraw = false;
 				}
 					
 				if (mDirtyCount < 3) {
@@ -403,14 +401,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				}
 				*/
 				
-				if (mInputMode != INPUT_MODE_REAL_JOYSTICK) {
-					if (mShowJoy) {
-						Overlay.drawJoystick(canvas, mTextPaint);
-					}
-				}
-				if (showExtraButtons) {
-					Overlay.drawExtraButtons(canvas, mTextPaint);
-				}
 				ensureMouseCalibration();
 			}
 		} finally {
@@ -516,6 +506,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
+		
 		final int pointerIndex = ((event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
 		final int pointCnt = mWrap.getPointerCount(event);
 		final int pointerId = mWrap.getPointerId(event, pointerIndex);
@@ -540,10 +531,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				case MotionEvent.ACTION_DOWN:
 				case TouchEventWrapper.ACTION_POINTER_DOWN:
 
-					if (showExtraButtons) {
-						if (Overlay.onExtraButtonPress(pointerId, xp, yp)) return true;
-					}
-					
 					int button = -1;
 			        if (mInputMode == INPUT_MODE_MOUSE) {
 			        	Log.d("MOUSE", "ACTION_POINTER_DOWN");
@@ -571,8 +558,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 			        		} 
 			        	}
 			        } else if (mInputMode == INPUT_MODE_JOYSTICK) {
-			        	if (Overlay.onTriggerPress(pointerId, xp, yp)) return true;
-			        	if (Overlay.onJoystickOverlayPress(pointerId, xp, yp)) return true;
 
 					} else if (mInputMode == INPUT_MODE_REAL_JOYSTICK) {
 						button = mWrap.getButtonState(event);
@@ -591,10 +576,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 				break;
 				case MotionEvent.ACTION_UP: 
 				case TouchEventWrapper.ACTION_POINTER_UP:
-					if (showExtraButtons) {
-						if (Overlay.onExtraButtonRelease(pointerId)) return true;
-					}
-					
 					long diff = event.getEventTime() - event.getDownTime();
 					if (mInputMode == INPUT_MODE_JOYSTICK) {
 						if (diff < BUTTON_TAP_DELAY) {
@@ -604,8 +585,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 							} catch (InterruptedException e) {
 							}
 						}		
-						if (Overlay.onJoystickOverlayRelease(pointerId, xp, yp)) return true;
-						if (Overlay.onTriggerRelease(pointerId)) return true;
 					} else
 					if (mInputMode == INPUT_MODE_MOUSE){
 						if (mLongClick) {
@@ -703,7 +682,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 							int newPointerId;
 							for(int i = 0; i < pointCnt; ++i) {
 								newPointerId = mWrap.getPointerId(event,i);
-								if (Overlay.onJoystickOverlayPress(newPointerId, (int)x[pointerId], (int)y[pointerId])) return true;
+								// if (Overlay.onJoystickOverlayPress(newPointerId, (int)x[pointerId], (int)y[pointerId])) return true;
 							}
 						break;
 						case INPUT_MODE_MOUSE: 
@@ -1111,12 +1090,10 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	private final void toggleMouseJoystick() {
 		switch (mInputMode) { 
 		case DosBoxSurfaceView.INPUT_MODE_JOYSTICK:
-			mShowJoy = false;
 			mInputMode = DosBoxSurfaceView.INPUT_MODE_MOUSE;
 			DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_JOYSTICK_ENABLE, 0 ,null, true);
 			break;
 		case DosBoxSurfaceView.INPUT_MODE_MOUSE:
-			mShowJoy = true;
 			mInputMode = DosBoxSurfaceView.INPUT_MODE_JOYSTICK;
 			DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_JOYSTICK_ENABLE, 1 ,null, true);
 			break;
@@ -1168,7 +1145,6 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	
 	public int lastCalibrationOriginX = -1;
 	public int lastCalibrationOriginY = -1;
-	public boolean showExtraButtons = false;
 	
 	private void ensureMouseCalibration() {
 		if (mScreenRect.left == lastCalibrationOriginX && mScreenRect.top == lastCalibrationOriginY) return;

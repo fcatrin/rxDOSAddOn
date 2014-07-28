@@ -320,19 +320,11 @@ public class DosBoxMenuUtility {
 		//context.mPrefHardkeyOn = prefs.getBoolean("confvolbuttons", true);
 
 		if (prefs.getBoolean("confjoyoverlay", true) && !isMouseOnly) {
-			context.mSurfaceView.mShowJoy = true;
-			context.mSurfaceView.showExtraButtons = true && context.mSurfaceView.mInputMode != DosBoxSurfaceView.INPUT_MODE_REAL_JOYSTICK;
 			//context.mSurfaceView.mInputMode = DosBoxSurfaceView.INPUT_MODE_JOYSTICK;	// switch to joystick mode
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.putString("confinputmode", String.valueOf(INPUT_JOYSTICK));
 			editor.commit();
-		} else {
-			context.mSurfaceView.showExtraButtons = false;
-			context.mSurfaceView.mShowJoy = false;	
 		}
-		
-		Log.d("EXTRA", "showExtraButtons " + context.mSurfaceView.showExtraButtons);
-		Log.d("EXTRA", "mShowJoy " + context.mSurfaceView.mShowJoy);
 		
 		if (prefs.getBoolean("confbuttonoverlay", false)) {
 			context.mSurfaceView.mShowInfo = true;

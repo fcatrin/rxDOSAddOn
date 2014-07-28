@@ -30,7 +30,12 @@ import retrobox.vinput.QuitHandler.QuitHandlerCallback;
 import retrobox.vinput.VirtualEvent.MouseButton;
 import retrobox.vinput.VirtualEventDispatcher;
 import retrobox.vinput.overlay.ExtraButtons;
+import retrobox.vinput.overlay.ExtraButtonsController;
+import retrobox.vinput.overlay.ExtraButtonsView;
+import retrobox.vinput.overlay.GamepadController;
+import retrobox.vinput.overlay.GamepadView;
 import retrobox.vinput.overlay.Overlay;
+import retrobox.vinput.overlay.OverlayNew;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import android.app.Activity;
 import android.content.Context;
@@ -50,7 +55,9 @@ import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
@@ -110,6 +117,13 @@ public class DosBoxLauncher extends Activity {
 	static Mapper mapper;
 	private VirtualEventDispatcher virtualEventDispatcher;
 	
+	static GamepadController gamepadController;
+	static GamepadView gamepadView;
+	static ExtraButtonsController extraButtonsController;
+	static ExtraButtonsView extraButtonsView;
+	public static final OverlayNew overlay = new OverlayNew();
+	
+	
 	
 	private static boolean useKeyTranslation = false;
     
@@ -124,12 +138,17 @@ public class DosBoxLauncher extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
-		useRealJoystick = getIntent().getBooleanExtra("realJoystick", false);
+		useRealJoystick = getIntent().getStringExtra("gamepad") != null;
 		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
 		//testingMode = getIntent().getBooleanExtra("testingMode", false);
+		
+		View main = getLayoutInflater().inflate(R.layout.main, null);
+		setContentView(main);
+		
+		ViewGroup root = (ViewGroup)findViewById(R.id.root);
 
 		mSurfaceView = new DosBoxSurfaceView(this);
-		setContentView(mSurfaceView);
+		root.addView(mSurfaceView);
 		registerForContextMenu(mSurfaceView); 
 		
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -186,6 +205,11 @@ public class DosBoxLauncher extends Activity {
 		virtualEventDispatcher = new VirtualInputDispatcher();
 		mapper = new Mapper(getIntent(), virtualEventDispatcher);
 		
+		gamepadController = new GamepadController();
+		gamepadView = new GamepadView(this, overlay);
+		extraButtonsController = new ExtraButtonsController();
+		extraButtonsView = new ExtraButtonsView(this);
+		
 		int mouseWarpX = getIntent().getIntExtra("warpX", 100);
 		int mouseWarpY = getIntent().getIntExtra("warpY", 100);
 		if (mouseWarpX>0) mSurfaceView.warpX = mouseWarpX / 100.0f;
@@ -197,6 +221,8 @@ public class DosBoxLauncher extends Activity {
 		splash.setTargetDensity(120);
 		splash.setGravity(Gravity.CENTER);		
 		mSurfaceView.setBackgroundDrawable(splash);
+
+		setupGamepadOverlay(root);
 
 		initDosBox();
 		startDosBox();
@@ -210,23 +236,40 @@ public class DosBoxLauncher extends Activity {
 			e.printStackTrace();
 		}
 		
-		// calculate joystick constants
-		ViewTreeObserver observer = mSurfaceView.getViewTreeObserver();
-		observer.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-
-	        public void onGlobalLayout() {
-	        	int w = mSurfaceView.getWidth();
-	        	int h = mSurfaceView.getHeight();
-	        	Overlay.initJoystickOverlay(w, h);
-	    	    ExtraButtons.initExtraButtons(DosBoxLauncher.this, getIntent().getStringExtra("buttons"), mSurfaceView.getWidth(), mSurfaceView.getHeight(), isMouseOnly);
-	    		
-	            Log.v("DosBoxTurbo",
-	                    String.format("new width=%d; new height=%d", mSurfaceView.getWidth(),
-	                            mSurfaceView.getHeight()));
-	        }
-	    });
-
 	}
+	
+	private boolean needsOverlay() {
+		return !getIntent().hasExtra("gamepad");
+	}
+	
+	private void setupGamepadOverlay(ViewGroup root) {
+		ViewTreeObserver observer = root.getViewTreeObserver();
+		observer.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				int w = mSurfaceView.getWidth();
+				int h = mSurfaceView.getHeight();
+				if (needsOverlay()) {
+					String overlayConfig = getIntent().getStringExtra("OVERLAY");
+					if (overlayConfig!=null) overlay.init(overlayConfig, w, h);
+				}
+				Log.d("REMAP", "addExtraButtons : " + getIntent().getStringExtra("buttons"));
+				ExtraButtons.initExtraButtons(DosBoxLauncher.this, getIntent().getStringExtra("buttons"), mSurfaceView.getWidth(), mSurfaceView.getHeight(), isMouseOnly);
+				}
+			});
+		
+		Log.d("OVERLAY", "setupGamepadOverlay");
+		if (needsOverlay()) {
+			Log.d("OVERLAY", "has Overlay");
+			gamepadView.addToLayout(root);
+			gamepadView.showPanel();
+		}
+		Log.d("OVERLAY", "extraButtonsView.addToLayout");
+		extraButtonsView.addToLayout(root);
+		extraButtonsView.hidePanel();
+	}
+	
+	
 	// splash can go here
 
 	@Override
@@ -348,6 +391,23 @@ public class DosBoxLauncher extends Activity {
 		mDosBoxThread = new DosBoxThread(this);
 	}
 	
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent ev) {
+		if (gamepadView.isVisible() && gamepadController.onTouchEvent(ev)) {
+			Log.d("TOUCH", "dispatched to gamepadController");
+			if (OverlayNew.requiresRedraw) {
+				OverlayNew.requiresRedraw = false;
+				gamepadView.invalidate();
+			}
+			return true;
+		}
+		
+		if (extraButtonsView.isVisible() && extraButtonsController.onTouchEvent(ev)) {
+			return true;
+		}
+		
+		return super.dispatchTouchEvent(ev);
+	}
 	void loadCustomPreferences() {
 		// SCREEN SCALE FACTOR
 		mPrefScaleFactor = 100;
@@ -575,12 +635,20 @@ public class DosBoxLauncher extends Activity {
     static final private int TURBO_CYCLES_ID = Menu.FIRST +10;
     static final private int TURBO_AUDIO_ID = Menu.FIRST +11;
     static final private int FULLSCREEN_UPDATE_ID = Menu.FIRST +12;
+    static final private int OVERLAY_ID = Menu.FIRST + 13;
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
-        menu.add(0, TOGGLE_BUTTONS_ID, 0, "Toggle Buttons");
+        if (Overlay.hasExtraButtons()) {
+        	menu.add(0, TOGGLE_BUTTONS_ID, 0, "Extra Buttons");
+        }
+        
+        if (needsOverlay()) {
+        	menu.add(0, OVERLAY_ID, 0, "Overlay ON/OFF");
+        }
+        	
         if (testingMode) {
 	        menu.add(0, TOGGLE_FILTER_ID, 0, "Toggle Video Filter");
 	        menu.add(0, MORE_FRAMESKIP_ID, 0, "More Frameskip");
@@ -604,6 +672,7 @@ public class DosBoxLauncher extends Activity {
 	        switch (item.getItemId()) {
 	        case TOGGLE_BUTTONS_ID : uiToggleButtons(); return true;
 	        case TOGGLE_FILTER_ID : uiToggleFilter(); return true;
+	        case OVERLAY_ID : uiToggleOverlay(); return true;
 	        case MORE_FRAMESKIP_ID : uiFrameskipMore(); return true;
 	        case LESS_FRAMESKIP_ID : uiFrameskipLess(); return true;
 	        case MORE_CYCLES_ID : uiCyclesMore(); return true;
@@ -632,8 +701,11 @@ public class DosBoxLauncher extends Activity {
 	}
 	
 	protected void uiToggleButtons() {
-		mSurfaceView.showExtraButtons = !mSurfaceView.showExtraButtons;
-		mSurfaceView.forceRedraw();
+		extraButtonsView.toggleView();
+	}
+	
+	private void uiToggleOverlay() {
+		gamepadView.toggleView();
 	}
 	
 	protected void uiToggleFilter() {
