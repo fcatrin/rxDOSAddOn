@@ -34,7 +34,8 @@ import retrobox.vinput.overlay.ExtraButtonsController;
 import retrobox.vinput.overlay.ExtraButtonsView;
 import retrobox.vinput.overlay.GamepadController;
 import retrobox.vinput.overlay.GamepadView;
-import retrobox.vinput.overlay.OverlayNew;
+import retrobox.vinput.overlay.Overlay;
+import retrobox.vinput.overlay.OverlayExtra;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import android.app.Activity;
 import android.content.Context;
@@ -120,9 +121,7 @@ public class DosBoxLauncher extends Activity {
 	static GamepadView gamepadView;
 	static ExtraButtonsController extraButtonsController;
 	static ExtraButtonsView extraButtonsView;
-	public static final OverlayNew overlay = new OverlayNew();
-	
-	
+	public static final Overlay overlay = new Overlay();
 	
 	private static boolean useKeyTranslation = false;
     
@@ -394,14 +393,18 @@ public class DosBoxLauncher extends Activity {
 	public boolean dispatchTouchEvent(MotionEvent ev) {
 		if (gamepadView.isVisible() && gamepadController.onTouchEvent(ev)) {
 			Log.d("TOUCH", "dispatched to gamepadController");
-			if (OverlayNew.requiresRedraw) {
-				OverlayNew.requiresRedraw = false;
+			if (Overlay.requiresRedraw) {
+				Overlay.requiresRedraw = false;
 				gamepadView.invalidate();
 			}
 			return true;
 		}
 		
 		if (extraButtonsView.isVisible() && extraButtonsController.onTouchEvent(ev)) {
+			if (OverlayExtra.requiresRedraw) {
+				OverlayExtra.requiresRedraw = false;
+				extraButtonsView.invalidate();
+			}
 			return true;
 		}
 		
@@ -640,7 +643,7 @@ public class DosBoxLauncher extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
-        if (OverlayNew.hasExtraButtons()) {
+        if (OverlayExtra.hasExtraButtons()) {
         	menu.add(0, TOGGLE_BUTTONS_ID, 0, "Extra Buttons");
         }
         
