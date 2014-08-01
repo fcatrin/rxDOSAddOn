@@ -202,6 +202,7 @@ public class DosBoxLauncher extends Activity {
 		Log.d("JSTICK", "useRealJoystick is " + useRealJoystick);
 		virtualEventDispatcher = new VirtualInputDispatcher();
 		mapper = new Mapper(getIntent(), virtualEventDispatcher);
+		Mapper.initGestureDetector(this);
 		
 		gamepadController = new GamepadController();
 		gamepadView = new GamepadView(this, overlay);
@@ -407,6 +408,8 @@ public class DosBoxLauncher extends Activity {
 			}
 			return true;
 		}
+		
+		mapper.onTouchEvent(ev);
 		
 		return super.dispatchTouchEvent(ev);
 	}
