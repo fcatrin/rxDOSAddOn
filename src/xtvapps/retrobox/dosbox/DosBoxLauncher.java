@@ -135,8 +135,19 @@ public class DosBoxLauncher extends Activity {
 		
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
-		useRealJoystick = getIntent().getStringExtra("gamepad") != null;
+
+		// load real joystick translation
+		virtualEventDispatcher = new VirtualInputDispatcher();
+		mapper = new Mapper(getIntent(), virtualEventDispatcher);
+		Mapper.initGestureDetector(this);
+        for(int i=0; i<2; i++) {
+        	String prefix = "j" + (i+1);
+        	String deviceDescriptor = getIntent().getStringExtra(prefix + "DESCRIPTOR");
+        	Mapper.registerGamepad(i, deviceDescriptor);
+        }
+        
+		useRealJoystick = Mapper.hasGamepads();
+		Log.d("JSTICK", "useRealJoystick is " + useRealJoystick);
 		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
 		//testingMode = getIntent().getBooleanExtra("testingMode", false);
 		
@@ -198,12 +209,6 @@ public class DosBoxLauncher extends Activity {
 			}
 		}
 
-		// load real joystick translation
-		Log.d("JSTICK", "useRealJoystick is " + useRealJoystick);
-		virtualEventDispatcher = new VirtualInputDispatcher();
-		mapper = new Mapper(getIntent(), virtualEventDispatcher);
-		Mapper.initGestureDetector(this);
-		
 		gamepadController = new GamepadController();
 		gamepadView = new GamepadView(this, overlay);
 		extraButtonsController = new ExtraButtonsController();
