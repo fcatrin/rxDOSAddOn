@@ -238,7 +238,7 @@ public class DosBoxLauncher extends Activity {
 	}
 	
 	private boolean needsOverlay() {
-		return !getIntent().hasExtra("gamepad");
+		return !Mapper.hasGamepads();
 	}
 	
 	private void setupGamepadOverlay(ViewGroup root) {
