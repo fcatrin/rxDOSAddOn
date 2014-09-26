@@ -462,7 +462,7 @@ public class DosBoxLauncher extends Activity {
 		mPrefScaleFilterOn = DosBoxCustomConfig.getBoolean("videofilter", mPrefScaleFilterOn);
 		 
 		// ASPECT Ratio 
-		mSurfaceView.mMaintainAspect = DosBoxCustomConfig.getBoolean("keepaspect", mSurfaceView.mMaintainAspect);
+		mSurfaceView.mMaintainAspect = getIntent().getBooleanExtra("keepAspect",  true);
 		
 		mPrefFrameskip = DosBoxCustomConfig.getInt("frameskip", mPrefFrameskip);
 		turboCycles = DosBoxCustomConfig.getBoolean("turboCycle", turboCycles);
