@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="xtvapps.retrobox.dosbox"  
-      android:versionCode="221007"
-      android:versionName="2.2.1-7"
+      android:versionCode="221008"
+      android:versionName="2.2.1-8"
       android:installLocation="auto"
       android:sharedUserId="psychoworld.retrobox"
       > 
-    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="18"/>
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="19"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 	<uses-permission android:name="com.android.vending.CHECK_LICENSE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>

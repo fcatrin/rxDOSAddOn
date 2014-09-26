@@ -37,6 +37,7 @@ import retrobox.vinput.overlay.GamepadView;
 import retrobox.vinput.overlay.Overlay;
 import retrobox.vinput.overlay.OverlayExtra;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -46,6 +47,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -128,6 +130,7 @@ public class DosBoxLauncher extends Activity {
     // gives the native activity a copy of this object so it can call OnNativeMotion
     //public native int RegisterThis();
     
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -136,6 +139,8 @@ public class DosBoxLauncher extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        setImmersiveMode();
+        
 		// load real joystick translation
 		virtualEventDispatcher = new VirtualInputDispatcher();
 		mapper = new Mapper(getIntent(), virtualEventDispatcher);
@@ -240,6 +245,31 @@ public class DosBoxLauncher extends Activity {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) new Handler().postDelayed(new Runnable(){
+			@Override
+			public void run() {
+				setImmersiveMode();
+			}
+		}, 5000);
+	}
+
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	private void setImmersiveMode() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			getWindow().getDecorView().setSystemUiVisibility(
+		            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+		            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+		            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+		            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+		            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+		            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+		} else {
+			
+		}
 	}
 	
 	private boolean needsOverlay() {
