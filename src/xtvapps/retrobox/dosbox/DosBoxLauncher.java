@@ -300,7 +300,9 @@ public class DosBoxLauncher extends Activity {
 		}
 		Log.d("OVERLAY", "extraButtonsView.addToLayout");
 		extraButtonsView.addToLayout(root);
-		extraButtonsView.hidePanel();
+		boolean hideExtraButtons = !getIntent().getBooleanExtra("showExtraButtons", false);
+		if (hideExtraButtons) extraButtonsView.hidePanel();
+		else extraButtonsView.showPanel();
 	}
 	
 	
