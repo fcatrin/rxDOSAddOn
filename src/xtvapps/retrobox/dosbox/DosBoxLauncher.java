@@ -23,6 +23,7 @@ import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
+import retrobox.vinput.GenericGamepad.Analog;
 import retrobox.vinput.Mapper;
 import retrobox.vinput.Mapper.ShortCut;
 import retrobox.vinput.QuitHandler;
@@ -285,7 +286,8 @@ public class DosBoxLauncher extends Activity {
 				int h = mSurfaceView.getHeight();
 				if (needsOverlay()) {
 					String overlayConfig = getIntent().getStringExtra("OVERLAY");
-					if (overlayConfig!=null) overlay.init(overlayConfig, w, h);
+					float alpha = getIntent().getFloatExtra("OVERLAY_ALPHA", 0.8f);
+					if (overlayConfig!=null) overlay.init(overlayConfig, w, h, alpha);
 				}
 				Log.d("REMAP", "addExtraButtons : " + getIntent().getStringExtra("buttons"));
 				ExtraButtons.initExtraButtons(DosBoxLauncher.this, getIntent().getStringExtra("buttons"), mSurfaceView.getWidth(), mSurfaceView.getHeight(), isMouseOnly);
@@ -833,6 +835,9 @@ public class DosBoxLauncher extends Activity {
 	class VirtualInputDispatcher implements VirtualEventDispatcher {
 
 		@Override
+		public void sendAnalog(Analog index, double x, double y) {}
+
+		@Override
 		public void sendKey(int keyCode, boolean down) {
 			DosBoxControl.sendNativeKey(keyCode, down, false, false, false);
 		}
@@ -853,7 +858,8 @@ public class DosBoxLauncher extends Activity {
 				return false;
 			}
 		}
-		
+
+	
 	}
 	
 }
