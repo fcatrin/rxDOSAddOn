@@ -53,6 +53,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
@@ -142,6 +143,7 @@ public class DosBoxLauncher extends Activity {
 
         setImmersiveMode();
         
+        
 		// load real joystick translation
 		virtualEventDispatcher = new VirtualInputDispatcher();
 		mapper = new Mapper(getIntent(), virtualEventDispatcher);
@@ -159,9 +161,16 @@ public class DosBoxLauncher extends Activity {
 		
 		View main = getLayoutInflater().inflate(R.layout.main, null);
 		setContentView(main);
-		
-		ViewGroup root = (ViewGroup)findViewById(R.id.root);
 
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        Log.d("VIDEO", "metrics " + metrics.widthPixels + "x" + metrics.heightPixels);
+
+		ViewGroup root = (ViewGroup)findViewById(R.id.root);
+        Log.d("VIDEO", "root " + root.getMeasuredWidth() + "x" + root.getMeasuredHeight());
+        
+        View decor = getWindow().getDecorView();
+        Log.d("VIDEO", "decor " + decor.getMeasuredWidth() + "x" + decor.getMeasuredHeight());
+        
 		mSurfaceView = new DosBoxSurfaceView(this);
 		root.addView(mSurfaceView);
 		registerForContextMenu(mSurfaceView); 
@@ -246,6 +255,8 @@ public class DosBoxLauncher extends Activity {
 			e.printStackTrace();
 		}
 		
+		
+		
 	}
 	
 	public void onWindowFocusChanged(boolean hasFocus) {
@@ -284,6 +295,7 @@ public class DosBoxLauncher extends Activity {
 			public void onGlobalLayout() {
 				int w = mSurfaceView.getWidth();
 				int h = mSurfaceView.getHeight();
+				Log.d("VIDEO", "global layout " + w + "x" + h);
 				if (needsOverlay()) {
 					String overlayConfig = getIntent().getStringExtra("OVERLAY");
 					float alpha = getIntent().getFloatExtra("OVERLAY_ALPHA", 0.8f);
@@ -336,6 +348,19 @@ public class DosBoxLauncher extends Activity {
 	@Override
 	protected void onResume() {
 		Log.i("DosBoxTurbo","onResume()");
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        Log.d("VIDEO", "metrics2 " + metrics.widthPixels + "x" + metrics.heightPixels);
+
+		ViewGroup root = (ViewGroup)findViewById(R.id.root);
+        Log.d("VIDEO", "root2 " + root.getMeasuredWidth() + "x" + root.getMeasuredHeight());
+        
+        View decor = getWindow().getDecorView();
+        Log.d("VIDEO", "decor2 " + decor.getMeasuredWidth() + "x" + decor.getMeasuredHeight());
+
+        Log.d("VIDEO", "mSurfaceView " + mSurfaceView.getMeasuredWidth() + "x" + mSurfaceView.getMeasuredHeight());
+
+        
+
 		super.onResume();
 		pauseDosBox(false);
 		
