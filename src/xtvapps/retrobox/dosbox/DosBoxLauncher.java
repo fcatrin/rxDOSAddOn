@@ -689,7 +689,7 @@ public class DosBoxLauncher extends Activity {
     
 	@Override
 	public void onBackPressed() {
-		uiQuitConfirm();
+		openOptionsMenu();
 	}
 	
     static final private int TOGGLE_BUTTONS_ID = Menu.FIRST +1;
