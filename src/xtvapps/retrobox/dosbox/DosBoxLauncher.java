@@ -487,8 +487,7 @@ public class DosBoxLauncher extends Activity {
 		// Full Screen update
 		mPrefFullScreenUpdate = DosBoxCustomConfig.getBoolean("fsupdate", mPrefFullScreenUpdate);
 		
-		// SCALE MODE
-		mPrefScaleFilterOn = DosBoxCustomConfig.getBoolean("videofilter", mPrefScaleFilterOn);
+		mPrefScaleFilterOn = false; // TOO SLOW when active :-( getIntent().getBooleanExtra("linearFilter", true);
 		 
 		// ASPECT Ratio 
 		mSurfaceView.mMaintainAspect = getIntent().getBooleanExtra("keepAspect",  true);
@@ -705,11 +704,14 @@ public class DosBoxLauncher extends Activity {
     static final private int TURBO_AUDIO_ID = Menu.FIRST +11;
     static final private int FULLSCREEN_UPDATE_ID = Menu.FIRST +12;
     static final private int OVERLAY_ID = Menu.FIRST + 13;
+    static final private int CANCEL_ID = Menu.FIRST + 14;
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
+        menu.add(0, CANCEL_ID, 0, "Cancel");
+        
         if (OverlayExtra.hasExtraButtons()) {
         	menu.add(0, TOGGLE_BUTTONS_ID, 0, "Extra Buttons");
         }
