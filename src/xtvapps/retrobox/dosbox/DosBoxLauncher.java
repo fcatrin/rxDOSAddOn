@@ -22,8 +22,13 @@ package xtvapps.retrobox.dosbox;
 import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrobox.utils.ImmersiveModeSetter;
+import retrobox.utils.ListOption;
+import retrobox.utils.RetroBoxDialog;
+import retrobox.utils.RetroBoxUtils;
 import retrobox.vinput.GenericGamepad.Analog;
 import retrobox.vinput.Mapper;
 import retrobox.vinput.Mapper.ShortCut;
@@ -38,6 +43,9 @@ import retrobox.vinput.overlay.GamepadController;
 import retrobox.vinput.overlay.GamepadView;
 import retrobox.vinput.overlay.Overlay;
 import retrobox.vinput.overlay.OverlayExtra;
+import xtvapps.core.AndroidFonts;
+import xtvapps.core.Callback;
+import xtvapps.core.content.KeyValue;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -162,6 +170,8 @@ public class DosBoxLauncher extends Activity {
 		
 		View main = getLayoutInflater().inflate(R.layout.main, null);
 		setContentView(main);
+		
+		AndroidFonts.setViewFont(findViewById(R.id.txtDialogListTitle), RetroBoxUtils.FONT_DEFAULT_M);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         Log.d("VIDEO", "metrics " + metrics.widthPixels + "x" + metrics.heightPixels);
@@ -679,39 +689,24 @@ public class DosBoxLauncher extends Activity {
     
 	@Override
 	public void onBackPressed() {
-		openOptionsMenu();
+		if (RetroBoxDialog.cancelDialog(this)) return;
+		
+		openRetroBoxMenu();
 	}
 	
-    static final private int TOGGLE_BUTTONS_ID = Menu.FIRST +1;
-    static final private int TOGGLE_FILTER_ID = Menu.FIRST +2;
-    static final private int MORE_CYCLES_ID = Menu.FIRST +3;
-    static final private int AUTO_CYCLES_ID = Menu.FIRST +4;
-    static final private int LESS_CYCLES_ID = Menu.FIRST +5;
-    static final private int MORE_FRAMESKIP_ID = Menu.FIRST +6;
-    static final private int LESS_FRAMESKIP_ID = Menu.FIRST +7;
-    static final private int QUIT_ID = Menu.FIRST +8;
-    static final private int TURBO_VGA_ID = Menu.FIRST +9;
-    static final private int TURBO_CYCLES_ID = Menu.FIRST +10;
-    static final private int TURBO_AUDIO_ID = Menu.FIRST +11;
-    static final private int FULLSCREEN_UPDATE_ID = Menu.FIRST +12;
-    static final private int OVERLAY_ID = Menu.FIRST + 13;
-    static final private int CANCEL_ID = Menu.FIRST + 14;
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
-        menu.add(0, CANCEL_ID, 0, "Cancel");
+	private void openRetroBoxMenu() {
+		onPause();
+		
+		List<ListOption> options = new ArrayList<ListOption>();
+		
+        options.add(new ListOption("", "Cancel"));
         
         if (OverlayExtra.hasExtraButtons()) {
-        	menu.add(0, TOGGLE_BUTTONS_ID, 0, "Extra Buttons");
-        }
-        
-        if (needsOverlay()) {
-        	menu.add(0, OVERLAY_ID, 0, "Overlay ON/OFF");
+            options.add(new ListOption("extra", "Extra Buttons"));
         }
         	
         if (testingMode) {
+        	/*
 	        menu.add(0, TOGGLE_FILTER_ID, 0, "Toggle Video Filter");
 	        menu.add(0, MORE_FRAMESKIP_ID, 0, "More Frameskip");
 	        menu.add(0, LESS_FRAMESKIP_ID, 0, "Less Frameskip");
@@ -722,45 +717,56 @@ public class DosBoxLauncher extends Activity {
 	        menu.add(0, TURBO_CYCLES_ID, 0, "Toggle Turbo Cycles");
 	        menu.add(0, TURBO_AUDIO_ID, 0, "Toggle Turbo Audio");
 	        menu.add(0, FULLSCREEN_UPDATE_ID, 0, "Toggle FullScreen Update");
+	        */
         }
-        menu.add(0, QUIT_ID, 0, "Quit");
+        options.add(new ListOption("quit", "Quit"));
         
-        return true;
-    }
-    
-    @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-    	if (item != null) {
-	        switch (item.getItemId()) {
-	        case TOGGLE_BUTTONS_ID : uiToggleButtons(); return true;
-	        case TOGGLE_FILTER_ID : uiToggleFilter(); return true;
-	        case OVERLAY_ID : uiToggleOverlay(); return true;
-	        case MORE_FRAMESKIP_ID : uiFrameskipMore(); return true;
-	        case LESS_FRAMESKIP_ID : uiFrameskipLess(); return true;
-	        case MORE_CYCLES_ID : uiCyclesMore(); return true;
-	        case AUTO_CYCLES_ID : uiCyclesAuto(); return true;
-	        case LESS_CYCLES_ID : uiCyclesLess(); return true;
-	        case TURBO_VGA_ID : uiTurboVGA(); return true;
-	        case TURBO_CYCLES_ID : uiTurboCycles(); return true;
-	        case TURBO_AUDIO_ID : uiTurboAudio(); return true;
-	        case FULLSCREEN_UPDATE_ID : uiToggleFullScreenUpdate(); return true;
-	        case QUIT_ID : uiQuit(); return true;
-	        }
-    	}
-        return super.onMenuItemSelected(featureId, item);
-    }
-    
-    @Override
-	public boolean onMenuOpened(int featureId, Menu menu) {
-		onPause();
-		return super.onMenuOpened(featureId, menu);
-	}
+        RetroBoxDialog.showListDialog(this, "RetroBoxTV", options, new Callback<KeyValue>() {
+			
+			@Override
+			public void onResult(KeyValue result) {
+				String key = result.getKey();
+				if (key.equals("quit")) {
+					uiQuit();
+				} else if (key.equals("extra")) {
+					uiToggleButtons();
+				} else if (key.equals("filter")) {
+					uiToggleFilter();
+				} else if (key.equals("overlay")) {
+					uiToggleOverlay();
+				} else if (key.equals("frame+")) {
+					uiFrameskipMore();
+				} else if (key.equals("frame-")) {
+					uiFrameskipLess();
+				} else if (key.equals("cycles")) {
+					uiCyclesAuto();
+				} else if (key.equals("cycles+")) {
+					uiCyclesMore();
+				} else if (key.equals("cycles-")) {
+					uiCyclesLess();
+				} else if (key.equals("turboVGA")) {
+					uiTurboVGA();
+				} else if (key.equals("turboCPU")) {
+					uiTurboCycles();
+				} else if (key.equals("turboAudio")) {
+					uiTurboAudio();
+				} else if (key.equals("fullscreenUpdate")) {
+					uiToggleFullScreenUpdate();
+				}
+				onResume();
+			}
 
-	@Override
-	public void onOptionsMenuClosed(Menu menu) {
-		onResume();
-		super.onOptionsMenuClosed(menu);
+			@Override
+			public void onError() {
+				super.onError();
+				onResume();
+			}
+			
+			
+		});
+
 	}
+    
 	
 	protected void uiToggleButtons() {
 		extraButtonsView.toggleView();
@@ -871,7 +877,7 @@ public class DosBoxLauncher extends Activity {
 		public boolean handleShortcut(ShortCut shortcut, boolean down) {
 			switch(shortcut) {
 			case EXIT: if (!down) uiQuitConfirm(); return true;
-			case MENU : if (!down) openOptionsMenu(); return true;
+			case MENU : if (!down) openRetroBoxMenu(); return true;
 			default:
 				return false;
 			}

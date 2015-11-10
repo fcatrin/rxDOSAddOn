@@ -2,5 +2,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:id="@+id/root" >
+    android:id="@+id/rootContainer" >
+
+    <FrameLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/root" ></FrameLayout>
+
+    <include layout="@layout/modal_dialog_list" />
+    
 </FrameLayout>
