@@ -116,6 +116,7 @@ public class DosBoxLauncher extends Activity {
 	static boolean turboCycles = true;
 	static boolean turboVGA = true;
 	static boolean turboAudio = true;
+	static boolean turboCPU = false;
 
 	
 	public String mPID = null;
@@ -704,20 +705,15 @@ public class DosBoxLauncher extends Activity {
         if (OverlayExtra.hasExtraButtons()) {
             options.add(new ListOption("extra", "Extra Buttons"));
         }
-        	
+        
         if (testingMode) {
-        	/*
-	        menu.add(0, TOGGLE_FILTER_ID, 0, "Toggle Video Filter");
-	        menu.add(0, MORE_FRAMESKIP_ID, 0, "More Frameskip");
-	        menu.add(0, LESS_FRAMESKIP_ID, 0, "Less Frameskip");
-	        menu.add(0, MORE_CYCLES_ID, 0, "More Cycles");
-	        menu.add(0, AUTO_CYCLES_ID, 0, "Auto Cycles");
-	        menu.add(0, LESS_CYCLES_ID, 0, "Less Cycles");
-	        menu.add(0, TURBO_VGA_ID, 0, "Toggle Turbo VGA");
-	        menu.add(0, TURBO_CYCLES_ID, 0, "Toggle Turbo Cycles");
-	        menu.add(0, TURBO_AUDIO_ID, 0, "Toggle Turbo Audio");
-	        menu.add(0, FULLSCREEN_UPDATE_ID, 0, "Toggle FullScreen Update");
-	        */
+            options.add(new ListOption("unlockCPU", "Turbo CPU"));
+            options.add(new ListOption("cycles", "Auto Cycles"));
+            options.add(new ListOption("cycles+", "More Cycles"));
+            options.add(new ListOption("cycles-", "Less Cycles"));
+            options.add(new ListOption("turboVGA", "Toggle Turbo VGA"));
+            options.add(new ListOption("turboCPU", "Toggle Turbo Cycles"));
+            options.add(new ListOption("fullscreenUpdate", "Toggle FullScreen Update"));
         }
         options.add(new ListOption("quit", "Quit"));
         
@@ -750,6 +746,8 @@ public class DosBoxLauncher extends Activity {
 					uiTurboCycles();
 				} else if (key.equals("turboAudio")) {
 					uiTurboAudio();
+				} else if (key.equals("unlockCPU")) {
+					uiUnlockSpeed();
 				} else if (key.equals("fullscreenUpdate")) {
 					uiToggleFullScreenUpdate();
 				}
@@ -840,6 +838,12 @@ public class DosBoxLauncher extends Activity {
 		turboAudio = !turboAudio;
 		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_MIXER_HACK_ON, turboAudio?1:0,null,true);
 		toastMessage("Turbo Audio is " + (turboAudio?"on":"off"));
+	}
+	
+	protected void uiUnlockSpeed() {
+		turboCPU = !turboCPU;
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_TURBO_ON, turboCPU?1:0, null,true);
+		toastMessage("Turbo CPU is " + (turboCPU?"on":"off"));
 	}
 	
     protected void uiQuit() {
