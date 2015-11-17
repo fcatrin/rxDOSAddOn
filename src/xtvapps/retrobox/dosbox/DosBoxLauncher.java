@@ -484,7 +484,7 @@ public class DosBoxLauncher extends Activity {
 		mPrefScaleFactor = 100;
 		
 		// Test mode
-		testingMode = DosBoxCustomConfig.getBoolean("testmode", false);
+		testingMode = getIntent().getBooleanExtra("testingMode", false);
 		
 		// Full Screen update
 		mPrefFullScreenUpdate = DosBoxCustomConfig.getBoolean("fsupdate", mPrefFullScreenUpdate);
@@ -707,13 +707,10 @@ public class DosBoxLauncher extends Activity {
         }
         
         if (testingMode) {
-            options.add(new ListOption("unlockCPU", "Turbo CPU"));
-            options.add(new ListOption("cycles", "Auto Cycles"));
-            options.add(new ListOption("cycles+", "More Cycles"));
-            options.add(new ListOption("cycles-", "Less Cycles"));
-            options.add(new ListOption("turboVGA", "Toggle Turbo VGA"));
-            options.add(new ListOption("turboCPU", "Toggle Turbo Cycles"));
-            options.add(new ListOption("fullscreenUpdate", "Toggle FullScreen Update"));
+            options.add(new ListOption("cycles", "DEVEL - Auto Cycles"));
+            options.add(new ListOption("cycles+", "DEVEL - More Cycles"));
+            options.add(new ListOption("cycles-", "DEVEL - Less Cycles"));
+            options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
         }
         options.add(new ListOption("quit", "Quit"));
         
