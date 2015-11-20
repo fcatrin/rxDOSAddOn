@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="xtvapps.retrobox.dosbox"  
-      android:versionCode="221016"
-      android:versionName="2.2.1-16"
+      package="xtvapps.retrobox.v2.dosbox"  
+      android:versionCode="221017"
+      android:versionName="2.2.1-17"
       android:installLocation="auto"
-      android:sharedUserId="psychoworld.retrobox"
+      android:sharedUserId="psychoworld.retrobox.v2"
       > 
     <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="19"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -18,11 +18,11 @@
                   android:screenOrientation="sensorLandscape" 
                   android:configChanges="orientation|keyboardHidden">
             <intent-filter>
-                <action android:name="retrobox.dosbox" />
+                <action android:name="retrobox.v2.dosbox" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain"/>
             </intent-filter>
             </activity>
-        <activity android:label="@string/app_name" android:name="xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences"></activity>
+        <activity android:label="@string/app_name" android:name="xtvapps.retrobox.v2.dosbox.library.dosboxprefs.DosBoxPreferences"></activity>
     </application>
 </manifest> 

@@ -24,7 +24,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
 import retrobox.utils.ImmersiveModeSetter;
 import retrobox.utils.ListOption;
 import retrobox.utils.RetroBoxDialog;
@@ -47,6 +46,7 @@ import xtvapps.core.AndroidFonts;
 import xtvapps.core.Callback;
 import xtvapps.core.content.KeyValue;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
+import xtvapps.retrobox.v2.dosbox.R;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;

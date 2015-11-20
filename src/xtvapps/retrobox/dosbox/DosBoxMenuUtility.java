@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
-import xtvapps.retrobox.dosbox.R;
+import xtvapps.retrobox.v2.dosbox.R;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.preference.GamePreference;
 import android.app.AlertDialog;
