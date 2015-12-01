@@ -24,6 +24,8 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrobox.utils.GamepadInfoDialog;
 import retrobox.utils.ImmersiveModeSetter;
 import retrobox.utils.ListOption;
 import retrobox.utils.RetroBoxDialog;
@@ -44,6 +46,7 @@ import retrobox.vinput.overlay.Overlay;
 import retrobox.vinput.overlay.OverlayExtra;
 import xtvapps.core.AndroidFonts;
 import xtvapps.core.Callback;
+import xtvapps.core.SimpleCallback;
 import xtvapps.core.content.KeyValue;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.retrobox.v2.dosbox.R;
@@ -136,6 +139,7 @@ public class DosBoxLauncher extends Activity {
 	static ExtraButtonsController extraButtonsController;
 	static ExtraButtonsView extraButtonsView;
 	public static final Overlay overlay = new Overlay();
+	private GamepadInfoDialog gamepadInfoDialog;
 	
 	private static boolean useKeyTranslation = false;
     
@@ -173,6 +177,13 @@ public class DosBoxLauncher extends Activity {
 		setContentView(main);
 		
 		AndroidFonts.setViewFont(findViewById(R.id.txtDialogListTitle), RetroBoxUtils.FONT_DEFAULT_M);
+		
+        AndroidFonts.setViewFont(findViewById(R.id.txtGamepadInfoTop), RetroBoxUtils.FONT_DEFAULT_M);
+        AndroidFonts.setViewFont(findViewById(R.id.txtGamepadInfoBottom), RetroBoxUtils.FONT_DEFAULT_M);
+
+        gamepadInfoDialog = new GamepadInfoDialog(this);
+        gamepadInfoDialog.loadFromIntent(getIntent());
+		
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         Log.d("VIDEO", "metrics " + metrics.widthPixels + "x" + metrics.heightPixels);
@@ -712,6 +723,7 @@ public class DosBoxLauncher extends Activity {
             options.add(new ListOption("cycles-", "DEVEL - Less Cycles"));
             options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
         }
+        options.add(new ListOption("help", "Help"));
         options.add(new ListOption("quit", "Quit"));
         
         RetroBoxDialog.showListDialog(this, "RetroBoxTV", options, new Callback<KeyValue>() {
@@ -747,6 +759,9 @@ public class DosBoxLauncher extends Activity {
 					uiUnlockSpeed();
 				} else if (key.equals("fullscreenUpdate")) {
 					uiToggleFullScreenUpdate();
+				} else if (key.equals("help")) {
+					uiHelp();
+					return;
 				}
 				onResume();
 			}
@@ -761,7 +776,15 @@ public class DosBoxLauncher extends Activity {
 		});
 
 	}
-    
+	
+    protected void uiHelp() {
+		RetroBoxDialog.showGamepadDialogIngame(this, gamepadInfoDialog, new SimpleCallback() {
+			@Override
+			public void onResult() {
+				onResume();
+			}
+		});
+    }
 	
 	protected void uiToggleButtons() {
 		extraButtonsView.toggleView();
