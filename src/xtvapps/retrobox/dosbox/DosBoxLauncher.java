@@ -30,6 +30,7 @@ import retrobox.utils.ImmersiveModeSetter;
 import retrobox.utils.ListOption;
 import retrobox.utils.RetroBoxDialog;
 import retrobox.utils.RetroBoxUtils;
+import retrobox.vinput.GenericGamepad;
 import retrobox.vinput.GenericGamepad.Analog;
 import retrobox.vinput.Mapper;
 import retrobox.vinput.Mapper.ShortCut;
@@ -883,14 +884,6 @@ public class DosBoxLauncher extends Activity {
 	class VirtualInputDispatcher implements VirtualEventDispatcher {
 
 		@Override
-		public void sendAnalog(Analog index, double x, double y) {}
-
-		@Override
-		public void sendKey(int keyCode, boolean down) {
-			DosBoxControl.sendNativeKey(keyCode, down, false, false, false);
-		}
-
-		@Override
 		public void sendMouseButton(MouseButton button, boolean down) {
 			int action = down?DosBoxSurfaceView.ACTION_DOWN:DosBoxSurfaceView.ACTION_UP;
 			int btn = button == MouseButton.LEFT?DosBoxSurfaceView.BTN_A:DosBoxSurfaceView.BTN_B;
@@ -907,6 +900,14 @@ public class DosBoxLauncher extends Activity {
 			}
 		}
 
+		@Override
+		public void sendKey(GenericGamepad gamepad, int keyCode, boolean down) {
+			DosBoxControl.sendNativeKey(keyCode, down, false, false, false);
+		}
+
+		@Override
+		public void sendAnalog(GenericGamepad gamepad, Analog index, double x, double y, double hatx, double haty) {
+		}
 	
 	}
 	
