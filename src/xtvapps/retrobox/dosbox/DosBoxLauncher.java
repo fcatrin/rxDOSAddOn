@@ -163,6 +163,8 @@ public class DosBoxLauncher extends Activity {
 		virtualEventDispatcher = new VirtualInputDispatcher();
 		mapper = new Mapper(getIntent(), virtualEventDispatcher);
 		Mapper.initGestureDetector(this);
+		Mapper.joinPorts = getIntent().getBooleanExtra("joinPorts", false);
+		
         for(int i=0; i<2; i++) {
         	String prefix = "j" + (i+1);
         	String deviceDescriptor = getIntent().getStringExtra(prefix + "DESCRIPTOR");
