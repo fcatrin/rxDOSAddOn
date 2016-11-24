@@ -28,7 +28,7 @@ LOCAL_CPP_EXTENSION := .cpp
 LOCAL_SRC_FILES := $(foreach F, $(CG_SUBDIRS), $(addprefix $(F)/,$(notdir $(wildcard $(LOCAL_PATH)/$(F)/*.cpp))))
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-	LOCAL_CFLAGS += -DC_TARGETCPU=ARMV7LE
+	LOCAL_CFLAGS += -DC_TARGETCPU=ARMV7LE -DC_DYNREC=1
 endif
 
 ifeq ($(TARGET_ARCH_ABI),armeabi)
