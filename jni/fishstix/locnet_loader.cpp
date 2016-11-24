@@ -43,6 +43,8 @@ char arg_start_conf_user[256]="";
 extern struct loader_config myLoader;
 extern struct loader_config *loadf;
 
+extern int CPU_Cycles;
+
 extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeStart(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint height, jstring confpath)
 {
 	Android_Init(env, obj, bitmap, width, height);
@@ -144,6 +146,51 @@ extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeSetOption(JNIE
 		case 52:
 			strcpy(arg_start_conf_user, (env)->GetStringUTFChars((jstring)value2, 0));
 			break;
+
+
+		case 60: // cpu = auto
+			CPU_SkipCycleAutoAdjust=false;
+			CPU_AutoDetermineMode|=CPU_AUTODETERMINE_CYCLES;
+			CPU_Cycles=0;
+			CPU_CycleMax=3000;
+			CPU_OldCycleMax=3000;
+			CPU_CyclePercUsed=100;
+			break;
+		case 61: // cpu=max
+			CPU_SkipCycleAutoAdjust=false;
+			CPU_AutoDetermineMode=CPU_AUTODETERMINE_NONE;
+			CPU_Cycles=0;
+			CPU_CycleMax=0;
+			CPU_CyclePercUsed=100;
+			CPU_CycleAutoAdjust=true;
+			CPU_CycleLimit=-1;
+			break;
+		case 62: // cpu=fixed
+			CPU_SkipCycleAutoAdjust=false;
+			CPU_AutoDetermineMode=CPU_AUTODETERMINE_NONE;
+			CPU_Cycles=0;
+			CPU_CycleMax = value;
+			CPU_CycleAutoAdjust = false;
+			CPU_OldCycleMax = value;
+			CPU_CycleLimit = value;
+			break;
+	}
+}
+
+/*
+ * possible return values
+ *  0  : max
+ *  -1 : auto
+ *  n  : cycles
+ */
+
+extern "C" jint Java_xtvapps_retrobox_dosbox_DosBoxControl_nativeGetCPUCycles(JNIEnv * env, jobject obj) {
+	if (CPU_AutoDetermineMode == CPU_AUTODETERMINE_NONE) {
+		// max or fixed
+		return CPU_CycleLimit;
+	} else {
+		// auto
+		return 0;
 	}
 }
 

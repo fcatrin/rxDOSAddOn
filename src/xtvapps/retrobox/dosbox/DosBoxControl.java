@@ -27,6 +27,7 @@ public class DosBoxControl {
 	public static native void nativeMouseWarp(float x, float y, int dst_left, int dst_top, int width, int height);
 	public static native int nativeGetCycleCount();
 	public static native boolean nativeGetAutoAdjust();
+	public static native int nativeGetCPUCycles();
 	//return true to clear modifier 
 	public static boolean sendNativeKey(int keyCode, boolean down, boolean ctrl, boolean alt, boolean shift) {
 		boolean result = false;

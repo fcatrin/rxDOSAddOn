@@ -23,7 +23,11 @@ import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import retrobox.utils.GamepadInfoDialog;
 import retrobox.utils.ImmersiveModeSetter;
@@ -48,6 +52,7 @@ import retrobox.vinput.overlay.OverlayExtra;
 import xtvapps.core.AndroidFonts;
 import xtvapps.core.Callback;
 import xtvapps.core.SimpleCallback;
+import xtvapps.core.Utils;
 import xtvapps.core.content.KeyValue;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.retrobox.v2.dosbox.R;
@@ -709,6 +714,77 @@ public class DosBoxLauncher extends Activity {
 		openRetroBoxMenu();
 	}
 	
+	Map<Integer, String> cpuCycles = new LinkedHashMap<Integer, String>();
+	private void setupCpuCycles() {
+		if (!cpuCycles.isEmpty()) return;
+		
+		cpuCycles.put(0, "Auto (100%)");
+		cpuCycles.put(-1, "Max");
+		cpuCycles.put(3000, "Slow 386 (3000 cycles)");
+		cpuCycles.put(6000, "Fast 386 (6000 cycles)");
+		cpuCycles.put(9000, "Slow 486 (9000 cycles)");
+		cpuCycles.put(15000, "Fast 486 (15000 cycles)");
+		cpuCycles.put(20000, "Faster 486 (20000 cycles)");
+		cpuCycles.put(25000, "Pentium (25000 cycles)");
+		
+	}
+	
+	private String getCpuCyclesName() {
+		setupCpuCycles();
+		int cycles = DosBoxControl.nativeGetCPUCycles();
+		String cpuCyclesName = cpuCycles.get(cycles);
+		if (cpuCyclesName == null) {
+			cpuCyclesName = cycles + " cycles";
+		}
+		return cpuCyclesName;
+	}
+	
+	private void uiCPUSettings() {
+		List<ListOption> options = new ArrayList<ListOption>();
+        options.add(new ListOption("cycles+", "More Cycles"));
+        options.add(new ListOption("cycles-", "Less Cycles"));
+        
+        boolean isOneActive = false;
+        final int cycles = DosBoxControl.nativeGetCPUCycles();
+        for(Entry<Integer, String> entry : cpuCycles.entrySet()) {
+        	boolean selected = entry.getKey() == cycles;
+        	isOneActive |= selected;
+        	options.add(new ListOption(String.valueOf(entry.getKey()), entry.getValue(), selected?"Active":""));
+        }
+        
+        String title = "CPU Settings" + (isOneActive?"":" (" + cycles + " cycles)");
+        
+        RetroBoxDialog.showListDialog(this, title, options, new Callback<KeyValue>() {
+			
+			@Override
+			public void onResult(KeyValue result) {
+				String key = result.getKey();
+				if (key.equals("cycles+")) {
+					uiCyclesMore(cycles);
+				} else if (key.equals("cycles-")) {
+					uiCyclesLess(cycles);
+				} else {
+					int newCycles = Utils.str2i(key);
+					if (newCycles < 0) {
+						uiCPUMaxCycles();
+					} else if (newCycles == 0) {
+						uiAutoCycles();
+					} else {
+						mPrefCycles = newCycles;
+						uiUpdateCycles();
+					}
+				}
+				onResume();
+			}
+
+			@Override
+			public void onError() {
+				super.onError();
+				onResume();
+			}
+		});
+	}
+	
 	private void openRetroBoxMenu() {
 		onPause();
 		
@@ -721,15 +797,13 @@ public class DosBoxLauncher extends Activity {
         }
         
         if (testingMode) {
-            options.add(new ListOption("cycles", "DEVEL - Auto Cycles"));
-            options.add(new ListOption("cycles+", "DEVEL - More Cycles"));
-            options.add(new ListOption("cycles-", "DEVEL - Less Cycles"));
             options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
         }
+        options.add(new ListOption("cpu", "CPU settings", getCpuCyclesName()));
         options.add(new ListOption("help", "Help"));
         options.add(new ListOption("quit", "Quit"));
         
-        RetroBoxDialog.showListDialog(this, "RetroBoxTV", options, new Callback<KeyValue>() {
+        RetroBoxDialog.showListDialog(this, getString(R.string.emu_opt_title), options, new Callback<KeyValue>() {
 			
 			@Override
 			public void onResult(KeyValue result) {
@@ -746,12 +820,6 @@ public class DosBoxLauncher extends Activity {
 					uiFrameskipMore();
 				} else if (key.equals("frame-")) {
 					uiFrameskipLess();
-				} else if (key.equals("cycles")) {
-					uiCyclesAuto();
-				} else if (key.equals("cycles+")) {
-					uiCyclesMore();
-				} else if (key.equals("cycles-")) {
-					uiCyclesLess();
 				} else if (key.equals("turboVGA")) {
 					uiTurboVGA();
 				} else if (key.equals("turboCPU")) {
@@ -760,8 +828,13 @@ public class DosBoxLauncher extends Activity {
 					uiTurboAudio();
 				} else if (key.equals("unlockCPU")) {
 					uiUnlockSpeed();
+				} else if (key.equals("autoCPU")) {
+					uiAutoCycles();
 				} else if (key.equals("fullscreenUpdate")) {
 					uiToggleFullScreenUpdate();
+				} else if (key.equals("cpu")) {
+					uiCPUSettings();
+					return;
 				} else if (key.equals("help")) {
 					uiHelp();
 					return;
@@ -825,25 +898,29 @@ public class DosBoxLauncher extends Activity {
 		toastMessage("Frameskip: " + mPrefFrameskip);
 	}
 
-	protected void uiCyclesMore() {
-		mPrefCycles += 1000; 
+	protected void uiCyclesMore(int current) {
+		mPrefCycles = (current>0?current:3000) + 1000; 
 		uiUpdateCycles();
 	}
 
-	protected void uiCyclesAuto() {
-		mPrefCycles = 3000; 
-		uiUpdateCycles();
-	}
-
-	protected void uiCyclesLess() {
-		if (mPrefCycles<=1000) return;
-		
-		mPrefCycles -= 1000; 
+	protected void uiCyclesLess(int current) {
+		mPrefCycles = (current>0?current:3000) - 1000;
+		if (mPrefCycles<1000) mPrefCycles = 1000;
 		uiUpdateCycles();
 	}
 	
+	protected void uiAutoCycles() {
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CPU_AUTO, 1,null,true);
+		toastMessage("Auto CPU is ON");
+	}
+
+	protected void uiCPUMaxCycles() {
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CPU_MAX, 1,null,true);
+		toastMessage("CPU set as max cycles");
+	}
+
 	protected void uiUpdateCycles() {
-		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLES, mPrefCycles,null,true);
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CPU_FIXED, mPrefCycles,null,true);
 		toastMessage("CPU Cycles: " + mPrefCycles);
 	}
 	

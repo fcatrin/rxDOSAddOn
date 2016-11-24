@@ -133,6 +133,10 @@ public class DosBoxMenuUtility {
 	public final static int DOSBOX_OPTION_ID_DOSBOX_DEFAULT = 51;
 	public final static int DOSBOX_OPTION_ID_DOSBOX_USER = 52;
 	
+	public final static int DOSBOX_OPTION_ID_CPU_AUTO  = 60;
+	public final static int DOSBOX_OPTION_ID_CPU_MAX   = 61;
+	public final static int DOSBOX_OPTION_ID_CPU_FIXED = 62;
+	
 	private static boolean initialized = false;
 	
 	static public void loadPreference(DosBoxLauncher context, final SharedPreferences prefs) {	
