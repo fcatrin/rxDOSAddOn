@@ -43,6 +43,6 @@ LOCAL_CPPFLAGS := $(LOCAL_CFLAGS)
 LOCAL_CXXFLAGS := $(LOCAL_CFLAGS)
 LOCAL_STATIC_LIBRARIES := locnet_al dosbox_main 
 #LOCAL_LDFLAGS := /home/gene/workspace/DosBox/libs/armeabi/libandprof.a
-
+LOCAL_LDFLAGS := -llog
 include $(BUILD_SHARED_LIBRARY)
 

@@ -519,7 +519,9 @@ public class DosBoxLauncher extends Activity {
 		turboAudio  = DosBoxCustomConfig.getBoolean("turboAudio", turboCycles);
 		mPrefAutoCPUOn = DosBoxCustomConfig.getBoolean("autocpu", mPrefAutoCPUOn);
 		
-		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLES, mPrefCycles, null, true);
+		// this now come from dosbox.conf or rbx menu
+		// DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLES, mPrefCycles, null, true);
+		
 		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_FRAMESKIP, mPrefFrameskip ,null, true);		
 		
 		// TURBO CYCLE
@@ -718,7 +720,7 @@ public class DosBoxLauncher extends Activity {
 	private void setupCpuCycles() {
 		if (!cpuCycles.isEmpty()) return;
 		
-		cpuCycles.put(0, "Auto (100%)");
+		cpuCycles.put(0, "Auto");
 		cpuCycles.put(-1, "Max");
 		cpuCycles.put(3000, "Slow 386 (3000 cycles)");
 		cpuCycles.put(6000, "Fast 386 (6000 cycles)");
@@ -741,8 +743,8 @@ public class DosBoxLauncher extends Activity {
 	
 	private void uiCPUSettings() {
 		List<ListOption> options = new ArrayList<ListOption>();
-        options.add(new ListOption("cycles+", "More Cycles"));
-        options.add(new ListOption("cycles-", "Less Cycles"));
+        // options.add(new ListOption("cycles+", "More Cycles"));
+        // options.add(new ListOption("cycles-", "Less Cycles"));
         
         boolean isOneActive = false;
         final int cycles = DosBoxControl.nativeGetCPUCycles();
