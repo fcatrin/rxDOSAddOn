@@ -45,9 +45,9 @@ extern struct loader_config *loadf;
 
 extern int CPU_Cycles;
 
-extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeStart(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint height, jstring confpath)
+extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeStart(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint height, jstring confpath, jboolean invertRGB)
 {
-	Android_Init(env, obj, bitmap, width, height);
+	Android_Init(env, obj, bitmap, width, height, invertRGB);
 	
 	if (strlen(arg_start_conf_default)>0) {
 		const char *argv[] = { "dosbox",

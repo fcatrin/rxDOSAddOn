@@ -94,5 +94,6 @@ bool RENDER_StartUpdate(void);
 void RENDER_EndUpdate(bool abort);
 void RENDER_SetPal(Bit8u entry,Bit8u red,Bit8u green,Bit8u blue);
 
+extern int ANDROID_invertRGB;
 
 #endif

@@ -69,7 +69,7 @@ jclass JavaCallbackThreadClass = NULL;
 jmethodID JavaVideoGetBuffer = NULL;
 
 
-void Android_Init(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint height) {
+void Android_Init(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint height, jboolean invertRGB) {
 	gEnv = env;
 	JavaCallbackThread = env->NewGlobalRef(obj);
 	JavaCallbackThreadClass = env->GetObjectClass(JavaCallbackThread);
@@ -95,6 +95,8 @@ void Android_Init(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint he
 	enableRefreshHack = myLoader.refreshHack;
 	enableMixerHack = myLoader.mixerHack;
 	//enableAutoCPU = myLoader.autoCPU;
+
+	ANDROID_invertRGB = invertRGB;
 }
 /*
 extern "C"

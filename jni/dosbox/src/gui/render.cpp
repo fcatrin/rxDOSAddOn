@@ -37,6 +37,8 @@
 Render_t render;
 ScalerLineHandler_t RENDER_DrawLine;
 
+int ANDROID_invertRGB = 0;
+
 static void RENDER_CallBack( GFX_CallBackFunctions_t function );
 
 static void Check_Palette(void) {
@@ -58,7 +60,7 @@ static void Check_Palette(void) {
 			Bit8u r=render.pal.rgb[i].red;
 			Bit8u g=render.pal.rgb[i].green;
 			Bit8u b=render.pal.rgb[i].blue;
-			Bit16u newPal = GFX_GetRGB(r,g,b);
+			Bit16u newPal = ANDROID_invertRGB ? GFX_GetRGB(b, g, r) : GFX_GetRGB(r, g, b);
 			if (newPal != render.pal.lut.b16[i]) {
 				render.pal.changed = true;
 				render.pal.modified[i] = 1;

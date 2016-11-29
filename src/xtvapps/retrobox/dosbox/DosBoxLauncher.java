@@ -100,7 +100,7 @@ public class DosBoxLauncher extends Activity {
 	public native void nativeInit(Object ctx);
 	public static native void nativeShutDown();
 	public static native void nativeSetOption(int option, int value, String value2, boolean l);
-	public native void nativeStart(Bitmap bitmap, int width, int height, String confPath);
+	public native void nativeStart(Bitmap bitmap, int width, int height, String confPath, boolean invertRGB);
 	public static native void nativePause(int state);
 	public static native void nativeStop();
 	public static native void nativePrefs();
@@ -657,7 +657,9 @@ public class DosBoxLauncher extends Activity {
 		public void run() {
 			mDosBoxRunning = true;
 			Log.i("DosBoxTurbo", "Using DosBox Config: "+mConfPath+mConfFile);
-			nativeStart(mSurfaceView.mBitmap, mSurfaceView.mBitmap.getWidth(), mSurfaceView.mBitmap.getHeight(), mConfPath+mConfFile);
+			
+			boolean invertRGB = getIntent().getBooleanExtra("invertRGB", false);
+			nativeStart(mSurfaceView.mBitmap, mSurfaceView.mBitmap.getWidth(), mSurfaceView.mBitmap.getHeight(), mConfPath+mConfFile, invertRGB);
 			//will never return to here;
 		}
 		

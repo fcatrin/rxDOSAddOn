@@ -21,7 +21,7 @@
 
 #include <jni.h>
 
-void Android_Init(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint height);
+void Android_Init(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint height, jboolean invertRGB);
 void Android_ShutDown();
 void Android_SetVideoMode(int width, int height, int depth);
 void Android_LockSurface();
