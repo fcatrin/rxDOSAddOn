@@ -6,4 +6,4 @@ APP_STL := stlport_static
 APP_CPPFLAGS += -O2 -fPIC
 APP_PLATFORM := android-8
 APP_OPTIM := release
-NDK_TOOLCHAIN_VERSION := 4.6
+NDK_TOOLCHAIN_VERSION := 4.8
