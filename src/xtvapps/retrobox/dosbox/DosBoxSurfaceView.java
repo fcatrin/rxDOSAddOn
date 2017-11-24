@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 import retrobox.vinput.Mapper;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.retrobox.dosbox.touchevent.TouchEventWrapper;
+import xtvapps.retrobox.v2.dosbox.R;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -43,9 +44,11 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -146,6 +149,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 	boolean mModifierShift = false;
 	//private int mKeyboardType = Configuration.KEYBOARD_NOKEYS;
 	 
+	boolean showFPS = false;
+	
 	class KeyHandler extends Handler {
 		boolean mReCheck = false;
 		
@@ -174,7 +179,17 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		private long startTime = 0;
 		private int frameCount = 0;
 		private long curTime, nextUpdateTime, sleepTime;
-
+		
+		private long fpsLastTime = 0;
+		private int fpsCount = 0;
+		private Handler fpsHandler;
+		private TextView txtFPS;
+		
+		public DosBoxVideoThread(Handler fpsHandler, TextView txtFPS) {
+			this.fpsHandler = fpsHandler;
+			this.txtFPS = txtFPS;
+		}
+		
 		void setRunning(boolean running) {
 			mVideoRunning = running;
 		}
@@ -198,6 +213,19 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 					//if (mDebug) {
 					//	Log.d("dosbox", "fps:" + 1000 * frameCount / (curTime - startTime));
 					//}
+					
+					fpsCount++;
+					if (showFPS && (curTime - fpsLastTime) > 1000) {
+						final int fps = fpsCount;
+						fpsCount = 0;
+						fpsLastTime = curTime;
+						fpsHandler.post(new Runnable() {
+							@Override
+							public void run() {
+								txtFPS.setText(String.valueOf(fps));
+							}
+						});
+					}
 				
 					synchronized (mDirty) {
 						if (mDirty) {
@@ -242,8 +270,13 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
   
 		//2011-04-28, support 2.1 or below
 		mVideoBuffer = ByteBuffer.allocateDirect(DEFAULT_WIDTH * DEFAULT_HEIGHT * 2);
+
+		showFPS = context.getIntent().getBooleanExtra("showFPS", false);
+		TextView txtFPS = (TextView)context.findViewById(R.id.txtFPS);
+		txtFPS.setVisibility(showFPS ? View.VISIBLE : View.GONE);
+		txtFPS.setText("");
 		
-		mVideoThread = new DosBoxVideoThread();
+		mVideoThread = new DosBoxVideoThread(new Handler(), txtFPS);
 		//mVideoThread.setPriority(5);
 		if (mDebug)
 			Log.i("DosBoxTurbo","Video Priority: " + mVideoThread.getPriority());
@@ -261,6 +294,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		getHolder().setKeepScreenOn(true);
 		//mKeyboardType = getResources().getConfiguration().keyboard;
 		//setOnLongClickListener(this);
+		
 	}
 	
 	public void shutDown() {

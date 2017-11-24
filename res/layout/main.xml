@@ -8,6 +8,18 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:id="@+id/root" ></FrameLayout>
+    <TextView
+        android:id="@+id/txtFPS"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_small"
+        android:layout_marginTop="@dimen/spacing_small"
+        android:layout_marginLeft="@dimen/spacing_small"
+        android:textSize="@dimen/text_medium"
+        android:textColor="#F0C2FF0D"
+        android:text="XX"
+        android:visibility="gone"
+        />
 
     <include layout="@layout/modal_dialog_gamepad" />
     <include layout="@layout/modal_dialog_list" />
