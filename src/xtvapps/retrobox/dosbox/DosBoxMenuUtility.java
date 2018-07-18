@@ -249,9 +249,11 @@ public class DosBoxMenuUtility {
 		
 		int inputMode = INPUT_JOYSTICK; // Integer.valueOf(prefs.getString("confinputmode", "0"));
 		boolean isMouseOnly = DosBoxLauncher.mDosBoxLauncher.isMouseOnly;
+		boolean isRealMouse = DosBoxLauncher.mDosBoxLauncher.isRealMouse;
 		boolean useRealJoystick = DosBoxLauncher.mDosBoxLauncher.useRealJoystick;
 		if (isMouseOnly) inputMode = INPUT_MOUSE;
 		if (useRealJoystick) inputMode = INPUT_REAL_JOYSTICK;
+		if (isRealMouse) inputMode = INPUT_REAL_MOUSE;
 		
 		Log.d("JSTICK", "setting Input Mode " + inputMode);
 		Log.d("JSTICK", "isMouseOnly " + isMouseOnly);

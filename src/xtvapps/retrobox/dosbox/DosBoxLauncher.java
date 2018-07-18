@@ -136,6 +136,7 @@ public class DosBoxLauncher extends Activity {
 	public int mPrefScaleFactor = 100;
 	public boolean isMouseOnly = false;
 	public boolean useRealJoystick = false;
+	public boolean isRealMouse = false;
 	
 	static Mapper mapper;
 	private VirtualEventDispatcher virtualEventDispatcher;
