@@ -55,7 +55,7 @@ import xtvapps.core.SimpleCallback;
 import xtvapps.core.Utils;
 import xtvapps.core.content.KeyValue;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
-import xtvapps.retrobox.v2.dosbox.R;
+import xtvapps.prg.dosbox.R;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;

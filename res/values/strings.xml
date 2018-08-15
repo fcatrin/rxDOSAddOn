@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RetroX DOS Add-on</string>
+    <string name="app_name">PRG DOS Add-on</string>
     <string name="debug">WARNING: DEBUG Mode is Enabled</string>
-
+    <string name="emu_opt_title">PRG Options</string>
+    
 <!--    <string name="absdefault">Absolute Tracking Calibration Reset</string>
     <string name="abscalibrate">Tap visible DOS pointer to calibrate</string>
     <string name="abscalibrate_success">Mouse Pointer Calibrated</string> -->
