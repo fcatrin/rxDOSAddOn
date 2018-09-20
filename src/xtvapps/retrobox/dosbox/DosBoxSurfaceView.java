@@ -156,15 +156,10 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 		
 		@Override
 		public void handleMessage (Message msg) {
-			if (msg.what == DosBoxLauncher.SPLASH_TIMEOUT_MESSAGE) {
-				setBackgroundResource(0);				
-			}
-			else {
-				if (DosBoxControl.sendNativeKey(msg.what, false, mModifierCtrl, mModifierAlt, mModifierShift)) {
-					mModifierCtrl = false;
-					mModifierAlt = false;
-					mModifierShift = false;					
-				}
+			if (DosBoxControl.sendNativeKey(msg.what, false, mModifierCtrl, mModifierAlt, mModifierShift)) {
+				mModifierCtrl = false;
+				mModifierAlt = false;
+				mModifierShift = false;					
 			}
 		}		
 	}
