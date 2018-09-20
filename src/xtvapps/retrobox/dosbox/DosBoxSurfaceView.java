@@ -22,13 +22,14 @@ package xtvapps.retrobox.dosbox;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -300,6 +301,7 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 
 	int tmp = 0;
 	int tmp2 = 0;
+	@TargetApi(26)
 	public void VideoRedraw(Bitmap bitmap, int src_width, int src_height, int startLine, int endLine) {
 		if (!mSurfaceViewRunning || (bitmap == null) || (src_width <= 0) || (src_height <= 0))
 			return;
@@ -390,14 +392,23 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 					mDirtyRect.set(mDstRect);
 				}						
 				
-				if (isDirty) {
-					canvas = surfaceHolder.lockCanvas(null);
-					canvas.drawColor(0xff000000);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					if (isDirty) {
+						canvas = surfaceHolder.lockHardwareCanvas();
+						canvas.drawColor(0xff000000);
+					}
+					else {
+						canvas = surfaceHolder.lockHardwareCanvas();
+					}
+				} else { 
+					if (isDirty) {
+						canvas = surfaceHolder.lockCanvas(null);
+						canvas.drawColor(0xff000000);
+					}
+					else {
+						canvas = surfaceHolder.lockCanvas(mDirtyRect);
+					}
 				}
-				else {
-					canvas = surfaceHolder.lockCanvas(mDirtyRect);
-				}
-				
 				//2011-04-28, support 2.1 or below
 				if (mVideoBuffer != null) {
 					mVideoBuffer.position(0);

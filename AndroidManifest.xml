@@ -3,10 +3,10 @@
       package="xtvapps.retrobox.v2.dosbox"  
       android:versionCode="221030"
       android:versionName="2.2.1-30"
-      android:installLocation="auto"
+      android:installLocation="internalOnly"
       android:sharedUserId="psychoworld.retrobox.v2"
       > 
-    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="21"/>
+    <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="23"/>
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
