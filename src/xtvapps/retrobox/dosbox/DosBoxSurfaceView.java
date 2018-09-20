@@ -392,7 +392,7 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 					mDirtyRect.set(mDstRect);
 				}						
 				
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 					if (isDirty) {
 						canvas = surfaceHolder.lockHardwareCanvas();
 						canvas.drawColor(0xff000000);
