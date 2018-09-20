@@ -282,10 +282,18 @@ public class DosBoxLauncher extends Activity {
 	private void setupGamepadOverlay(ViewGroup root) {
 		ViewTreeObserver observer = root.getViewTreeObserver();
 		observer.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			int lastWidth  = -1;
+			int lastHeight = -1;
 			@Override
 			public void onGlobalLayout() {
 				int w = mSurfaceView.getWidth();
 				int h = mSurfaceView.getHeight();
+				
+				if (w == lastWidth && h == lastHeight) return;
+				
+				lastWidth  = w;
+				lastHeight = h;
+				
 				Log.d("VIDEO", "global layout " + w + "x" + h);
 				if (needsOverlay()) {
 					String overlayConfig = getIntent().getStringExtra("OVERLAY");
