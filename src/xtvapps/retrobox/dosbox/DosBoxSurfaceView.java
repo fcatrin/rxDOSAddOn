@@ -23,17 +23,12 @@ package xtvapps.retrobox.dosbox;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-import retrobox.vinput.Mapper;
-import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
-import xtvapps.retrobox.dosbox.touchevent.TouchEventWrapper;
-import xtvapps.retrobox.v2.dosbox.R;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -44,15 +39,20 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
 import android.widget.Toast;
+import retrobox.vinput.Mapper;
+import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
+import xtvapps.retrobox.dosbox.touchevent.TouchEventWrapper;
+import xtvapps.retrobox.v2.dosbox.R;
 
 
-class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback {
+class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 	private final static int DEFAULT_WIDTH = 640;//800;
 	private final static int DEFAULT_HEIGHT = 400;//600; 
 	public int mJoyCenterX = 0;
