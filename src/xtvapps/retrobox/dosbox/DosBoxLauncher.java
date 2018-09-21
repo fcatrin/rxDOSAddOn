@@ -117,7 +117,7 @@ public class DosBoxLauncher extends Activity {
 	
 	static boolean turboCycles = true;
 	static boolean turboVGA = true;
-	static boolean turboAudio = true;
+	static boolean turboAudio = false;
 	static boolean turboCPU = false;
 
 	
@@ -495,8 +495,8 @@ public class DosBoxLauncher extends Activity {
 		
 		mPrefFrameskip = DosBoxCustomConfig.getInt("frameskip", mPrefFrameskip);
 		turboCycles = DosBoxCustomConfig.getBoolean("turboCycle", turboCycles);
-		turboVGA    = DosBoxCustomConfig.getBoolean("turboVGA", turboCycles);
-		turboAudio  = DosBoxCustomConfig.getBoolean("turboAudio", turboCycles);
+		turboVGA    = DosBoxCustomConfig.getBoolean("turboVGA", turboVGA);
+		turboAudio  = DosBoxCustomConfig.getBoolean("turboAudio", turboAudio);
 		mPrefAutoCPUOn = DosBoxCustomConfig.getBoolean("autocpu", mPrefAutoCPUOn);
 		
 		// this now come from dosbox.conf or rbx menu
