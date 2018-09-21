@@ -172,6 +172,8 @@ public class DosBoxLauncher extends Activity {
 		useRealJoystick = Mapper.hasGamepads();
 		Log.d("JSTICK", "useRealJoystick is " + useRealJoystick);
 		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
+		isRealMouse  = getIntent().getBooleanExtra("useRealMouse", false);
+		
 		//testingMode = getIntent().getBooleanExtra("testingMode", false);
 		
 		setContentView(R.layout.main);
