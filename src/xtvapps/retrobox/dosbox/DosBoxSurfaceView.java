@@ -901,7 +901,8 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 		if (mDebug)
 			Log.d("DosBoxTurbo", "onKeyDown keyCode="+keyCode + " mEnableDpad=" + mEnableDpad);
 		
-		if (mInputMode == INPUT_MODE_REAL_JOYSTICK && Mapper.instance.handleKeyEvent(event, keyCode, true)) return true;
+		if ((mInputMode == INPUT_MODE_REAL_JOYSTICK || mInputMode == INPUT_MODE_REAL_MOUSE) 
+			&& Mapper.instance.handleKeyEvent(event, keyCode, true)) return true;
 
 		if (mEnableDpad) {
 			switch (keyCode) {
@@ -965,7 +966,8 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 		if (mDebug)
 			Log.d("DosBoxTurbo", "onKeyUp keyCode="+keyCode);
 
-		if (mInputMode == INPUT_MODE_REAL_JOYSTICK && Mapper.instance.handleKeyEvent(event, keyCode, false)) return true;
+		if ((mInputMode == INPUT_MODE_REAL_JOYSTICK || mInputMode == INPUT_MODE_REAL_MOUSE) 
+				&& Mapper.instance.handleKeyEvent(event, keyCode, false)) return true;
 		
 		if (mEnableDpad) {
 			switch (keyCode) {
