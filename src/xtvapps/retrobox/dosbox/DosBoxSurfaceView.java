@@ -23,17 +23,14 @@ package xtvapps.retrobox.dosbox;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-import retrobox.vinput.Mapper;
-import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
-import xtvapps.retrobox.dosbox.touchevent.TouchEventWrapper;
-import xtvapps.prg.dosbox.R;
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -44,15 +41,20 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
 import android.widget.Toast;
+import retrobox.vinput.Mapper;
+import xtvapps.prg.dosbox.R;
+import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
+import xtvapps.retrobox.dosbox.touchevent.TouchEventWrapper;
 
 
-class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback {
+class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 	private final static int DEFAULT_WIDTH = 640;//800;
 	private final static int DEFAULT_HEIGHT = 400;//600; 
 	public int mJoyCenterX = 0;
@@ -156,15 +158,10 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		
 		@Override
 		public void handleMessage (Message msg) {
-			if (msg.what == DosBoxLauncher.SPLASH_TIMEOUT_MESSAGE) {
-				setBackgroundResource(0);				
-			}
-			else {
-				if (DosBoxControl.sendNativeKey(msg.what, false, mModifierCtrl, mModifierAlt, mModifierShift)) {
-					mModifierCtrl = false;
-					mModifierAlt = false;
-					mModifierShift = false;					
-				}
+			if (DosBoxControl.sendNativeKey(msg.what, false, mModifierCtrl, mModifierAlt, mModifierShift)) {
+				mModifierCtrl = false;
+				mModifierAlt = false;
+				mModifierShift = false;					
 			}
 		}		
 	}
@@ -305,6 +302,7 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 
 	int tmp = 0;
 	int tmp2 = 0;
+	@TargetApi(26)
 	public void VideoRedraw(Bitmap bitmap, int src_width, int src_height, int startLine, int endLine) {
 		if (!mSurfaceViewRunning || (bitmap == null) || (src_width <= 0) || (src_height <= 0))
 			return;
@@ -395,14 +393,23 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 					mDirtyRect.set(mDstRect);
 				}						
 				
-				if (isDirty) {
-					canvas = surfaceHolder.lockCanvas(null);
-					canvas.drawColor(0xff000000);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+					if (isDirty) {
+						canvas = surfaceHolder.lockHardwareCanvas();
+						canvas.drawColor(0xff000000);
+					}
+					else {
+						canvas = surfaceHolder.lockHardwareCanvas();
+					}
+				} else { 
+					if (isDirty) {
+						canvas = surfaceHolder.lockCanvas(null);
+						canvas.drawColor(0xff000000);
+					}
+					else {
+						canvas = surfaceHolder.lockCanvas(mDirtyRect);
+					}
 				}
-				else {
-					canvas = surfaceHolder.lockCanvas(mDirtyRect);
-				}
-				
 				//2011-04-28, support 2.1 or below
 				if (mVideoBuffer != null) {
 					mVideoBuffer.position(0);
@@ -895,7 +902,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		if (mDebug)
 			Log.d("DosBoxTurbo", "onKeyDown keyCode="+keyCode + " mEnableDpad=" + mEnableDpad);
 		
-		if (mInputMode == INPUT_MODE_REAL_JOYSTICK && Mapper.instance.handleKeyEvent(event, keyCode, true)) return true;
+		if ((mInputMode == INPUT_MODE_REAL_JOYSTICK || mInputMode == INPUT_MODE_REAL_MOUSE) 
+			&& Mapper.instance.handleKeyEvent(event, keyCode, true)) return true;
 
 		if (mEnableDpad) {
 			switch (keyCode) {
@@ -959,7 +967,8 @@ class DosBoxSurfaceView extends GLSurfaceView implements SurfaceHolder.Callback 
 		if (mDebug)
 			Log.d("DosBoxTurbo", "onKeyUp keyCode="+keyCode);
 
-		if (mInputMode == INPUT_MODE_REAL_JOYSTICK && Mapper.instance.handleKeyEvent(event, keyCode, false)) return true;
+		if ((mInputMode == INPUT_MODE_REAL_JOYSTICK || mInputMode == INPUT_MODE_REAL_MOUSE) 
+				&& Mapper.instance.handleKeyEvent(event, keyCode, false)) return true;
 		
 		if (mEnableDpad) {
 			switch (keyCode) {

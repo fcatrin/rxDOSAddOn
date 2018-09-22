@@ -22,6 +22,7 @@ package xtvapps.retrobox.dosbox;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.util.Log;
  
 public class DosBoxAudio
 {
@@ -37,6 +38,7 @@ public class DosBoxAudio
 	
 	public int initAudio(int rate, int channels, int encoding, int bufSize)
 	{
+		Log.d("Audio", "initAudio rate:" + rate + ", channels:" + channels);
 		if( mAudio == null )
 		{ 
 			channels = ( channels == 1 ) ? AudioFormat.CHANNEL_CONFIGURATION_MONO : 

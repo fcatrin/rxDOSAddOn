@@ -23,12 +23,36 @@ import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 import retrobox.utils.GamepadInfoDialog;
 import retrobox.utils.ImmersiveModeSetter;
 import retrobox.utils.ListOption;
@@ -54,42 +78,11 @@ import xtvapps.core.Callback;
 import xtvapps.core.SimpleCallback;
 import xtvapps.core.Utils;
 import xtvapps.core.content.KeyValue;
-import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.prg.dosbox.R;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
+import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 
   
 public class DosBoxLauncher extends Activity {
-	public static final int SPLASH_TIMEOUT_MESSAGE = -1;
 	public static final String START_COMMAND_ID = "start_command";
 	public String mConfFile = DosBoxPreferences.CONFIG_FILE;
 	public String mConfPath = DosBoxPreferences.CONFIG_PATH;
@@ -124,7 +117,7 @@ public class DosBoxLauncher extends Activity {
 	
 	static boolean turboCycles = true;
 	static boolean turboVGA = true;
-	static boolean turboAudio = true;
+	static boolean turboAudio = false;
 	static boolean turboCPU = false;
 
 	
@@ -164,7 +157,6 @@ public class DosBoxLauncher extends Activity {
 
         setImmersiveMode();
         
-        
 		// load real joystick translation
 		virtualEventDispatcher = new VirtualInputDispatcher();
 		mapper = new Mapper(getIntent(), virtualEventDispatcher);
@@ -180,19 +172,16 @@ public class DosBoxLauncher extends Activity {
 		useRealJoystick = Mapper.hasGamepads();
 		Log.d("JSTICK", "useRealJoystick is " + useRealJoystick);
 		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
+		isRealMouse  = getIntent().getBooleanExtra("useRealMouse", false);
+		
 		//testingMode = getIntent().getBooleanExtra("testingMode", false);
 		
-		View main = getLayoutInflater().inflate(R.layout.main, null);
-		setContentView(main);
+		setContentView(R.layout.main);
 		
-		AndroidFonts.setViewFont(findViewById(R.id.txtDialogListTitle), RetroBoxUtils.FONT_DEFAULT_M);
-		
-        AndroidFonts.setViewFont(findViewById(R.id.txtGamepadInfoTop), RetroBoxUtils.FONT_DEFAULT_M);
-        AndroidFonts.setViewFont(findViewById(R.id.txtGamepadInfoBottom), RetroBoxUtils.FONT_DEFAULT_M);
+		AndroidFonts.setViewFontRecursive(findViewById(R.id.rootContainer), RetroBoxUtils.FONT_DEFAULT_M);
 
         gamepadInfoDialog = new GamepadInfoDialog(this);
         gamepadInfoDialog.loadFromIntent(getIntent());
-		
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         Log.d("VIDEO", "metrics " + metrics.widthPixels + "x" + metrics.heightPixels);
@@ -268,27 +257,11 @@ public class DosBoxLauncher extends Activity {
 		
 		DosBoxMenuUtility.loadPreference(this,prefs);	
 
-		BitmapDrawable splash = (BitmapDrawable) getResources().getDrawable(R.drawable.splash);
-		splash.setTargetDensity(120);
-		splash.setGravity(Gravity.CENTER);		
-		mSurfaceView.setBackgroundDrawable(splash);
-
 		setupGamepadOverlay(root);
 
 		initDosBox();
 		startDosBox();
-		Log.i("DosBoxTurbo","onCreate");
-		// don't know whether one more handler will hurt, so abuse key handler
-		mSurfaceView.mKeyHandler.sendEmptyMessageDelayed(SPLASH_TIMEOUT_MESSAGE, 1000);
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		
+		Log.i("DosBoxTurbo","onCreate ends");
 	}
 	
 	public void onWindowFocusChanged(boolean hasFocus) {
@@ -311,10 +284,18 @@ public class DosBoxLauncher extends Activity {
 	private void setupGamepadOverlay(ViewGroup root) {
 		ViewTreeObserver observer = root.getViewTreeObserver();
 		observer.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			int lastWidth  = -1;
+			int lastHeight = -1;
 			@Override
 			public void onGlobalLayout() {
 				int w = mSurfaceView.getWidth();
 				int h = mSurfaceView.getHeight();
+				
+				if (w == lastWidth && h == lastHeight) return;
+				
+				lastWidth  = w;
+				lastHeight = h;
+				
 				Log.d("VIDEO", "global layout " + w + "x" + h);
 				if (needsOverlay()) {
 					String overlayConfig = getIntent().getStringExtra("OVERLAY");
@@ -516,8 +497,8 @@ public class DosBoxLauncher extends Activity {
 		
 		mPrefFrameskip = DosBoxCustomConfig.getInt("frameskip", mPrefFrameskip);
 		turboCycles = DosBoxCustomConfig.getBoolean("turboCycle", turboCycles);
-		turboVGA    = DosBoxCustomConfig.getBoolean("turboVGA", turboCycles);
-		turboAudio  = DosBoxCustomConfig.getBoolean("turboAudio", turboCycles);
+		turboVGA    = DosBoxCustomConfig.getBoolean("turboVGA", turboVGA);
+		turboAudio  = DosBoxCustomConfig.getBoolean("turboAudio", turboAudio);
 		mPrefAutoCPUOn = DosBoxCustomConfig.getBoolean("autocpu", mPrefAutoCPUOn);
 		
 		// this now come from dosbox.conf or rbx menu

@@ -18,6 +18,16 @@
 
 #ifndef DOSBOX_LOGGING_H
 #define DOSBOX_LOGGING_H
+
+#ifdef _ANDROID_
+	#include <android/log.h>
+	#ifdef _ANDOID_LOG_
+		#define LOGV(...)   __android_log_print((int)ANDROID_LOG_INFO, "DosBoxNative", __VA_ARGS__)
+	#else
+		#define LOGV(...)
+	#endif
+#endif
+
 enum LOG_TYPES {
 	LOG_ALL,
 	LOG_VGA, LOG_VGAGFX,LOG_VGAMISC,LOG_INT10,
@@ -53,7 +63,11 @@ public:
 };
 
 void DEBUG_ShowMsg(char const* format,...) GCC_ATTRIBUTE(__format__(__printf__, 1, 2));
-#define LOG_MSG DEBUG_ShowMsg
+#ifdef _ANDROID_
+	#define LOG_MSG LOGV
+#else
+	#define LOG_MSG DEBUG_ShowMsg
+#endif
 
 #else  //C_DEBUG
 
@@ -82,7 +96,12 @@ struct LOG
 }; //add missing operators to here
 	//try to avoid anything smaller than bit32...
 void GFX_ShowMsg(char const* format,...) GCC_ATTRIBUTE(__format__(__printf__, 1, 2));
-#define LOG_MSG GFX_ShowMsg
+
+#ifdef _ANDROID_
+	#define LOG_MSG LOGV
+#else
+	#define LOG_MSG GFX_ShowMsg
+#endif
 
 #endif //C_DEBUG
 
