@@ -49,7 +49,7 @@ import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
 import android.widget.Toast;
 import retrobox.vinput.Mapper;
-import xtvapps.prg.dosbox.R;
+import xtvapps.res.dosbox.R;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.retrobox.dosbox.touchevent.TouchEventWrapper;
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="xtvapps.prg.dosbox"  
+      package="xtvapps.res.dosbox"  
       android:versionCode="221031"
       android:versionName="2.2.1-31"
       android:installLocation="auto"
-      android:sharedUserId="xtvapps.prg.user"
+      android:sharedUserId="xtvapps.res.user"
       > 
     <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="23"/>
     <uses-feature
@@ -26,7 +26,7 @@
                   android:screenOrientation="sensorLandscape" 
                   android:configChanges="orientation|keyboardHidden">
             <intent-filter>
-                <action android:name="xtvapps.prg.dosbox" />
+                <action android:name="xtvapps.res.dosbox" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain"/>
             </intent-filter>

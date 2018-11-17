@@ -78,7 +78,7 @@ import xtvapps.core.Callback;
 import xtvapps.core.SimpleCallback;
 import xtvapps.core.Utils;
 import xtvapps.core.content.KeyValue;
-import xtvapps.prg.dosbox.R;
+import xtvapps.res.dosbox.R;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 
   
