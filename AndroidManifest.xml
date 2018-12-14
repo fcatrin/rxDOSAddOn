@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="xtvapps.retrobox.v2.dosbox"  
-      android:versionCode="221031"
-      android:versionName="2.2.1-31"
+      android:versionCode="221032"
+      android:versionName="2.2.1-32"
       android:installLocation="internalOnly"
       android:sharedUserId="psychoworld.retrobox.v2"
       > 
-    <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="23"/>
+    <uses-sdk android:minSdkVersion="17" android:targetSdkVersion="23"/>
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
