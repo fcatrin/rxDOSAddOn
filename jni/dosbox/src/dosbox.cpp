@@ -43,6 +43,9 @@
 #include "render.h"
 //#include "pci_bus.h"
 
+#include <android/log.h>
+#define LOGD(LOG_TAG, ...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+
 #ifdef C_NE2000
 //#include "ne2000.h"
 void NE2K_Init(Section* sec);
@@ -156,6 +159,7 @@ static Bitu Normal_Loop(void) {
 			GFX_Events();
 			//locnet, abort current program without exception
 			if (loadf->abort == 1) {
+				LOGD("SHUTDOWN", "Setting abort = 2");
 				loadf->abort = 2;
 				return 1;
 			}

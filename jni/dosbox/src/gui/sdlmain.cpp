@@ -52,6 +52,9 @@
 #include "cross.h"
 #include "control.h"
 
+#include <android/log.h>
+#define LOGD(LOG_TAG, ...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+
 #define MAPPERFILE "mapper-" VERSION ".map"
 //#define DISABLE_JOYSTICK
 
@@ -1431,7 +1434,7 @@ bool GFX_IsFullscreen(void) {
 void GFX_Events() {
 	//locnet, exit from shell
 	if (loadf->abort == 2) {
-		//loadf->abort = 3;
+		LOGD("SHUTDOWN", "typing exit");
 		KEYBOARD_AddKey(KBD_e, true);
 		KEYBOARD_AddKey(KBD_e, false);
 		KEYBOARD_AddKey(KBD_x, true);
@@ -1447,6 +1450,7 @@ void GFX_Events() {
 		return;
 	}
 	if (loadf->pause) {
+		LOGD("SHUTDOWN", "pausing");
 		PauseDOSBox(true);
 		//loadf->eventType = SDL_FIRSTEVENT;
 		return;

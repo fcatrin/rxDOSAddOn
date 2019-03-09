@@ -146,11 +146,16 @@ public class DosBoxLauncher extends Activity {
     // gives the native activity a copy of this object so it can call OnNativeMotion
     //public native int RegisterThis();
     
+	boolean isShuttingDown = false;
+	boolean shutDown = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i("DosBoxTurbo", "onCreate()");
+		
+		isShuttingDown = false;
+		shutDown = false;
 		
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -335,9 +340,10 @@ public class DosBoxLauncher extends Activity {
 
 	@Override
 	protected void onPause() {
-		Log.i("DosBoxTurbo","onPause()");
+		Log.i("DosBoxTurbo","onPause() start");
 		pauseDosBox(true);
 		super.onPause();
+		Log.i("DosBoxTurbo","onPause() end");
 	}
 	
 	@Override
@@ -393,6 +399,17 @@ public class DosBoxLauncher extends Activity {
 		*/
 		
 		Log.i("DosBoxTurbo","onResume");
+		
+		if (shutDown) {
+			new Handler().postDelayed(new Runnable(){
+	
+				@Override
+				public void run() {
+					stopDosBox();
+					finish();
+					
+				}}, 5000);
+		}
 	}
 	
 	@Override
@@ -414,6 +431,7 @@ public class DosBoxLauncher extends Activity {
 	}	
 
 	void pauseDosBox(boolean pause) {
+		Log.d("SHUTDOWN", "pauseDosBox " + pause + " start");
 		if (pause) {
 			mDosBoxThread.mDosBoxRunning = false;
 			nativePause(1);
@@ -427,6 +445,7 @@ public class DosBoxLauncher extends Activity {
 			//if (mAudioDevice != null)
 			//	mAudioDevice.play();		
 		}
+		Log.d("SHUTDOWN", "pauseDosBox " + pause + " end");
 	}
 	
 	void initDosBox() {
@@ -522,21 +541,29 @@ public class DosBoxLauncher extends Activity {
 	void shutDownDosBox() {
 		boolean retry;
 		retry = true;
+		Log.d("SHUTDOWN", "shutDownDosBox start");
 		while (retry) {
 			try {
+				Log.d("SHUTDOWN", "shutDownDosBox join()");
 				mDosBoxThread.join();
+				Log.d("SHUTDOWN", "shutDownDosBox joined!");
 				retry =	false;
 			}
 			catch (InterruptedException e) { // try again shutting down the thread
 			}
 		}		
+		Log.d("SHUTDOWN", "shutDownDosBox nativeShutDown() start");
 		nativeShutDown();
+		Log.d("SHUTDOWN", "shutDownDosBox nativeShutDown() end");
 
 		if (mAudioDevice != null) {
+			Log.d("SHUTDOWN", "shutDownDosBox shutDownAudio() start");
 			mAudioDevice.shutDownAudio();
+			Log.d("SHUTDOWN", "shutDownDosBox shutDownAudio() end");
 			mAudioDevice = null;
 		}
 		mDosBoxThread = null;
+		Log.d("SHUTDOWN", "shutDownDosBox end");
 	}	
 
 	void startDosBox() {
@@ -548,25 +575,24 @@ public class DosBoxLauncher extends Activity {
 	}
 	
 	void stopDosBox() {
+		if (isShuttingDown) return;
+		
+		isShuttingDown = true;
+		
+		/*
 		nativePause(0);//it won't die if not running
 		
 		//stop audio AFTER above
 		if (mAudioDevice != null)
 			mAudioDevice.pause();
 		
+		*/
 		mSurfaceView.mVideoThread.setRunning(false);
-		
-		nativeStop();		
-		
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		finish();
+		nativeStop();
 	}
 	
 	public void callbackExit() {
+		Log.d("SHUTDOWN", "callbackExit mDosBoxThread is null: " + (mDosBoxThread == null));
 		if (mDosBoxThread != null)
 			mDosBoxThread.doExit();
 	}
@@ -661,7 +687,9 @@ public class DosBoxLauncher extends Activity {
 			}
 			
 			mDosBoxRunning = false;
-			mParent.finish();						
+			Log.d("SHUTDOWN", "Call finish start");
+			mParent.finish();
+			Log.d("SHUTDOWN", "Call finish end");
 		}		
 	}
 	
@@ -940,7 +968,7 @@ public class DosBoxLauncher extends Activity {
 	}
 	
     protected void uiQuit() {
-    	stopDosBox();
+    	shutDown = true;
     }
     
 	public void uiQuitConfirm() {

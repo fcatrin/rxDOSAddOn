@@ -27,6 +27,8 @@
 #include "callback.h"
 #include "support.h"
 
+#include <android/log.h>
+#define LOGD(LOG_TAG, ...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 
 Bitu call_shellstop;
 /* Larger scope so shell_del autoexec can use it to
@@ -285,6 +287,8 @@ void DOS_Shell::RunInternal(void)
 #include "loader.h"
 extern struct loader_config *loadf;
 
+time_t shutdown_time;
+
 void DOS_Shell::Run(void) {
 	char input_line[CMD_MAXLINE] = {0};
 	std::string line;
@@ -313,31 +317,51 @@ void DOS_Shell::Run(void) {
 		ParseLine(input_line);
 	}
 	do {
-		if (bf){
-			if(bf->ReadLine(input_line)) {
-				if (echo) {
-					if (input_line[0]!='@') {
-						ShowPrompt();
-						WriteOut_NoParsing(input_line);
-						WriteOut_NoParsing("\n");
+		if (loadf->abort < 3) {
+			if (bf){
+				LOGD("SHUTDOWN", "DOS_Shell::Run ReadLine");
+				if(bf->ReadLine(input_line)) {
+					LOGD("SHUTDOWN", "> %s", input_line);
+					if (echo) {
+						if (input_line[0]!='@') {
+							ShowPrompt();
+							WriteOut_NoParsing(input_line);
+							WriteOut_NoParsing("\n");
+						};
 					};
-				};
+					LOGD("SHUTDOWN", "P: %s", input_line);
+					ParseLine(input_line);
+					if (echo) WriteOut("\n");
+				}
+			} else {
+
+				//locnet, exit shell loop without exception
+				LOGD("SHUTDOWN", "DOS_Shell::Run ShowPrompt");
+				if (echo) ShowPrompt();
+				LOGD("SHUTDOWN", "DOS_Shell::Run InputCommand");
+				InputCommand(input_line);
+				LOGD("SHUTDOWN", "P: %s", input_line);
 				ParseLine(input_line);
-				if (echo) WriteOut("\n");
+				if (echo && !bf) WriteOut_NoParsing("\n");
 			}
-		} else {
-			//locnet, exit shell loop without exception
-			if (loadf->abort == 2) {
-				loadf->abort = 3;
-				exit = true;
-				break;
-			}
-			if (echo) ShowPrompt();
-			InputCommand(input_line);
-			ParseLine(input_line);
-			if (echo && !bf) WriteOut_NoParsing("\n");
 		}
+
+		if (loadf->abort == 2) {
+			LOGD("SHUTDOWN", "DOS_Shell::Run setting abort = 3");
+			shutdown_time = time(NULL);
+			loadf->abort = 3;
+		}
+
+		if (loadf->abort == 3 && time(NULL) - shutdown_time > 1) {  // wait 1 seconds max to kill this thread
+			loadf->abort = 4;
+			exit = true;
+			LOGD("SHUTDOWN", "DOS_Shell::Run setting abort = 4, exit");
+			break;
+		}
+
 	} while (!exit);
+	LOGD("SHUTDOWN", "DOS_Shell::Run exit");
+
 }
 
 void DOS_Shell::SyntaxError(void) {
