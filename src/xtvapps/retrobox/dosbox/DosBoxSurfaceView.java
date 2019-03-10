@@ -22,6 +22,8 @@ package xtvapps.retrobox.dosbox;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
+
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -166,11 +168,14 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	class DosBoxVideoThread extends Thread {
-		private static final int   TARGET_FPS = 60;
-		private static final float UPDATE_INTERVAL = 1000.0f / TARGET_FPS;
-		private static final float UPDATE_INTERVAL_MIN = UPDATE_INTERVAL / 4;
-		private static final int   RESET_INTERVAL = TARGET_FPS * 4; // recalculate after 4[s]
-
+		
+		private float targetFps = 60.0f;
+		private float updateInterval;
+		private float resetInterval;
+		
+		private static final float UPDATE_INTERVAL_MIN = 1000.0f / 60.0f;
+		private final DecimalFormat fpsFormat = new DecimalFormat("#00");
+		
 		private boolean mVideoRunning = false;
 
 		private long startTime = 0;
@@ -186,10 +191,20 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 		public DosBoxVideoThread(Handler fpsHandler, TextView txtFPS) {
 			this.fpsHandler = fpsHandler;
 			this.txtFPS = txtFPS;
+			
+			setTargetFps(targetFps);
 		}
 		
 		void setRunning(boolean running) {
 			mVideoRunning = running;
+		}
+		
+		public void setTargetFps(float fps) {
+			synchronized (mDirty) {
+				targetFps = fps;
+				updateInterval = 1000.0f / targetFps;
+				resetInterval = fps * 4;
+			}
 		}
 		
 		public void run() {
@@ -199,7 +214,7 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 
 					curTime = System.currentTimeMillis();
 
-					if (frameCount > RESET_INTERVAL)
+					if (frameCount > resetInterval)
 						frameCount = 0;					
 					
 					if (frameCount == 0) {
@@ -214,8 +229,8 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 					
 					fpsCount++;
 					if (showFPS && (curTime - fpsLastTime) > 1000) {
-						final int fps = fpsCount;
-						final int fpsInternal = fpsCountInternal;
+						final float fps = fpsCount > targetFps ? targetFps : fpsCount; // avoid problems for TOC people
+						final float fpsInternal = fpsCountInternal;
 						
 						fpsCount = 0;
 						fpsCountInternal = 0;
@@ -224,7 +239,9 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 						fpsHandler.post(new Runnable() {
 							@Override
 							public void run() {
-								txtFPS.setText("dosbox " + fps + " / pc " + fpsInternal);
+								String sFps = fpsFormat.format(fps);
+								String sFpsInternal = fpsFormat.format(fpsInternal);
+								txtFPS.setText("FPS Render " + sFps + " / Internal " + sFpsInternal);
 							}
 						});
 					}
@@ -238,9 +255,9 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 			        
 					try {
 						long t0 = System.currentTimeMillis();
-						nextUpdateTime = startTime + (long)(frameCount * UPDATE_INTERVAL);
+						nextUpdateTime = startTime + (long)(frameCount * updateInterval);
 						sleepTime = nextUpdateTime - t0;
-						Log.d("SLEEP", "sleep: " + sleepTime + ", start:" + startTime + ", t0:" + t0 + ", next:" + nextUpdateTime + ", frame:" + frameCount + ", interval:" + UPDATE_INTERVAL);
+						// Log.d("SLEEP", "sleep: " + sleepTime + ", start:" + startTime + ", t0:" + t0 + ", next:" + nextUpdateTime + ", frame:" + frameCount + ", interval:" + UPDATE_INTERVAL);
 						Thread.sleep((long)Math.max(sleepTime, UPDATE_INTERVAL_MIN));
 					} catch (InterruptedException e) {
 					}

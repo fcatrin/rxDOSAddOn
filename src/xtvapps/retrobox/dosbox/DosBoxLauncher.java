@@ -32,6 +32,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
@@ -73,6 +74,7 @@ import retrobox.vinput.overlay.GamepadController;
 import retrobox.vinput.overlay.GamepadView;
 import retrobox.vinput.overlay.Overlay;
 import retrobox.vinput.overlay.OverlayExtra;
+import xtvapps.core.AndroidCoreUtils;
 import xtvapps.core.AndroidFonts;
 import xtvapps.core.Callback;
 import xtvapps.core.SimpleCallback;
@@ -86,6 +88,8 @@ public class DosBoxLauncher extends Activity {
 	public static final String START_COMMAND_ID = "start_command";
 	public String mConfFile = DosBoxPreferences.CONFIG_FILE;
 	public String mConfPath = DosBoxPreferences.CONFIG_PATH;
+	
+	private static final String KEY_TARGET_FPS = "targetFps";
 	
 	static { 
 		System.loadLibrary("dosbox");
@@ -143,6 +147,9 @@ public class DosBoxLauncher extends Activity {
 	
 	private static boolean useKeyTranslation = false;
     
+	private int fpsOptions[] = {20, 25, 30, 40, 50, 60};
+	private int targetFps = fpsOptions[fpsOptions.length-1];
+	
     // gives the native activity a copy of this object so it can call OnNativeMotion
     //public native int RegisterThis();
     
@@ -256,12 +263,25 @@ public class DosBoxLauncher extends Activity {
 		if (mouseWarpY>0) mSurfaceView.warpY = mouseWarpY / 100.0f;
 		
 		DosBoxMenuUtility.loadPreference(this,prefs);	
-
+		loadPreferences(prefs);
+		
+		updateTargetFps(targetFps);
+		
 		setupGamepadOverlay(root);
 
 		initDosBox();
 		startDosBox();
 		Log.i("DosBoxTurbo","onCreate ends");
+	}
+	
+	private void loadPreferences(SharedPreferences prefs) {
+		targetFps = prefs.getInt(KEY_TARGET_FPS, targetFps);
+	}
+	
+	private void savePreferences(SharedPreferences prefs) {
+		Editor editor = prefs.edit();
+		editor.putInt(KEY_TARGET_FPS, targetFps);
+		editor.commit();
 	}
 	
 	public void onWindowFocusChanged(boolean hasFocus) {
@@ -787,6 +807,7 @@ public class DosBoxLauncher extends Activity {
             options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
         }
         options.add(new ListOption("cpu", "CPU settings", getCpuCyclesName()));
+        options.add(new ListOption("fps", "Target FPS", String.valueOf(targetFps)));
         options.add(new ListOption("help", "Help"));
         options.add(new ListOption("quit", "Quit"));
         
@@ -822,6 +843,9 @@ public class DosBoxLauncher extends Activity {
 				} else if (key.equals("cpu")) {
 					uiCPUSettings();
 					return;
+				} else if (key.equals("fps")) {
+					uiChooseTargetFPS();
+					return;
 				} else if (key.equals("help")) {
 					uiHelp();
 					return;
@@ -840,12 +864,45 @@ public class DosBoxLauncher extends Activity {
 
 	}
 	
+	private void uiChooseTargetFPS() {
+		List<ListOption> options = new ArrayList<ListOption>();
+		for(int fpsOption : fpsOptions) {
+			options.add(new ListOption(String.valueOf(fpsOption), fpsOption + " frames per second"));
+		}
+
+		RetroBoxDialog.showListDialog(this, "Target frames per second", options, new Callback<KeyValue>() {
+			
+			@Override
+			public void onResult(KeyValue result) {
+				int fps = Utils.str2i(result.getKey());
+				updateTargetFps(fps);
+				savePreferences(prefs);
+				AndroidCoreUtils.toast(DosBoxLauncher.this, "Target FPS set to " + targetFps);
+			}
+			
+			@Override
+			public void onFinally() {
+				onResume();
+			}
+		});
+	}
+	
+	private void updateTargetFps(int fps) {
+		targetFps = fps;
+		if (mSurfaceView!=null && mSurfaceView.mVideoThread!=null) {
+			mSurfaceView.mVideoThread.setTargetFps(fps);
+		}
+	}
+	
     protected void uiHelp() {
 		RetroBoxDialog.showGamepadDialogIngame(this, gamepadInfoDialog, new SimpleCallback() {
 			@Override
-			public void onResult() {
+			public void onFinally() {
 				onResume();
 			}
+
+			@Override
+			public void onResult() {}
 		});
     }
 	
