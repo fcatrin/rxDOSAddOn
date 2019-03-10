@@ -571,12 +571,13 @@ public class DosBoxLauncher extends Activity {
 			if (mSurfaceView.mDirty) {
 				mSurfaceView.mStartLine = Math.min(mSurfaceView.mStartLine, s);
 				mSurfaceView.mEndLine = Math.max(mSurfaceView.mEndLine, e);				
-			}
-			else {
+			} else {
 				mSurfaceView.mStartLine = s;
 				mSurfaceView.mEndLine = e;
 			}
+			mSurfaceView.copyPixels();
 			mSurfaceView.mDirty = true;
+			mSurfaceView.mVideoThread.fpsCountInternal++;
 		}
 	}
 
