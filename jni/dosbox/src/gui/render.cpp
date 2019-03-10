@@ -34,6 +34,9 @@
 
 #include "render_scalers.h"
 
+#include <android/log.h>
+#define LOGD(LOG_TAG, ...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+
 Render_t render;
 ScalerLineHandler_t RENDER_DrawLine;
 
@@ -266,6 +269,10 @@ static void RENDER_Reset( void ) {
 	bool dblw=render.src.dblw;
 	bool dblh=render.src.dblh;
 
+	LOGD("DOSVIDEO", "RENDER_Reset %dx%d dblw:%s dblh:%s", render.src.width, render.src.height,
+			render.src.dblw ? "true":"false",
+			render.src.dblh ? "true":"false");
+
 	double gfx_scalew;
 	double gfx_scaleh;
 	
@@ -284,6 +291,11 @@ static void RENDER_Reset( void ) {
 		gfx_scalew = 1;
 		gfx_scaleh = 1;
 	}
+
+	LOGD("DOSVIDEO", "RENDER_Reset gfx_scalew:%f, gfx_scaleh:%f scaler:%d", gfx_scalew, gfx_scaleh,
+			RENDER_USE_ADVANCED_SCALERS);
+
+
 	if ((dblh && dblw) || (render.scale.forced && !dblh && !dblw)) {
 		/* Initialize always working defaults */
 		if (render.scale.size == 2)
@@ -530,8 +542,8 @@ void RENDER_SetSize(Bitu width,Bitu height,Bitu bpp,float fps,double ratio,bool 
 	render.src.width=width;
 	render.src.height=height;
 	render.src.bpp=bpp;
-	render.src.dblw=false;	//dblw;
-	render.src.dblh=false;	//dblh;
+	render.src.dblw=dblw;
+	render.src.dblh=dblh;
 	render.src.fps=fps;
 	render.src.ratio=ratio;
 	RENDER_Reset( );
