@@ -557,13 +557,6 @@ public class DosBoxLauncher extends Activity {
 		mSurfaceView.mVideoThread.setRunning(false);
 		
 		nativeStop();		
-		
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		finish();
 	}
 	
 	public void callbackExit() {

@@ -313,7 +313,11 @@ void DOS_Shell::Run(void) {
 		ParseLine(input_line);
 	}
 	do {
-		if (bf){
+		if (loadf->abort == 2) {
+			loadf->abort = 3;
+			exit = true;
+			break;
+		} else if (bf){
 			if(bf->ReadLine(input_line)) {
 				if (echo) {
 					if (input_line[0]!='@') {
@@ -327,11 +331,6 @@ void DOS_Shell::Run(void) {
 			}
 		} else {
 			//locnet, exit shell loop without exception
-			if (loadf->abort == 2) {
-				loadf->abort = 3;
-				exit = true;
-				break;
-			}
 			if (echo) ShowPrompt();
 			InputCommand(input_line);
 			ParseLine(input_line);
