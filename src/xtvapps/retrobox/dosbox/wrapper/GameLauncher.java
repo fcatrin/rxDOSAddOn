@@ -119,7 +119,7 @@ public class GameLauncher extends Activity {
 		addKeymapDefault(dosboxIntent, "BTN_A", "KEY_SPACE");
 
 		
-		// dosboxIntent.putExtra(EXTRA_KEEP_ASPECT, hasKeepAspectRatio(game));
+		dosboxIntent.putExtra("keepAspect", false);
 		// dosboxIntent.putExtra(EXTRA_INVERT_RGB, RetroXCore.isRaspberryPiTillHertz());
 		
 		startActivity(dosboxIntent);
