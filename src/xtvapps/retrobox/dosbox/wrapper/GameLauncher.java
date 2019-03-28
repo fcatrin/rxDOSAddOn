@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import xtvapps.core.Utils;
 import xtvapps.retrobox.dosbox.DosBoxLauncher;
-import xtvapps.retrobox.v2.dosbox.R;
+import xtvapps.dosbox.swos.R;
 
 public class GameLauncher extends Activity {
 	private static final String DOS_ENCODING = "ISO-8859-1";

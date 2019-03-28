@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="xtvapps.retrobox.v2.dosbox"  
+      package="xtvapps.dosbox.swos"  
       android:versionCode="221032"
       android:versionName="2.2.1-32"
       android:installLocation="internalOnly"
