@@ -4,7 +4,6 @@
       android:versionCode="221032"
       android:versionName="2.2.1-32"
       android:installLocation="internalOnly"
-      android:sharedUserId="psychoworld.retrobox.v2"
       > 
     <uses-sdk android:minSdkVersion="17" android:targetSdkVersion="23"/>
     <uses-feature
