@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Sensible World of Soccer</string>
     <string name="gamedir">SWOS</string>
+    <string name="overlay">1b_single.cfg</string>
 </resources>

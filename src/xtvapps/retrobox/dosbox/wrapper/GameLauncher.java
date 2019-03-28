@@ -25,14 +25,19 @@ public class GameLauncher extends Activity {
 	private static final String DOSBOX_GAMEPAD = "gaemepad";
 	private static final String DOSBOX_APK_ID = "xtvapps.retrobox.v2.dosbox";
 	private static final String DOSBOX_SHOW_FPS = "showFPS";
-
+	private static final String GAMEPAD_OVERLAY = "OVERLAY";;
 	
 	private static final long SPLASH_TIME = 3000;
+
+	private File cDrive;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.boot);
+		
+		File rootDir = getFilesDir();
+		cDrive = new File(rootDir, "game"); 
 	}
 
 	@Override
@@ -58,11 +63,8 @@ public class GameLauncher extends Activity {
 
 
 	private File gamePrepare() throws IOException {
-		File rootDir = getFilesDir();
+		AndroidUtils.unpackAssets(GameLauncher.this, "game", cDrive.getParentFile());
 		
-		AndroidUtils.unpackAssets(GameLauncher.this, "game", rootDir);
-		
-		File cDrive = new File(rootDir, "game"); 
 		String gameDir = getString(R.string.gamedir);
 
 		// read dosbox.conf template
@@ -102,11 +104,27 @@ public class GameLauncher extends Activity {
 		dosboxIntent.putExtra(DOSBOX_WARP_X, 0);
 		dosboxIntent.putExtra(DOSBOX_WARP_Y, 0);
 		dosboxIntent.putExtra(DOSBOX_CMD, "-exit");
+		
+		File overlayDir = new File(cDrive, "overlay/" + getString(R.string.overlay));
+		dosboxIntent.putExtra(GAMEPAD_OVERLAY, overlayDir.getAbsolutePath());
 
+		// TODO make it more configurable
+		
+		addKeymapDefault(dosboxIntent, "UP", "KEY_UP");
+		addKeymapDefault(dosboxIntent, "DOWN", "KEY_DOWN");
+		addKeymapDefault(dosboxIntent, "LEFT", "KEY_LEFT");
+		addKeymapDefault(dosboxIntent, "RIGHT", "KEY_RIGHT");
+		addKeymapDefault(dosboxIntent, "BTN_A", "KEY_SPACE");
+
+		
 		// dosboxIntent.putExtra(EXTRA_KEEP_ASPECT, hasKeepAspectRatio(game));
 		// dosboxIntent.putExtra(EXTRA_INVERT_RGB, RetroXCore.isRaspberryPiTillHertz());
 		
 		startActivity(dosboxIntent);
 		finish();
+	}
+
+	private void addKeymapDefault(Intent intent, String src, String dst) {
+		intent.putExtra("kmap1" + src, dst);
 	}
 }
