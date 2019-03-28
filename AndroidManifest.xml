@@ -16,9 +16,10 @@
     <uses-permission android:name="xtvapps.retrobox.dosbox_provider.CONTENT"/> 
     <supports-screens android:xlargeScreens="true"/>
     <application 
-        android:icon="@drawable/retrobox" 
+        android:icon="@drawable/ic_game" 
 		android:hardwareAccelerated="true"
 		android:launchMode="singleInstance"
+		android:banner="@drawable/ic_game_tv"
         android:label="@string/app_name" 
         android:theme="@style/AppTheme">
          <activity android:name="xtvapps.retrobox.dosbox.wrapper.GameLauncher">

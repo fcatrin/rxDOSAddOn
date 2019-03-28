@@ -6,6 +6,7 @@ import java.io.IOException;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import xtvapps.core.Utils;
 import xtvapps.retrobox.dosbox.DosBoxLauncher;
 import xtvapps.retrobox.v2.dosbox.R;
@@ -26,14 +27,19 @@ public class GameLauncher extends Activity {
 	private static final String DOSBOX_SHOW_FPS = "showFPS";
 
 	
+	private static final long SPLASH_TIME = 3000;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.boot);
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
+		
+		final long t0 = System.currentTimeMillis();
 		
 		BackgroundTask<File> task = new BackgroundTask<File>() {
 
@@ -44,7 +50,7 @@ public class GameLauncher extends Activity {
 
 			@Override
 			public void onSuccess(File config) {
-				runEmulator(config);
+				runEmulator(t0, config);
 			}
 		};
 		task.execute();
@@ -72,6 +78,21 @@ public class GameLauncher extends Activity {
 		Utils.saveBytes(dosboxFile, dosboxconf.getBytes(DOS_ENCODING));
 		
 		return dosboxFile;
+	}
+	
+	private void runEmulator(long t0, final File dosboxConfigFile) {
+		Runnable task = new Runnable() {
+			@Override
+			public void run() {
+				runEmulator(dosboxConfigFile);
+			}
+		};
+		
+		long delta = SPLASH_TIME - (System.currentTimeMillis() - t0);
+		if (delta < 0) delta = 0;
+		
+		new Handler().postDelayed(task, delta);
+		
 	}
 	
 	private void runEmulator(File dosboxConfigFile) {
