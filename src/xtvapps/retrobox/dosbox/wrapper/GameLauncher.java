@@ -18,7 +18,7 @@ public class GameLauncher extends Activity {
 	private static final String DOSBOX_CMD = "cmdline";
 	private static final String DOSBOX_MOUSEONLY = "mouseOnly";
 	private static final String DOSBOX_REALMOUSE = "useRealMouse";
-	private static final String DOSBOX_TESTING = "testingMode";
+	private static final String DOSBOX_STANDALONE = "standalone";
 	private static final String DOSBOX_SHOW_EXTRA_BUTTONS = "showExtraButtons";
 	private static final String DOSBOX_WARP_X = "warpX";
 	private static final String DOSBOX_WARP_Y = "warpY";
@@ -104,6 +104,8 @@ public class GameLauncher extends Activity {
 		dosboxIntent.putExtra(DOSBOX_WARP_X, 0);
 		dosboxIntent.putExtra(DOSBOX_WARP_Y, 0);
 		dosboxIntent.putExtra(DOSBOX_CMD, "-exit");
+		
+		dosboxIntent.putExtra(DOSBOX_STANDALONE, true);
 		
 		File overlayDir = new File(cDrive, "overlay/" + getString(R.string.overlay));
 		dosboxIntent.putExtra(GAMEPAD_OVERLAY, overlayDir.getAbsolutePath());

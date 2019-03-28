@@ -181,6 +181,8 @@ public class DosBoxLauncher extends Activity {
 		isMouseOnly  = getIntent().getBooleanExtra("mouseOnly", false);
 		isRealMouse  = getIntent().getBooleanExtra("useRealMouse", false);
 		
+		standalone = getIntent().getBooleanExtra("standalone", false);
+		
 		//testingMode = getIntent().getBooleanExtra("testingMode", false);
 		
 		setContentView(R.layout.main);
@@ -727,6 +729,7 @@ public class DosBoxLauncher extends Activity {
 	}
 	
 	Map<Integer, String> cpuCycles = new LinkedHashMap<Integer, String>();
+	private boolean standalone;
 	private void setupCpuCycles() {
 		if (!cpuCycles.isEmpty()) return;
 		
@@ -804,16 +807,20 @@ public class DosBoxLauncher extends Activity {
 		
         options.add(new ListOption("", "Cancel"));
         
-        if (OverlayExtra.hasExtraButtons()) {
-            options.add(new ListOption("extra", "Extra Buttons"));
+        if (!standalone) {
+        
+	        if (OverlayExtra.hasExtraButtons()) {
+	            options.add(new ListOption("extra", "Extra Buttons"));
+	        }
+	        
+	        if (testingMode) {
+	            options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
+	        }
+	        options.add(new ListOption("cpu", "CPU settings", getCpuCyclesName()));
+	        options.add(new ListOption("fps", "Target FPS", String.valueOf(targetFps)));
+	        options.add(new ListOption("help", "Help"));
         }
         
-        if (testingMode) {
-            options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
-        }
-        options.add(new ListOption("cpu", "CPU settings", getCpuCyclesName()));
-        options.add(new ListOption("fps", "Target FPS", String.valueOf(targetFps)));
-        options.add(new ListOption("help", "Help"));
         options.add(new ListOption("quit", "Quit"));
         
         RetroBoxDialog.showListDialog(this, getString(R.string.emu_opt_title), options, new Callback<KeyValue>() {
