@@ -1394,5 +1394,13 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 			}
         }
     }
+    
+    public void showKeyboard() {
+    	DosBoxMenuUtility.doShowKeyboard(mParent);
+    }
+    
+    public void showMenu() {
+    	DosBoxMenuUtility.doShowMenu(mParent);
+    }
 }
 

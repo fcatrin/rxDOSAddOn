@@ -148,7 +148,7 @@ public class DosBoxLauncher extends Activity {
 	private static boolean useKeyTranslation = false;
     
 	private int fpsOptions[] = {20, 25, 30, 40, 50, 60};
-	private int targetFps = fpsOptions[fpsOptions.length-1];
+	private int targetFps = 30; // fpsOptions[fpsOptions.length-1];
 	
     // gives the native activity a copy of this object so it can call OnNativeMotion
     //public native int RegisterThis();
@@ -809,6 +809,13 @@ public class DosBoxLauncher extends Activity {
         options.add(new ListOption("cpu", "CPU settings", getCpuCyclesName()));
         options.add(new ListOption("fps", "Target FPS", String.valueOf(targetFps)));
         options.add(new ListOption("help", "Help"));
+        
+        if (testingMode) {
+            options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
+        }
+        options.add(new ListOption("cpu", "CPU settings", getCpuCyclesName()));
+        options.add(new ListOption("fps", "Target FPS", String.valueOf(targetFps)));
+        options.add(new ListOption("help", "Help"));
         options.add(new ListOption("quit", "Quit"));
         
         RetroBoxDialog.showListDialog(this, getString(R.string.emu_opt_title), options, new Callback<KeyValue>() {
@@ -849,6 +856,8 @@ public class DosBoxLauncher extends Activity {
 				} else if (key.equals("help")) {
 					uiHelp();
 					return;
+				} else if (key.equals("keyboard")) {
+					mSurfaceView.showKeyboard();
 				}
 				onResume();
 			}
