@@ -1207,7 +1207,7 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 	public final static int GESTURE_DOUBLE_CLICK = 5;
 	public int mGestureUp = GESTURE_NONE;
 	public int mGestureDown = GESTURE_NONE;
-	public int mGestureSingleClick = GESTURE_NONE;
+	public int mGestureSingleClick = GESTURE_SHOW_KEYBOARD;
 	public int mGestureDoubleClick = GESTURE_NONE;
 	public int mGestureTwoFinger = GESTURE_NONE;
 	public boolean mTwoFingerAction = false;
@@ -1356,6 +1356,13 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
         @Override
     	public boolean onSingleTapConfirmed(MotionEvent event) {
 			Log.i("DosBoxTurbo","onSingleTapConfirmed()");
+			
+			if (mGestureSingleClick == GESTURE_SHOW_KEYBOARD) {
+				Log.i("DosBoxTurbo","onShowKeyboard");
+				showKeyboard();
+				return true;
+			}
+			
         	if (mInputMode == INPUT_MODE_MOUSE) {
         		//pointerIndex = ((event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
        			//final int pointerId = mWrap.getPointerId(event, ((event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT));
@@ -1374,6 +1381,8 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
         		if ((mGestureDoubleClick == GESTURE_NONE)&&(mGestureSingleClick != GESTURE_NONE)) {	// fishstix,fire only when doubleclick gesture is disabled
         			mouseClick(mGestureSingleClick-GESTURE_LEFT_CLICK);
         			return true;
+        		} else {
+        			showKeyboard();
         		}
         	}
 

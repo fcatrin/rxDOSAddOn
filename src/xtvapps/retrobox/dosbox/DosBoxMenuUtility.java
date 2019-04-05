@@ -373,7 +373,7 @@ public class DosBoxMenuUtility {
 		context.mSurfaceView.mGestureDown = Short.valueOf(prefs.getString("confgesture_swipedown", "0"));
 		
 		// TOUCHSCREEN MOUSE
-		context.mSurfaceView.mGestureSingleClick = Short.valueOf(prefs.getString("confgesture_singletap", "3"));
+		// context.mSurfaceView.mGestureSingleClick = Short.valueOf(prefs.getString("confgesture_singletap", "3"));
 		context.mSurfaceView.mGestureDoubleClick = Short.valueOf(prefs.getString("confgesture_doubletap", "5"));
 		context.mSurfaceView.mGestureTwoFinger = Short.valueOf(prefs.getString("confgesture_twofinger", "0"));
 		context.mSurfaceView.mLongPress = prefs.getBoolean("confgesture_longpress", true);
