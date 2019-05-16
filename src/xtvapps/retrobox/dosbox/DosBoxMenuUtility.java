@@ -338,7 +338,7 @@ public class DosBoxMenuUtility {
 			context.mSurfaceView.mShowInfo = false;
 		}
 		// dpad / trackpad emulation
-		context.mSurfaceView.mEnableDpad = prefs.getBoolean("confenabledpad", true);
+		context.mSurfaceView.mEnableDpad = false; // prefs.getBoolean("confenabledpad", true);
 		try {
 			int tmp = Integer.valueOf(prefs.getString("confdpadsensitivity", "7").trim());
 			if ((tmp >= 1) && (tmp <= 25)) {
