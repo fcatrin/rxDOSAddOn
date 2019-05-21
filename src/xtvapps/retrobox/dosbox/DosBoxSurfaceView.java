@@ -308,7 +308,7 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 		setFocusableInTouchMode(true);
 		setFocusable(true);
 		requestFocus(); 
-		// requestFocusFromTouch();
+		requestFocusFromTouch();
 	
 		getHolder().addCallback(this);
 		getHolder().setFormat(PixelFormat.RGB_565);
