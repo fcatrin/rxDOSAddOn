@@ -727,7 +727,7 @@ public class DosBoxLauncher extends Activity {
 	public void onBackPressed() {
 		if (RetroBoxDialog.cancelDialog(this)) return;
 		if (customKeyboard.isVisible()) {
-			customKeyboard.close();
+			closeKeyboard();
 			return;
 		}
 		
@@ -1058,8 +1058,17 @@ public class DosBoxLauncher extends Activity {
 
 	public void showKeyboard() {
 		if (!customKeyboard.isVisible()) customKeyboard.open();
+		if (needsOverlay()) {
+			gamepadView.setVisibility(View.GONE);
+		}
 	}
 	
+	public void closeKeyboard() {
+		customKeyboard.close();
+		if (needsOverlay()) {
+			gamepadView.setVisibility(View.VISIBLE);
+		}
+	}
 }
 
 
