@@ -6,11 +6,15 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
 import retrobox.keyboard.KeyboardLayout;
 import retrobox.keyboard.KeyboardView;
+import xtvapps.core.SimpleCallback;
 import xtvapps.dosbox.swos.R;
 
 public class CustomKeyboard {
@@ -22,8 +26,8 @@ public class CustomKeyboard {
 	
 	String labels_1[] = {"Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "Back"};
 	
-	String labels_2[] = {"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "Enter"};
-	String labels_3[] = {"A", "S", "D", "F", "G", "H", "J", "K", "L", "\\", "*"};
+	String labels_2[] = {"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "\\", "*" };
+	String labels_3[] = {"Up/Down", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Enter"};
 	String labels_4[] = {"Shift", "<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "-", "Shift"};
 	String labels_5[] = {"[Fn]", "Ctrl", "Win", "Alt", "Space", "AltGr", "Menu", "Ctrl"};
 	
@@ -33,8 +37,8 @@ public class CustomKeyboard {
 	String labels_9[] = {"[abc]", "KP .", "KP0", "KP1", "KP2", "KP3", "KP4", "KP5", "KP6", "KP7", "KP8", "KP9"};
 				
 	String codes_1[] = {"GRAVE", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "BACKSPACE"};
-	String codes_2[] = {"TAB", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "ENTER"};
-	String codes_3[] = {"A", "S", "D", "F", "G", "H", "J", "K", "L", "BACKSLASH", "STAR"};
+	String codes_2[] = {"TAB", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "BACKSLASH", "STAR"};
+	String codes_3[] = {"", "A", "S", "D", "F", "G", "H", "J", "K", "L", "ENTER"};
 	String codes_4[] = {"LEFTSHIFT", "SHIFT+KEY_COMMA", "Z", "X", "C", "V", "B", "N", "M", "COMMA", "DOT", "MINUS", "RIGHTSHIFT"};
 	String codes_5[] = {"", "LEFTCTRL", "DOS_WIN", "LEFTALT", "SPACE", "RIGHTALT", "DOS_MENU", "RIGHTCTRL"};
 	String codes_6[] = {"ESC","F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"};
@@ -58,10 +62,12 @@ public class CustomKeyboard {
 
 		kl.setKeySize("Space", 4);
 		kl.setKeyCode("[Fn]", KeyboardView.SWITCH_LAYOUT + 1);
+		kl.setKeyCode("Up/Down", KeyboardView.TOGGLE_POSITION);
+		kl.setKeySize("Up/Down", 2);
 		kl.setKeySize("Tab", 2);
 		kl.setKeySize("Enter", 2);
 		kl.setKeySize("Back", 2);
-		kl.setKeySize("Shit", 2);
+		kl.setKeySize("Shift", 2);
 		kb.init(activity, kl);
 
 		kl = new KeyboardLayout();
@@ -79,6 +85,16 @@ public class CustomKeyboard {
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				Log.d("KEYB", "pressed " + keyCode);
 				return true;
+			}
+		});
+		
+		kb.setOnTogglePositionCallback(new SimpleCallback() {
+			
+			@Override
+			public void onResult() {
+				FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)kb.getLayoutParams();
+				layoutParams.gravity = layoutParams.gravity == Gravity.TOP ? Gravity.BOTTOM : Gravity.TOP;
+				kb.requestLayout();
 			}
 		});
 		
