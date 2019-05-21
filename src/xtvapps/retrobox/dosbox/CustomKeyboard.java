@@ -10,7 +10,6 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import retrobox.keyboard.KeyboardLayout;
 import retrobox.keyboard.KeyboardView;
@@ -49,7 +48,7 @@ public class CustomKeyboard {
 	String codes_9[] = {"", "KPDOT", "KP0", "KP1", "KP2", "KP3", "KP4", "KP5", "KP6", "KP7", "KP8", "KP9"};
 
 	private KeyboardView kb;
-	
+
 	public CustomKeyboard(Activity activity) {
 		kb = (KeyboardView)activity.findViewById(R.id.keyboard_view);
 
@@ -97,21 +96,11 @@ public class CustomKeyboard {
 				kb.requestLayout();
 			}
 		});
-		
 	}
-
+	
 	public void open() {
 		kb.setVisibility(View.VISIBLE);
 		kb.requestFocus();
-		/*
-		kb.post(new Runnable() {
-
-			@Override
-			public void run() {
-				kb.getChildAt(0).requestFocus();
-			}
-		});
-		*/
 	}
 	
 	public void close() {

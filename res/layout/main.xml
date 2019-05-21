@@ -31,6 +31,8 @@
         android:layout_gravity="top"
         android:padding="@dimen/spacing_tiny"
         android:background="#404040"
+        android:visibility="gone"
+        android:focusable="false"
         android:nextFocusDown="@id/keyboard_view"
         android:nextFocusLeft="@id/keyboard_view"
         android:nextFocusRight="@id/keyboard_view"

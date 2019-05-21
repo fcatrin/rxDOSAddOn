@@ -8,11 +8,11 @@
            android:centerColor="#101010"
            android:endColor="#060606"
            android:angle="0" />
-           <stroke android:width="@dimen/button_bar_stroke_width" android:color="@color/pal_hl_background"/>
+           <stroke android:width="@dimen/button_bar_stroke_width" android:color="@color/pal_text_hl"/>
       </shape>
    </item>
    
-   <item android:state_selected="true">
+   <item android:state_focused="true">
        <shape android:shape="rectangle">
        <gradient 
            android:startColor="#060606" 
@@ -20,7 +20,7 @@
            android:endColor="#060606"
            android:angle="0" />
            
-         <stroke android:width="@dimen/button_bar_stroke_width" android:color="@color/pal_text_hl"/>
+         <stroke android:width="@dimen/button_bar_stroke_width" android:color="@color/pal_hl_background"/>
       </shape>
    </item>
    

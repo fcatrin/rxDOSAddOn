@@ -50,9 +50,9 @@ import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
 import android.widget.Toast;
 import retrobox.vinput.Mapper;
+import xtvapps.dosbox.swos.R;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.retrobox.dosbox.touchevent.TouchEventWrapper;
-import xtvapps.dosbox.swos.R;
 
 
 class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
@@ -308,13 +308,14 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 		setFocusableInTouchMode(true);
 		setFocusable(true);
 		requestFocus(); 
-		requestFocusFromTouch();
+		// requestFocusFromTouch();
 	
 		getHolder().addCallback(this);
 		getHolder().setFormat(PixelFormat.RGB_565);
 		getHolder().setKeepScreenOn(true);
 		//mKeyboardType = getResources().getConfiguration().keyboard;
 		//setOnLongClickListener(this);
+		
 		
 	}
 	
