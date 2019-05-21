@@ -149,6 +149,7 @@ public class DosBoxLauncher extends Activity {
     
 	private int fpsOptions[] = {20, 25, 30, 40, 50, 60};
 	private int targetFps = 30; // fpsOptions[fpsOptions.length-1];
+	private CustomKeyboard customKeyboard;
 	
     // gives the native activity a copy of this object so it can call OnNativeMotion
     //public native int RegisterThis();
@@ -184,6 +185,7 @@ public class DosBoxLauncher extends Activity {
 		//testingMode = getIntent().getBooleanExtra("testingMode", false);
 		
 		setContentView(R.layout.main);
+		customKeyboard = new CustomKeyboard(this);
 		
 		AndroidFonts.setViewFontRecursive(findViewById(R.id.rootContainer), RetroBoxUtils.FONT_DEFAULT_M);
 
@@ -717,7 +719,10 @@ public class DosBoxLauncher extends Activity {
 	@Override
 	public void onBackPressed() {
 		if (RetroBoxDialog.cancelDialog(this)) return;
-		
+		if (customKeyboard.isVisible()) {
+			closeKeyboard();
+			return;
+		}
 		openRetroBoxMenu();
 	}
 	
@@ -1042,7 +1047,20 @@ public class DosBoxLauncher extends Activity {
 		}
 	
 	}
+
+	public void showKeyboard() {
+		if (!customKeyboard.isVisible()) customKeyboard.open();
+		if (needsOverlay()) {
+			gamepadView.setVisibility(View.GONE);
+		}
+	}
 	
+	public void closeKeyboard() {
+		customKeyboard.close();
+		if (needsOverlay()) {
+			gamepadView.setVisibility(View.VISIBLE);
+		}
+	}
 }
 
 
