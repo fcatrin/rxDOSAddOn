@@ -38,5 +38,13 @@ public class DosBoxControl {
 		}		
 		return result;
 	}
+	
+	public static void sendNativeKeyPress(int keyCode, boolean ctrl, boolean alt, boolean shift) {
+		sendNativeKey(keyCode, true, ctrl, alt, shift);
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e) {}
+		sendNativeKey(keyCode, false, ctrl, alt, shift);
+	}
 }
 

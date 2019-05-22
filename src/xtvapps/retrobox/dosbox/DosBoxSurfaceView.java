@@ -928,7 +928,7 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public boolean onKeyDown(int keyCode, final KeyEvent event) {
 		mMapCapture = false;
-		if (mDebug)
+		if (true)
 			Log.d("DosBoxTurbo", "onKeyDown keyCode="+keyCode + " mEnableDpad=" + mEnableDpad);
 		
 		if ((mInputMode == INPUT_MODE_REAL_JOYSTICK || mInputMode == INPUT_MODE_REAL_MOUSE) 
@@ -1023,7 +1023,7 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	 
 	private boolean handleKey(int keyCode, final KeyEvent event) {
-		if (mDebug)
+		if (true)
 			Log.d("DosBoxTurbo", "handleKey keyCode="+keyCode);
 		int tKeyCode = 0;
 
