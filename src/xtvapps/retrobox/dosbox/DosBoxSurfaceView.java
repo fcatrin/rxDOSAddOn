@@ -1360,7 +1360,7 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 			
 			if (mGestureSingleClick == GESTURE_SHOW_KEYBOARD) {
 				Log.i("DosBoxTurbo","onShowKeyboard");
-				showKeyboard();
+				if (isValidTapPosition(event)) showKeyboard();
 				return true;
 			}
 			
@@ -1383,7 +1383,7 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
         			mouseClick(mGestureSingleClick-GESTURE_LEFT_CLICK);
         			return true;
         		} else {
-        			showKeyboard();
+        			if (isValidTapPosition(event)) showKeyboard();
         		}
         	}
 
@@ -1403,6 +1403,23 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 				mFilterLongClick = false;
 			}
         }
+    }
+    
+    private boolean isValidTapPosition(MotionEvent event) {
+    	return isValidTapPosition(event.getAxisValue(MotionEvent.AXIS_X), event.getAxisValue(MotionEvent.AXIS_Y));
+    }
+    
+    private boolean isValidTapPosition(float x, float y) {
+    	float w = this.getWidth();
+    	float h = this.getHeight();
+    	
+    	float xRatio = x / w;
+    	float yRatio = y / h; 
+    	
+    	// Log.d("TOUCH", "tap on " + x + ", " + y + " over " + w + "x" + h + " rx:" + xRatio + " ry:" + yRatio);
+    	
+    	if (yRatio < 0.55f) return true;
+    	return (xRatio > 0.25f && xRatio < 0.75f);
     }
     
     public void showKeyboard() {
