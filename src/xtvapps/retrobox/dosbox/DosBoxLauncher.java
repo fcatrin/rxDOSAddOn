@@ -808,12 +808,7 @@ public class DosBoxLauncher extends Activity {
             options.add(new ListOption("extra", "Extra Buttons"));
         }
         
-        if (testingMode) {
-            options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
-        }
-        options.add(new ListOption("cpu", "CPU settings", getCpuCyclesName()));
-        options.add(new ListOption("fps", "Target FPS", String.valueOf(targetFps)));
-        options.add(new ListOption("help", "Help"));
+        options.add(new ListOption("keyboard", "Open Keyboard"));
         
         if (testingMode) {
             options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
@@ -862,7 +857,7 @@ public class DosBoxLauncher extends Activity {
 					uiHelp();
 					return;
 				} else if (key.equals("keyboard")) {
-					mSurfaceView.showKeyboard();
+					showKeyboard();
 				}
 				onResume();
 			}
@@ -872,10 +867,7 @@ public class DosBoxLauncher extends Activity {
 				super.onError();
 				onResume();
 			}
-			
-			
 		});
-
 	}
 	
 	private void uiChooseTargetFPS() {
