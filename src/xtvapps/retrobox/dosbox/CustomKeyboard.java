@@ -40,7 +40,7 @@ public class CustomKeyboard {
 				}
 				VirtualEvent event = KeyTranslator.translate(code);
 				if (event!=null) {
-					// DosBoxControl.sendNativeKeyPress(event.keyCode, event.ctrl, event.alt, event.shift);
+					DosBoxControl.sendNativeKeyPress(event.keyCode, event.ctrl, event.alt, event.shift);
 				}
 			}
 		});
