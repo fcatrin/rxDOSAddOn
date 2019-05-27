@@ -5,13 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnKeyListener;
 import android.widget.FrameLayout;
-import retrobox.keyboard.KeyboardLayout;
 import retrobox.keyboard.KeyboardView;
 import retrobox.keyboard.VirtualKeyListener;
 import retrobox.keyboard.layouts.PCKeyboardLayout;
