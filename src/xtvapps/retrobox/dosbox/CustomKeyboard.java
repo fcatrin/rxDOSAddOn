@@ -35,13 +35,15 @@ public class CustomKeyboard {
 
 			@Override
 			public void onKeyPressed(String code) {
-				if (!code.contains("+") && !code.startsWith("KEY_")) {
-					code = "KEY_" + code;
-				}
 				VirtualEvent event = KeyTranslator.translate(code);
-				if (event!=null) {
+				if (event==null) return;
+				
+				if (event.isMouseButton()) {
+					DosBoxControl.sendNativeMousePress(event.mouseButton);
+				} else {
 					DosBoxControl.sendNativeKeyPress(event.keyCode, event.ctrl, event.alt, event.shift);
 				}
+				
 			}
 		});
 		
