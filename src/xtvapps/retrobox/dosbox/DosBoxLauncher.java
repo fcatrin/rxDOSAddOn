@@ -55,6 +55,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import retrobox.keyboard.KeyboardLayout;
+import retrobox.keyboard.KeyboardMappingPanel;
 import retrobox.keyboard.KeyboardMappingUtils;
 import retrobox.keyboard.layouts.PCKeyboardLayout;
 import retrobox.utils.GamepadInfoDialog;
@@ -726,6 +727,10 @@ public class DosBoxLauncher extends Activity {
 			closeKeyboard();
 			return;
 		}
+		if (KeyboardMappingUtils.isKeyMapperVisible()) {
+			KeyboardMappingUtils.closeKeyMapper();
+			return;
+		}
 		openRetroBoxMenu();
 	}
 	
@@ -876,6 +881,7 @@ public class DosBoxLauncher extends Activity {
 			}
 		});
 	}
+	
 	
 	private void openKeyMapper() {
 		SimpleCallback returnHereCallback = new SimpleCallback() {
