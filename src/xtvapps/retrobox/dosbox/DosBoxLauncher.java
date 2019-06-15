@@ -54,6 +54,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+import retrobox.keyboard.KeyboardLayout;
+import retrobox.keyboard.KeyboardMappingUtils;
+import retrobox.keyboard.layouts.PCKeyboardLayout;
 import retrobox.utils.GamepadInfoDialog;
 import retrobox.utils.ImmersiveModeSetter;
 import retrobox.utils.ListOption;
@@ -809,6 +812,7 @@ public class DosBoxLauncher extends Activity {
         }
         
         options.add(new ListOption("keyboard", "Open Keyboard"));
+        options.add(new ListOption("keymap", "Gamepad Mapping"));
         
         if (testingMode) {
             options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
@@ -858,6 +862,9 @@ public class DosBoxLauncher extends Activity {
 					return;
 				} else if (key.equals("keyboard")) {
 					showKeyboard();
+				} else if (key.equals("keymap")) {
+					openKeyMapper();
+					return;
 				}
 				onResume();
 			}
@@ -868,6 +875,18 @@ public class DosBoxLauncher extends Activity {
 				onResume();
 			}
 		});
+	}
+	
+	private void openKeyMapper() {
+		SimpleCallback returnHereCallback = new SimpleCallback() {
+			@Override
+			public void onResult() {
+				onResume();
+			}
+		};
+		
+		KeyboardLayout[] keyboardLayout = new PCKeyboardLayout().getKeyboardLayout();
+		KeyboardMappingUtils.openKeymapSettings(this, keyboardLayout, returnHereCallback);
 	}
 	
 	private void uiChooseTargetFPS() {

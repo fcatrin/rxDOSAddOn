@@ -38,4 +38,7 @@
         android:nextFocusRight="@id/keyboard_view"
         android:nextFocusUp="@id/keyboard_view" >
     </retrobox.keyboard.KeyboardView>
+    
+    <include layout="@layout/keyboard_mapping_view" />
+    
 </FrameLayout>
