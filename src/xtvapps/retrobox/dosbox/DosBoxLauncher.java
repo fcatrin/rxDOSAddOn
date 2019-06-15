@@ -816,7 +816,7 @@ public class DosBoxLauncher extends Activity {
         }
         
         options.add(new ListOption("keyboard", "Open Keyboard"));
-        options.add(new ListOption("keymap", "Gamepad Mapping"));
+        options.add(new ListOption("keymap", "Assign gamepad buttons"));
         
         if (testingMode) {
             options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
