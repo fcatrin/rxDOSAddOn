@@ -823,7 +823,6 @@ public class DosBoxLauncher extends Activity {
         }
         options.add(new ListOption("cpu", "CPU settings", getCpuCyclesName()));
         options.add(new ListOption("fps", "Target FPS", String.valueOf(targetFps)));
-        options.add(new ListOption("help", "Help"));
         options.add(new ListOption("quit", "Quit"));
         
         RetroBoxDialog.showListDialog(this, getString(R.string.emu_opt_title), options, new Callback<KeyValue>() {
@@ -860,9 +859,6 @@ public class DosBoxLauncher extends Activity {
 					return;
 				} else if (key.equals("fps")) {
 					uiChooseTargetFPS();
-					return;
-				} else if (key.equals("help")) {
-					uiHelp();
 					return;
 				} else if (key.equals("keyboard")) {
 					showKeyboard();
