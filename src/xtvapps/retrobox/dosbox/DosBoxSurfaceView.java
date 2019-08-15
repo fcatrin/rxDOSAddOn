@@ -22,6 +22,7 @@ package xtvapps.retrobox.dosbox;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
 
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
@@ -52,7 +53,6 @@ import retrobox.vinput.Mapper;
 import xtvapps.prg.dosbox.R;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.retrobox.dosbox.touchevent.TouchEventWrapper;
-
 
 class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 	private final static int DEFAULT_WIDTH = 640;//800;
@@ -167,10 +167,14 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	class DosBoxVideoThread extends Thread {
-		private static final int UPDATE_INTERVAL = 40;
-		private static final int UPDATE_INTERVAL_MIN = 20;
-		private static final int RESET_INTERVAL = 100;
-
+		
+		private float targetFps = 60.0f;
+		private float updateInterval;
+		private float resetInterval;
+		
+		private static final float UPDATE_INTERVAL_MIN = 1000.0f / 60.0f;
+		private final DecimalFormat fpsFormat = new DecimalFormat("#00");
+		
 		private boolean mVideoRunning = false;
 
 		private long startTime = 0;
@@ -179,16 +183,27 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 		
 		private long fpsLastTime = 0;
 		private int fpsCount = 0;
+		public int fpsCountInternal = 0;
 		private Handler fpsHandler;
 		private TextView txtFPS;
 		
 		public DosBoxVideoThread(Handler fpsHandler, TextView txtFPS) {
 			this.fpsHandler = fpsHandler;
 			this.txtFPS = txtFPS;
+			
+			setTargetFps(targetFps);
 		}
 		
 		void setRunning(boolean running) {
 			mVideoRunning = running;
+		}
+		
+		public void setTargetFps(float fps) {
+			synchronized (mDirty) {
+				targetFps = fps;
+				updateInterval = 1000.0f / targetFps;
+				resetInterval = fps * 4;
+			}
 		}
 		
 		public void run() {
@@ -198,11 +213,11 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 
 					curTime = System.currentTimeMillis();
 
-					if (frameCount > RESET_INTERVAL)
+					if (frameCount > resetInterval)
 						frameCount = 0;					
 					
 					if (frameCount == 0) {
-						startTime = curTime - UPDATE_INTERVAL;
+						startTime = curTime;
 					}
 					
 					frameCount++;
@@ -213,13 +228,19 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 					
 					fpsCount++;
 					if (showFPS && (curTime - fpsLastTime) > 1000) {
-						final int fps = fpsCount;
+						final float fps = fpsCount > targetFps ? targetFps : fpsCount; // avoid problems for TOC people
+						final float fpsInternal = fpsCountInternal;
+						
 						fpsCount = 0;
+						fpsCountInternal = 0;
+						
 						fpsLastTime = curTime;
 						fpsHandler.post(new Runnable() {
 							@Override
 							public void run() {
-								txtFPS.setText(String.valueOf(fps));
+								String sFps = fpsFormat.format(fps);
+								String sFpsInternal = fpsFormat.format(fpsInternal);
+								txtFPS.setText("FPS Render " + sFps + " / Internal " + sFpsInternal);
 							}
 						});
 					}
@@ -232,9 +253,11 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 					}
 			        
 					try {
-						nextUpdateTime = startTime + (frameCount+1) * UPDATE_INTERVAL;
-						sleepTime = nextUpdateTime - System.currentTimeMillis();
-						Thread.sleep(Math.max(sleepTime, UPDATE_INTERVAL_MIN));
+						long t0 = System.currentTimeMillis();
+						nextUpdateTime = startTime + (long)(frameCount * updateInterval);
+						sleepTime = nextUpdateTime - t0;
+						// Log.d("SLEEP", "sleep: " + sleepTime + ", start:" + startTime + ", t0:" + t0 + ", next:" + nextUpdateTime + ", frame:" + frameCount + ", interval:" + UPDATE_INTERVAL);
+						Thread.sleep((long)Math.max(sleepTime, UPDATE_INTERVAL_MIN));
 					} catch (InterruptedException e) {
 					}
 				}
@@ -410,21 +433,14 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 						canvas = surfaceHolder.lockCanvas(mDirtyRect);
 					}
 				}
-				//2011-04-28, support 2.1 or below
-				if (mVideoBuffer != null) {
-					mVideoBuffer.position(0);
-					if (bitmap.getWidth()*bitmap.getHeight()*2 == mVideoBuffer.remaining())
-						bitmap.copyPixelsFromBuffer(mVideoBuffer);
-				}
 				
-				
-				if (mScale) {
-					canvas.drawBitmap(bitmap, mSrcRect, mDstRect, (mParent.mPrefScaleFilterOn)?mBitmapPaint:null);
+				synchronized (mBitmap) {
+					if (mScale) {
+						canvas.drawBitmap(bitmap, mSrcRect, mDstRect, (mParent.mPrefScaleFilterOn)?mBitmapPaint:null);
+					} else {
+						canvas.drawBitmap(bitmap, mSrcRect, mDstRect, null);					
+					}
 				}
-				else {
-					canvas.drawBitmap(bitmap, mSrcRect, mDstRect, null);					
-				}
-				
 				/*
 				if (mShowInfo) {
 					screen_width = getWidth();
@@ -450,6 +466,17 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 		
 		surfaceHolder = null;
+	}
+	
+	public void copyPixels() {
+		//2011-04-28, support 2.1 or below
+		if (mVideoBuffer != null) {
+			mVideoBuffer.position(0);
+			synchronized (mBitmap) {
+				if (mBitmap.getWidth()*mBitmap.getHeight()*2 == mVideoBuffer.remaining())
+					mBitmap.copyPixelsFromBuffer(mVideoBuffer);
+			}
+		}
 	}
 	
 	private int[] mButtonDown = new int[MAX_POINT_CNT];
@@ -1365,6 +1392,14 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 				mFilterLongClick = false;
 			}
         }
+    }
+    
+    public void showKeyboard() {
+    	DosBoxMenuUtility.doShowKeyboard(mParent);
+    }
+    
+    public void showMenu() {
+    	DosBoxMenuUtility.doShowMenu(mParent);
     }
 }
 

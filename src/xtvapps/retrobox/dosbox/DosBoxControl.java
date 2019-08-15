@@ -19,6 +19,8 @@
 
 package xtvapps.retrobox.dosbox;
 
+import retrobox.vinput.VirtualEvent.MouseButton;
+
 public class DosBoxControl {  
 	public static native void nativeMouse(int x, int y, int down_x, int down_y, int action, int button);
 	public static native int nativeKey(int keyCode, int down, int ctrl, int alt, int shift);
@@ -37,6 +39,25 @@ public class DosBoxControl {
 			}
 		}		
 		return result;
+	}
+	
+	public static void sendNativeKeyPress(int keyCode, boolean ctrl, boolean alt, boolean shift) {
+		sendNativeKey(keyCode, true, ctrl, alt, shift);
+		pauseBetweenPress();
+		sendNativeKey(keyCode, false, ctrl, alt, shift);
+	}
+	
+	public static void sendNativeMousePress(MouseButton button) {
+		int btn = button == MouseButton.LEFT?DosBoxSurfaceView.BTN_A:DosBoxSurfaceView.BTN_B;
+		DosBoxControl.nativeMouse(0, 0, 0, 0, 1, btn);
+		pauseBetweenPress();
+		DosBoxControl.nativeMouse(0, 0, 0, 0, 0, btn);
+	}
+	
+	private static void pauseBetweenPress() {
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e) {}
 	}
 }
 
