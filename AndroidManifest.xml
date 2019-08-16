@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="xtvapps.res.dosbox"  
-      android:versionCode="221031"
-      android:versionName="2.2.1-31"
+      android:versionCode="221034"
+      android:versionName="2.2.1-34"
       android:installLocation="auto"
       android:sharedUserId="xtvapps.res.user"
       > 
-    <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="23"/>
+    <uses-sdk android:minSdkVersion="17" android:targetSdkVersion="23"/>
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />

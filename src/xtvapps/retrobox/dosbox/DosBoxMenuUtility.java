@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
+
 import xtvapps.res.dosbox.R;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.DosBoxPreferences;
 import xtvapps.retrobox.dosbox.library.dosboxprefs.preference.GamePreference;
@@ -338,7 +339,8 @@ public class DosBoxMenuUtility {
 			context.mSurfaceView.mShowInfo = false;
 		}
 		// dpad / trackpad emulation
-		context.mSurfaceView.mEnableDpad = prefs.getBoolean("confenabledpad", true);
+		// context.mSurfaceView.mEnableDpad = prefs.getBoolean("confenabledpad", true);
+		context.mSurfaceView.mEnableDpad = false;
 		try {
 			int tmp = Integer.valueOf(prefs.getString("confdpadsensitivity", "7").trim());
 			if ((tmp >= 1) && (tmp <= 25)) {
