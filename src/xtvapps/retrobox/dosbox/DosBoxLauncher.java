@@ -587,6 +587,34 @@ public class DosBoxLauncher extends Activity {
 		if (mDosBoxThread != null)
 			mDosBoxThread.doExit();
 	}
+	
+	public void callbackVideoFinishDemo() {
+		final SimpleCallback callback = new SimpleCallback() {
+			
+			@Override
+			public void onResult() {}
+			
+			@Override
+			public void onFinally() {
+				uiQuit();
+			}
+		};
+		
+		mHandler.post(new Runnable(){
+
+			@Override
+			public void run() {
+				String msg = "Thanks for trying out this demo";
+				RetroBoxDialog.showAlert(DosBoxLauncher.this, msg, callback);
+			}});
+		
+		mHandler.postDelayed(new Runnable(){
+
+			@Override
+			public void run() {
+				uiQuit();
+			}}, 10000);
+	}
 
 	public void callbackVideoRedraw( int w, int h, int s, int e) {
 		mSurfaceView.mSrc_width = w;
@@ -831,7 +859,7 @@ public class DosBoxLauncher extends Activity {
         
         options.add(new ListOption("quit", "Quit"));
         
-        RetroBoxDialog.showListDialog(this, getString(R.string.emu_opt_title), options, new Callback<KeyValue>() {
+        RetroBoxDialog.showListDialog(this, "Game options", options, new Callback<KeyValue>() {
 			
 			@Override
 			public void onResult(KeyValue result) {

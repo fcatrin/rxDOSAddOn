@@ -22,6 +22,7 @@
 #if USE_JNIGRAPHIC
 #include <android/bitmap.h>
 #endif
+#include <time.h>
 #include "config.h"
 #include "AndroidOSfunc.h"
 #include "string.h"
@@ -43,6 +44,8 @@ std::queue<struct locnet_al_event> eventQueue;
 
 struct loader_config myLoader;
 struct loader_config *loadf;
+int timeout = 0;
+int timed_out = 0;
 bool	enableSound = true;
 bool	enableCycleHack = true;
 bool	enableRefreshHack = true;
@@ -57,6 +60,7 @@ char *Android_VideoGetBuffer();
 
 JNIEnv	*gEnv = NULL;
 jobject JavaCallbackThread = NULL;
+jmethodID JavaVideoFinishDemo = NULL;
 jmethodID JavaVideoRedraw = NULL;
 jmethodID JavaVideoSetMode = NULL;
 jmethodID JavaAudioWriteBuffer = NULL;
@@ -74,6 +78,7 @@ void Android_Init(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint he
 	JavaCallbackThread = env->NewGlobalRef(obj);
 	JavaCallbackThreadClass = env->GetObjectClass(JavaCallbackThread);
 	JavaVideoRedraw = env->GetMethodID(JavaCallbackThreadClass, "callbackVideoRedraw", "(IIII)V");
+	JavaVideoFinishDemo = env->GetMethodID(JavaCallbackThreadClass, "callbackVideoFinishDemo", "()V");
 	JavaVideoSetMode = env->GetMethodID(JavaCallbackThreadClass, "callbackVideoSetMode", "(II)Landroid/graphics/Bitmap;");
 	JavaAudioInit = env->GetMethodID(JavaCallbackThreadClass, "callbackAudioInit", "(IIII)I");
 	JavaAudioWriteBuffer = env->GetMethodID(JavaCallbackThreadClass, "callbackAudioWriteBuffer", "(I)V");
@@ -544,6 +549,8 @@ void	Android_LockSurface() {
 	}
 }
 
+int checkTimeout = 0;
+
 void	Android_UnlockSurface(int startLine, int endLine)
 {
 	if ((gEnv != 0) && (loadf != 0) && (loadf->bmph != 0) && (loadf->videoBuffer != 0)) {
@@ -553,8 +560,19 @@ void	Android_UnlockSurface(int startLine, int endLine)
 #endif
 	}
 
-	if ((loadf != 0) && (loadf->abort == 0) && (gEnv != 0) && (endLine > startLine))
-		gEnv->CallVoidMethod( JavaCallbackThread, JavaVideoRedraw, loadf->width, loadf->height, startLine, endLine );
+	if ((loadf != 0) && (loadf->abort == 0) && (gEnv != 0) && (endLine > startLine)) {
+		if (!timed_out) {
+			gEnv->CallVoidMethod( JavaCallbackThread, JavaVideoRedraw, loadf->width, loadf->height, startLine, endLine );
+			if (checkTimeout++ > 30) {
+				int now = time(NULL);
+				if (timeout == 0) timeout = now + 15*60;
+				if (now > timeout) {
+					timed_out = true;
+					gEnv->CallVoidMethod( JavaCallbackThread, JavaVideoFinishDemo );
+				}
+			}
+		}
+	}
 }
 
 void 	Android_ResetScreen()

@@ -28,6 +28,7 @@
 #include <jni.h>
 #include <stdlib.h>
 #include <android/log.h>
+#include <time.h>
 #include "config.h"
 #include "loader.h"
 #include "render.h"
@@ -44,11 +45,16 @@ extern struct loader_config myLoader;
 extern struct loader_config *loadf;
 
 extern int CPU_Cycles;
+extern int timeout;
+extern int timed_out;
 
 extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeStart(JNIEnv * env, jobject obj, jobject bitmap, jint width, jint height, jstring confpath, jboolean invertRGB)
 {
 	Android_Init(env, obj, bitmap, width, height, invertRGB);
 	
+	timeout = 0;
+	timed_out = false;
+
 	if (strlen(arg_start_conf_default)>0) {
 		const char *argv[] = { "dosbox",
 				"-conf", arg_start_conf_default,
