@@ -928,7 +928,7 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public boolean onKeyDown(int keyCode, final KeyEvent event) {
 		mMapCapture = false;
-		if (true)
+		if (mDebug)
 			Log.d("DosBoxTurbo", "onKeyDown keyCode="+keyCode + " mEnableDpad=" + mEnableDpad);
 		
 		if ((mInputMode == INPUT_MODE_REAL_JOYSTICK || mInputMode == INPUT_MODE_REAL_MOUSE) 
@@ -1023,12 +1023,31 @@ class DosBoxSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	 
 	private boolean handleKey(int keyCode, final KeyEvent event) {
-		if (true)
+		if (mDebug)
 			Log.d("DosBoxTurbo", "handleKey keyCode="+keyCode);
 		int tKeyCode = 0;
 
 		if (keyCode == KeyEvent.KEYCODE_BACK) return false;
+		int isDownFlag = (event.getAction() == KeyEvent.ACTION_DOWN) ? 1 : 0;
+		
+		if (keyCode == KeyEvent.KEYCODE_BUTTON_A || 
+		    keyCode == KeyEvent.KEYCODE_BUTTON_B ||
+			keyCode == KeyEvent.KEYCODE_BUTTON_X ||
+			keyCode == KeyEvent.KEYCODE_BUTTON_Y) {
+			DosBoxControl.nativeKey(KeyEvent.KEYCODE_SPACE, isDownFlag, 0, 0, 0);
+			return true;
+		}
+		
+		if (keyCode == KeyEvent.KEYCODE_BUTTON_SELECT) {
+			DosBoxControl.nativeKey(KeyEvent.KEYCODE_ESCAPE, isDownFlag, 0, 0, 0);
+			return true;
+		}
 
+		if (keyCode == KeyEvent.KEYCODE_BUTTON_START) {
+			DosBoxControl.nativeKey(KeyEvent.KEYCODE_ENTER, isDownFlag, 0, 0, 0);
+			return true;
+		}
+		
 		// check for xperia play back case
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.isAltPressed()) {
 			int backval = customMap.get(DosBoxPreferences.XPERIA_BACK_BUTTON);
