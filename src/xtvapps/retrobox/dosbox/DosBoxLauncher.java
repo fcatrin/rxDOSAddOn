@@ -87,7 +87,7 @@ import xtvapps.dosbox.swos.R;
 public class DosBoxLauncher extends Activity {
 	public static final String START_COMMAND_ID = "start_command";
 	public String mConfFile = DosBoxPreferences.CONFIG_FILE;
-	public String mConfPath = DosBoxPreferences.CONFIG_PATH;
+	public String mConfPath; //  = DosBoxPreferences.CONFIG_PATH;
 	
 	private static final String KEY_TARGET_FPS = "targetFps";
 	
@@ -159,6 +159,8 @@ public class DosBoxLauncher extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i("DosBoxTurbo", "onCreate()");
+		
+		mConfPath = getFilesDir().getAbsolutePath() + "/";
 		
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -474,8 +476,8 @@ public class DosBoxLauncher extends Activity {
 		if (dosBoxConfigFile!=null) nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_DOSBOX_DEFAULT, 0, dosBoxConfigFile, true);
 		if (dosBoxConfigFileUser!=null) nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_DOSBOX_USER, 0, dosBoxConfigFileUser, true);
 		
-		DosBoxCustomConfig.init(dosBoxConfigFile);
-		DosBoxCustomConfig.init(dosBoxConfigFileUser);
+		if (dosBoxConfigFile!=null)     DosBoxCustomConfig.init(dosBoxConfigFile);
+		if (dosBoxConfigFileUser!=null) DosBoxCustomConfig.init(dosBoxConfigFileUser);
 		loadCustomPreferences();
 
 		mDosBoxThread = new DosBoxThread(this);
