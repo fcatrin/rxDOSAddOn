@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Sensible World of Soccer</string>
+    <string name="app_name">Sensible World of Soccer DEMO</string>
     <string name="gamedir">SWOS</string>
     <string name="overlay">1b_single.cfg</string>
 </resources>
