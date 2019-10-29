@@ -66,6 +66,12 @@ public class GameLauncher extends Activity {
 		AndroidUtils.unpackAssets(GameLauncher.this, "game", cDrive.getParentFile());
 		
 		String gameDir = getString(R.string.gamedir);
+		
+		File gameFolder = new File(cDrive, gameDir);
+		File files[] = gameFolder.listFiles();
+		for(File file : files) {
+			if (file.getName().endsWith(".CAR")) file.delete();
+		}
 
 		// read dosbox.conf template
 		File dosboxTemplateFile = new File(cDrive, "dosbox.template.conf");
