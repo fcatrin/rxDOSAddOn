@@ -7,6 +7,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
+import xtvapps.core.SimpleCallback;
 import xtvapps.core.Utils;
 import xtvapps.retrobox.dosbox.DosBoxLauncher;
 import xtvapps.dosbox.swos.R;
@@ -27,14 +30,22 @@ public class GameLauncher extends Activity {
 	private static final String DOSBOX_SHOW_FPS = "showFPS";
 	private static final String GAMEPAD_OVERLAY = "OVERLAY";;
 	
-	private static final long SPLASH_TIME = 20000;
+	private enum Stage {Boot, Credits, Splash}
+	private Stage stage = Stage.Boot;
+	
+	private static final long SPLASH_TIME_CREDITS = 12000;
+	private static final long SPLASH_TIME_GAME = 5000;
 
 	private File cDrive;
+
+	private ScrollTextView txtCredits;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.horizon);
+		setContentView(R.layout.credits);
+		
+		txtCredits = (ScrollTextView)findViewById(R.id.txtCredits);
 		
 		File rootDir = getFilesDir();
 		cDrive = new File(rootDir, "game"); 
@@ -45,13 +56,31 @@ public class GameLauncher extends Activity {
 		super.onStart();
 		
 		new Handler().postDelayed(new Runnable(){
-
 			@Override
 			public void run() {
-				ScrollTextView txtCredits = (ScrollTextView)findViewById(R.id.txtCredits);
-				txtCredits.startScroll();
-			}}, 1000);
+				startCreditsSplash();
+			}
+		}, 1000);
+	}
+	
+	private void startCreditsSplash() {
+		stage = Stage.Credits;
 		
+		txtCredits.setOnFinishedCallback(new SimpleCallback() {
+			
+			@Override
+			public void onResult() {
+				startGameSplash();
+			}
+		});
+		txtCredits.setDuration((int)SPLASH_TIME_CREDITS);
+		txtCredits.startScroll();
+	}
+	
+	private void startGameSplash() {
+		stage = Stage.Splash;
+
+		setContentView(R.layout.splash);
 		
 		final long t0 = System.currentTimeMillis();
 		
@@ -69,7 +98,26 @@ public class GameLauncher extends Activity {
 		};
 		task.execute();
 	}
+	
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		skipCredits();
+		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		skipCredits();
+		return super.onTouchEvent(event);
+	}
+	
+	private void skipCredits() {
+		if (stage != Stage.Credits) return;
+
+		txtCredits.stopScroll();
+		startGameSplash();
+	}
 
 	private File gamePrepare() throws IOException {
 		AndroidUtils.unpackAssets(GameLauncher.this, "game", cDrive.getParentFile());
@@ -105,7 +153,7 @@ public class GameLauncher extends Activity {
 			}
 		};
 		
-		long delta = SPLASH_TIME - (System.currentTimeMillis() - t0);
+		long delta = SPLASH_TIME_GAME - (System.currentTimeMillis() - t0);
 		if (delta < 0) delta = 0;
 		
 		new Handler().postDelayed(task, delta);

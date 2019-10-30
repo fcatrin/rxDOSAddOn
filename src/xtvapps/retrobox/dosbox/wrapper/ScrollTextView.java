@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
 import android.widget.TextView;
+import xtvapps.core.SimpleCallback;
 
 public class ScrollTextView extends TextView {
 
@@ -15,11 +16,13 @@ public class ScrollTextView extends TextView {
     private Scroller mSlr;
 
     // milliseconds for a round of scrolling
-    private int mRndDuration = 15000;
+    private int mDuration = 1000;
 
     // whether it's being paused
     private boolean mRunning = false;
 
+    private SimpleCallback onFinishedCallback;
+    
     /*
     * constructor
     */
@@ -79,7 +82,7 @@ public class ScrollTextView extends TextView {
         int distance = scrollingLen + width*2;
 
         setVisibility(VISIBLE);
-        mSlr.startScroll(-width, 0, distance, 0, mRndDuration);
+        mSlr.startScroll(-width, 0, distance, 0, mDuration);
         invalidate();
         mRunning = true;
         
@@ -109,16 +112,26 @@ public class ScrollTextView extends TextView {
         if (null == mSlr) return;
 
         if (mSlr.isFinished() && (mRunning)) {
-          this.startScroll();
+        	if (onFinishedCallback!=null) onFinishedCallback.onResult();
+        	this.startScroll();
         }
     }
-
-    public int getRndDuration() {
-      return mRndDuration;
+    
+    public void stopScroll() {
+    	mRunning = false;
+    	mSlr.abortAnimation();
     }
 
-    public void setRndDuration(int duration) {
-      this.mRndDuration = duration;
+    public int getDuration() {
+      return mDuration;
     }
+
+    public void setDuration(int duration) {
+      this.mDuration = duration;
+    }
+
+	public void setOnFinishedCallback(SimpleCallback onFinishedCallback) {
+		this.onFinishedCallback = onFinishedCallback;
+	}
 
 }
