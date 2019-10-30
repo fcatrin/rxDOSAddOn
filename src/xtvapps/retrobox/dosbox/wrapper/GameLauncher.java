@@ -27,14 +27,14 @@ public class GameLauncher extends Activity {
 	private static final String DOSBOX_SHOW_FPS = "showFPS";
 	private static final String GAMEPAD_OVERLAY = "OVERLAY";;
 	
-	private static final long SPLASH_TIME = 3000;
+	private static final long SPLASH_TIME = 20000;
 
 	private File cDrive;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.boot);
+		setContentView(R.layout.horizon);
 		
 		File rootDir = getFilesDir();
 		cDrive = new File(rootDir, "game"); 
@@ -43,6 +43,15 @@ public class GameLauncher extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+		
+		new Handler().postDelayed(new Runnable(){
+
+			@Override
+			public void run() {
+				ScrollTextView txtCredits = (ScrollTextView)findViewById(R.id.txtCredits);
+				txtCredits.startScroll();
+			}}, 1000);
+		
 		
 		final long t0 = System.currentTimeMillis();
 		

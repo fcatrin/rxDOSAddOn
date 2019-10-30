@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/horizon_retro">
+    <xtvapps.retrobox.dosbox.wrapper.ScrollTextView 
+        android:id="@+id/txtCredits"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_big"
+        android:textColor="@android:color/white"
+        android:layout_gravity="bottom"
+        android:layout_margin="@dimen/spacing_big"
+        android:text="@string/credits" />
+</FrameLayout>
