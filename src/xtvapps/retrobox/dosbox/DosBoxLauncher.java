@@ -1018,6 +1018,13 @@ public class DosBoxLauncher extends Activity {
 	
     protected void uiQuit() {
     	stopDosBox();
+    	new Handler().postDelayed(new Runnable() {
+			
+			@Override
+			public void run() {
+				finish();
+			}
+		}, 2500);
     }
     
 	public void uiQuitConfirm() {
@@ -1072,6 +1079,10 @@ public class DosBoxLauncher extends Activity {
 		if (needsOverlay()) {
 			gamepadView.setVisibility(View.VISIBLE);
 		}
+	}
+	
+	public void callbackVideoFinishDemo(){
+		finish();
 	}
 }
 
