@@ -717,7 +717,9 @@ public class DosBoxLauncher extends Activity {
     
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent event) {
-		if (!RetroBoxDialog.isDialogVisible(this)) {
+		if (!RetroBoxDialog.isDialogVisible(this) &&
+			!customKeyboard.isVisible()	&&
+			!KeyboardMappingUtils.isKeyMapperVisible()) {
 			int keyCode     = event.getKeyCode();
 			boolean isDown  = event.getAction() == KeyEvent.ACTION_DOWN;
 			if (mapper.handleKeyEvent(event, keyCode, isDown)) return true;
