@@ -44,6 +44,7 @@ import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -62,8 +63,8 @@ import retrobox.utils.ImmersiveModeSetter;
 import retrobox.utils.ListOption;
 import retrobox.utils.RetroBoxDialog;
 import retrobox.utils.RetroBoxUtils;
-import retrobox.vinput.GenericGamepad;
-import retrobox.vinput.GenericGamepad.Analog;
+import retrobox.vinput.GamepadDevice;
+import retrobox.vinput.GamepadMapping.Analog;
 import retrobox.vinput.Mapper;
 import retrobox.vinput.Mapper.ShortCut;
 import retrobox.vinput.QuitHandler;
@@ -73,10 +74,10 @@ import retrobox.vinput.VirtualEventDispatcher;
 import retrobox.vinput.overlay.ExtraButtons;
 import retrobox.vinput.overlay.ExtraButtonsController;
 import retrobox.vinput.overlay.ExtraButtonsView;
-import retrobox.vinput.overlay.GamepadController;
-import retrobox.vinput.overlay.GamepadView;
 import retrobox.vinput.overlay.Overlay;
 import retrobox.vinput.overlay.OverlayExtra;
+import retrobox.vinput.overlay.OverlayGamepadController;
+import retrobox.vinput.overlay.OverlayGamepadView;
 import xtvapps.core.AndroidCoreUtils;
 import xtvapps.core.AndroidFonts;
 import xtvapps.core.Callback;
@@ -141,8 +142,8 @@ public class DosBoxLauncher extends Activity {
 	static Mapper mapper;
 	private VirtualEventDispatcher virtualEventDispatcher;
 	
-	static GamepadController gamepadController;
-	static GamepadView gamepadView;
+	static OverlayGamepadController overlayGamepadController;
+	static OverlayGamepadView overlayGamepadView;
 	static ExtraButtonsController extraButtonsController;
 	static ExtraButtonsView extraButtonsView;
 	public static final Overlay overlay = new Overlay();
@@ -172,13 +173,6 @@ public class DosBoxLauncher extends Activity {
 		virtualEventDispatcher = new VirtualInputDispatcher();
 		mapper = new Mapper(getIntent(), virtualEventDispatcher);
 		Mapper.initGestureDetector(this);
-		Mapper.joinPorts = getIntent().getBooleanExtra("joinPorts", false);
-		
-        for(int i=0; i<2; i++) {
-        	String prefix = "j" + (i+1);
-        	String deviceDescriptor = getIntent().getStringExtra(prefix + "DESCRIPTOR");
-        	Mapper.registerGamepad(i, deviceDescriptor);
-        }
         
 		useRealJoystick = Mapper.hasGamepads();
 		Log.d("JSTICK", "useRealJoystick is " + useRealJoystick);
@@ -257,8 +251,8 @@ public class DosBoxLauncher extends Activity {
 			}
 		}
 
-		gamepadController = new GamepadController();
-		gamepadView = new GamepadView(this, overlay);
+		overlayGamepadController = new OverlayGamepadController();
+		overlayGamepadView = new OverlayGamepadView(this, overlay);
 		extraButtonsController = new ExtraButtonsController();
 		extraButtonsView = new ExtraButtonsView(this);
 		
@@ -299,7 +293,7 @@ public class DosBoxLauncher extends Activity {
 	}
 	
 	private boolean needsOverlay() {
-		return !Mapper.hasGamepads();
+		return Mapper.mustDisplayOverlayControllers();
 	}
 	
 	private boolean isLayoutStable() {
@@ -335,8 +329,8 @@ public class DosBoxLauncher extends Activity {
 		Log.d("OVERLAY", "setupGamepadOverlay");
 		if (needsOverlay()) {
 			Log.d("OVERLAY", "has Overlay");
-			gamepadView.addToLayout(root);
-			gamepadView.showPanel();
+			overlayGamepadView.addToLayout(root);
+			overlayGamepadView.showPanel();
 		}
 		Log.d("OVERLAY", "extraButtonsView.addToLayout");
 		extraButtonsView.addToLayout(root);
@@ -484,11 +478,11 @@ public class DosBoxLauncher extends Activity {
 	
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
-		if (gamepadView.isVisible() && gamepadController.onTouchEvent(ev)) {
+		if (overlayGamepadView.isVisible() && overlayGamepadController.onTouchEvent(ev)) {
 			Log.d("TOUCH", "dispatched to gamepadController");
 			if (Overlay.requiresRedraw) {
 				Overlay.requiresRedraw = false;
-				gamepadView.invalidate();
+				overlayGamepadView.invalidate();
 			}
 			return true;
 		}
@@ -715,10 +709,25 @@ public class DosBoxLauncher extends Activity {
 		}*/
 	//}
 	
+	
+	
 	protected void toastMessage(String message) {
     	Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
     
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		if (!RetroBoxDialog.isDialogVisible(this) &&
+			!customKeyboard.isVisible()	&&
+			!KeyboardMappingUtils.isKeyMapperVisible()) {
+			int keyCode     = event.getKeyCode();
+			boolean isDown  = event.getAction() == KeyEvent.ACTION_DOWN;
+			if (mapper.handleKeyEvent(this, event, keyCode, isDown)) return true;
+		}
+
+		return super.dispatchKeyEvent(event);
+	}
+	
 	@Override
 	public void onBackPressed() {
 		if (RetroBoxDialog.cancelDialog(this)) return;
@@ -921,7 +930,7 @@ public class DosBoxLauncher extends Activity {
 	}
 	
     protected void uiHelp() {
-		RetroBoxDialog.showGamepadDialogIngame(this, gamepadInfoDialog, new SimpleCallback() {
+		RetroBoxDialog.showGamepadDialogIngame(this, gamepadInfoDialog, Mapper.hasGamepads(), new SimpleCallback() {
 			@Override
 			public void onFinally() {
 				onResume();
@@ -937,7 +946,7 @@ public class DosBoxLauncher extends Activity {
 	}
 	
 	private void uiToggleOverlay() {
-		gamepadView.toggleView();
+		overlayGamepadView.toggleView();
 	}
 	
 	protected void uiToggleFilter() {
@@ -1018,6 +1027,13 @@ public class DosBoxLauncher extends Activity {
 	
     protected void uiQuit() {
     	stopDosBox();
+    	new Handler().postDelayed(new Runnable() {
+			
+			@Override
+			public void run() {
+				finish();
+			}
+		}, 2500);
     }
     
 	public void uiQuitConfirm() {
@@ -1050,12 +1066,12 @@ public class DosBoxLauncher extends Activity {
 		}
 
 		@Override
-		public void sendKey(GenericGamepad gamepad, int keyCode, boolean down) {
+		public void sendKey(GamepadDevice gamepad, int keyCode, boolean down) {
 			DosBoxControl.sendNativeKey(keyCode, down, false, false, false);
 		}
 
 		@Override
-		public void sendAnalog(GenericGamepad gamepad, Analog index, double x, double y, double hatx, double haty) {
+		public void sendAnalog(GamepadDevice gamepad, Analog index, double x, double y, double hatx, double haty) {
 		}
 	
 	}
@@ -1063,15 +1079,19 @@ public class DosBoxLauncher extends Activity {
 	public void showKeyboard() {
 		if (!customKeyboard.isVisible()) customKeyboard.open();
 		if (needsOverlay()) {
-			gamepadView.setVisibility(View.GONE);
+			overlayGamepadView.setVisibility(View.GONE);
 		}
 	}
 	
 	public void closeKeyboard() {
 		customKeyboard.close();
 		if (needsOverlay()) {
-			gamepadView.setVisibility(View.VISIBLE);
+			overlayGamepadView.setVisibility(View.VISIBLE);
 		}
+	}
+	
+	public void callbackVideoFinishDemo(){
+		finish();
 	}
 }
 
