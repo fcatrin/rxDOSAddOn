@@ -825,7 +825,7 @@ public class DosBoxLauncher extends Activity {
         }
         
         options.add(new ListOption("keyboard", getString(R.string.emu_opt_open_keyboard)));
-        options.add(new ListOption("keymap", getString(R.string.emu_opt_open_mapper)));
+        // options.add(new ListOption("keymap", getString(R.string.emu_opt_open_mapper)));
         
         if (testingMode) {
             options.add(new ListOption("fullscreenUpdate", "DEVEL - Toggle FullScreen Update"));
