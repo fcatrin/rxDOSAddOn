@@ -1,0 +1,65 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="android:Theme.Light">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <style name="media_title">
+        <item name="android:textColor">@color/media_title</item>
+        <item name="android:textSize">32px</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">left</item>
+    </style>
+
+    <style name="media_info">
+        <item name="android:textColor">@color/media_info</item>
+        <item name="android:textSize">24px</item>
+        <item name="android:paddingLeft">6px</item>
+    </style>
+
+    <style name="media_extra_info">
+        <item name="android:textColor">@color/media_extra_info</item>
+        <item name="android:textSize">24px</item>
+    </style>
+
+    <style name="media_time">
+        <item name="android:textColor">@color/media_time</item>
+        <item name="android:textSize">24px</item>
+        <item name="android:layout_gravity">center_vertical</item>
+    </style>
+
+    <style name="SmallButton" parent="android:style/Widget.Button">
+        <item name="android:padding">6dp</item>
+    </style>
+
+    <style name="ProgressDialog" parent="android:Theme.Dialog">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="DialogProgressBar" parent="@android:style/Widget.ProgressBar.Horizontal">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">@dimen/progress_padding</item>
+        <item name="android:layout_marginRight">@dimen/progress_padding</item>
+    </style>
+
+    <style name="DialogProgressTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/progress_info</item>
+    </style>
+
+</resources>

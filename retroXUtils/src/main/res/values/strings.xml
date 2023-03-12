@@ -1,0 +1,58 @@
+<resources>
+
+    <string name="cancel">Cancel</string>
+    
+    <string name="folder_loading">Loading folder</string>
+    
+    <string name="folder_elements_0">Empty folder</string>
+    <string name="folder_elements_1">1 element</string>
+    <string name="folder_elements_n">{n} elements</string>
+    
+    <string name="folder_free">{free} free of {total} ({percent}%)</string>
+    <string name="folder_parent">Go to parent folder</string>
+    <string name="folder_select">Select this folder</string>
+    
+    <string name="addon_installed">The {addon} for RetroX has been installed successfully</string>
+    <string name="addon_rbx_missing_msg">RetroX is not installed</string>
+    <string name="addon_rbx_missing_yes">Go to Play Store</string>
+    <string name="addon_rbx_missing_no">Cancel</string>
+    
+    <string name="no_browser">Your device doesn\'t seem to have a web browser\n\nPlease open\n{url}\nin any other device</string>
+    <string name="browser_required">This action requires a web browser like Google Chrome or Firefox to be installed in your device</string>
+    
+    <string name="slot_empty">EMPTY</string>
+    <string name="slot_latest">latest</string>
+    <string name="slot_latest_n">latest - {n}</string>
+    
+    <string name="slot_v_empty">E\nM\nP\nT\nY</string>
+    <string name="slot_v_latest">L\nA\nT\nE\nS\nT</string>
+    <string name="slot_v_latest_n">-\n-\n-\n-\n-\n-\n-\n</string>
+    
+    <string name="quit_title">Quit Game</string>
+    <string name="quit_msg">Confirm that you want to Quit this game</string>
+    <string name="quit_yes">Yes, Quit</string>
+    <string name="quit_no">No</string>
+    
+    <string name="login_user">User</string>
+    <string name="login_pass">Password</string>
+    <string name="login_yes">Log in</string>
+    <string name="login_no">Cancel</string>
+    
+    <string name="gamepad_label_up">Up</string>
+    <string name="gamepad_label_down">Down</string>
+    <string name="gamepad_label_left">Left</string>
+    <string name="gamepad_label_right">Right</string>
+    <string name="gamepad_label_a">Button A</string>
+    <string name="gamepad_label_b">Button B</string>
+    <string name="gamepad_label_x">Button X</string>
+    <string name="gamepad_label_y">Button Y</string>
+    <string name="gamepad_label_tl">Button L</string>
+    <string name="gamepad_label_tr">Button R</string>
+    <string name="gamepad_label_tl2">Button L2</string>
+    <string name="gamepad_label_tr2">Button R2</string>
+    <string name="gamepad_label_tl3">Button L3</string>
+    <string name="gamepad_label_tr3">Button R3</string>
+    <string name="gamepad_label_select">Select</string>
+    <string name="gamepad_label_start">Start</string>
+    
+</resources>

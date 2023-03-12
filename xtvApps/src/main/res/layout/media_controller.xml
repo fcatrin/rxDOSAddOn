@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2007 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+  
+          http://www.apache.org/licenses/LICENSE-2.0
+  
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/gradient_background"
+    android:orientation="horizontal"
+    android:paddingLeft="22px"
+    android:paddingRight="22px"
+    android:paddingTop="50px"
+    android:paddingBottom="10px"   >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8px"
+        >
+	    <ImageView 
+	        android:id="@+id/media_thumbnail"
+	        android:layout_width="288px"
+	        android:layout_height="162px"
+	        />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:padding="8px">
+	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal">
+
+	        <TextView
+	            android:id="@+id/media_title"
+	            style="@style/media_title"
+	            android:layout_width="0dip"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"
+	            android:ellipsize="end"
+	            android:lines="1"
+	            android:text="Este es un titulo de prueba de un video" />
+
+	        <TextView
+	            style="@style/media_info"
+	            android:id="@+id/media_info"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="HD 720" 
+	            android:gravity="center"
+	            />
+	        
+	    </LinearLayout>
+	    <TextView
+	        style="@style/media_extra_info"
+	        android:id="@+id/media_extra_info"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:text="Video subido por @blablah"
+	         />
+	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal"
+	        android:paddingTop="4px"
+	        >
+	        <TextView android:id="@+id/time_current"
+	            style="@style/media_time"
+	            android:text="00:00:00"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"/>
+	        <SeekBar
+	            android:id="@+id/mediacontroller_progress"
+	            style="?android:attr/progressBarStyleHorizontal"
+	            android:layout_width="0dip"
+	            android:layout_weight="1"
+	            android:progressDrawable="@drawable/seekbar"
+	            android:thumb="@drawable/seekbar_scrubber"
+	            android:layout_height="32px" />
+	        <TextView android:id="@+id/time"
+	            style="@style/media_time"
+	            android:text="00:00:00"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content" />
+	    </LinearLayout>
+	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="center"
+	        android:orientation="horizontal">
+	        	
+	        <ImageButton android:id="@+id/prev"
+	            style="@android:style/MediaButton.Previous"
+	            android:background="@drawable/media_button_selector"
+	            android:contentDescription="@string/mc_previous"
+	            android:layout_width="40px"
+	            android:layout_height="40px"
+	             />
+	        
+	        <ImageButton android:id="@+id/rew"
+	            style="@android:style/MediaButton.Rew"
+	            android:background="@drawable/media_button_selector"
+	            android:contentDescription="@string/mc_rewind" 
+	            android:layout_width="40px"
+	            android:layout_height="40px"
+	            
+	            />
+	        
+	        <ImageButton android:id="@+id/pause"
+	            style="@android:style/MediaButton.Play"
+	            android:background="@drawable/media_button_selector"
+	            android:contentDescription="@string/mc_playpause"
+	            android:layout_width="40px"
+	            android:layout_height="40px" />
+
+	        <ImageButton
+	            android:id="@+id/ffwd"
+	            style="@android:style/MediaButton.Ffwd"
+	            android:background="@drawable/media_button_selector"
+	            android:contentDescription="@string/mc_fforward"
+	            android:layout_width="40px"
+	            android:layout_height="40px" />
+	        
+	        <ImageButton android:id="@+id/next"
+	            style="@android:style/MediaButton.Next"
+	            android:background="@drawable/media_button_selector"
+	            android:contentDescription="@string/mc_next"
+	            android:layout_width="40px"
+	            android:layout_height="40px" />
+	    </LinearLayout>
+	
+    </LinearLayout>
+    
+</LinearLayout>

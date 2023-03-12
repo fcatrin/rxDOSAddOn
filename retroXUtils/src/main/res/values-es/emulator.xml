@@ -1,0 +1,41 @@
+<resources>
+    <string name="emu_slot_save_title">Selecciona el slot donde quieres guardar</string>
+    <string name="emu_slot_load_title">Selecciona el slot que quieres cargar</string>
+    
+    <string name="emu_disk_select">Selecciona el disco</string>
+    <string name="emu_disk_insert">Insertar disco {n}</string>
+    <string name="emu_disk_inserted">Se insertó el disco {name}</string>
+    <string name="emu_disk_inserted_n">Se insertó el disco {n}</string>
+    
+    <string name="emu_opt_title">Opciones de RetroX</string>
+    <string name="emu_opt_cancel">Cancelar</string>
+    <string name="emu_opt_state_load">Cargar partida</string>
+    <string name="emu_opt_state_save">Guardar partida</string>
+    <string name="emu_opt_disk_change">Cambiar de disco</string>
+    <string name="emu_opt_disk_swap">Cambiar de disco</string>
+    <string name="emu_opt_extra_buttons">Botones adicionales</string>
+    <string name="emu_opt_open_keyboard">Mostrar teclado</string>
+    <string name="emu_opt_open_mapper">Mapear botones del control</string>
+    <string name="emu_opt_help">Ayuda</string>
+    <string name="emu_opt_quit">Salir</string>
+    
+    <string name="emu_slot_saved">Partida guardada en slot #{n}</string>
+    <string name="emu_slot_loaded">Partida cargada desde slot #{n}</string>
+    
+    <string name="emu_n64_control_opt_title">Modo de controles</string>
+    <string name="emu_n64_control_opt_original">Original</string>
+    <string name="emu_n64_control_opt_swapped">Análogos invertidos</string>
+    <string name="emu_n64_control_opt_goldeneye">Optimizado para Golden Eye</string>
+    
+	<string name="emu_n64_control_original">Usando el modo de control ORIGINAL</string>
+    <string name="emu_n64_control_swapped">Usando el modo de control INVERTIDO</string>
+    <string name="emu_n64_control_goldeneye">Usando el modo de controles optimizados para GOLDEN EYE</string>
+    
+    <string name="emu_amiga_more_height">Más alto</string>
+    <string name="emu_amiga_less_height">Menos alto</string>
+    
+    <string name="emu_screenshot_taken">Se guardó una captura de pantalla</string>
+    <string name="emu_screenshot_failed">Falló la captura de pantalla</string>
+    <string name="emu_screenshot_failed_max">No se pueden tomar más capturas (ya hay un máximo de {n} capturas)</string>
+    
+</resources>

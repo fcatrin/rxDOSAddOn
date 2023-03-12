@@ -1,0 +1,8 @@
+<resources>
+    <color name="media_title">#F0FB9309</color>
+    <color name="media_info">#F0C0C0C0</color>
+    <color name="media_extra_info">#F0F0F0F0</color>
+    <color name="media_time">#F0F0F0F0</color>
+    <color name="transparentblack">#00000000</color>
+    
+</resources>

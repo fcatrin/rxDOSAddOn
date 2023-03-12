@@ -1,0 +1,15 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <gradient
+        android:angle="270"
+        android:centerColor="@color/gamepad_press_center"
+        android:endColor="@color/gamepad_press_end"
+        android:startColor="@color/gamepad_press_start" />
+
+    <stroke
+        android:width="2dp"
+        android:color="@color/gamepad_press_border" />
+
+    <corners android:radius="4dp" />
+
+</shape>

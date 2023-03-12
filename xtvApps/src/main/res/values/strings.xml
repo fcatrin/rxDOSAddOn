@@ -1,0 +1,33 @@
+<resources>
+
+    <!-- Title for error alert when a video cannot be played.  it can be used by any app. -->
+    <string name="VideoView_error_title">Cannot play video</string>
+    <!-- Text for error alert when a video container is not valid for progressive download/playback. -->
+    <string name="VideoView_error_text_invalid_progressive_playback">Sorry, this video is not valid for streaming to this device.</string>
+    <!-- Text for error alert when a video cannot be played. it can be used by any app. -->
+    <string name="VideoView_error_text_unknown">Sorry, this video cannot be played.</string>
+    <!-- Button to close error alert when a video cannot be played -->
+    <string name="VideoView_error_button">OK</string>
+    <string name="mc_previous">Previous</string>
+    <string name="mc_rewind">Rewind</string>
+    <string name="mc_playpause">Play/Pause</string>
+    <string name="mc_fforward">Forward</string>
+    <string name="mc_next">Next</string>
+    
+    <string name="msg_default_ok">OK</string>
+    <string name="msg_default_cancel">Cancel</string>
+    <string name="no_share_title">No share providers</string>
+    <string name="no_share_msg">No applications found for sharing.  Please install Twitter, Facebook or another sharing application</string>
+    <string name="title_share_default">Share on&#8230;</string>
+    <string name="xtv_not_enough_space_download">
+There is not enough storage space available to download this file\n
+Available: {available}\n
+Required: {required}
+   </string>
+    <string name="xtv_not_enough_space_uncompress">
+There is not enough storage space available to uncompress this file\n
+Available: {available}\n
+Required: {required}
+   </string>
+    
+</resources>

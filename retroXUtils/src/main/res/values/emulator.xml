@@ -1,0 +1,41 @@
+<resources>
+    <string name="emu_slot_save_title">Select slot to save on</string>
+    <string name="emu_slot_load_title">Select slot to load from</string>
+    
+    <string name="emu_disk_select">Select disk</string>
+    <string name="emu_disk_insert">Insert disk {n}</string>
+    <string name="emu_disk_inserted">Disk inserted: {name}</string>
+    <string name="emu_disk_inserted_n">Disk {n} inserted</string>
+    
+    <string name="emu_opt_title">RetroX Options</string>
+    <string name="emu_opt_cancel">Cancel</string>
+    <string name="emu_opt_state_load">Load State</string>
+    <string name="emu_opt_state_save">Save State</string>
+    <string name="emu_opt_disk_change">Change disk</string>
+    <string name="emu_opt_disk_swap">Swap disk</string>
+    <string name="emu_opt_extra_buttons">Extra Buttons</string>
+    <string name="emu_opt_open_keyboard">Show keyboard</string>
+    <string name="emu_opt_open_mapper">Map gamepad buttons</string>
+    <string name="emu_opt_help">Help</string>
+    <string name="emu_opt_quit">Quit</string>
+    
+    <string name="emu_slot_saved">State saved to slot #{n}</string>
+    <string name="emu_slot_loaded">State restored from slot #{n}</string>
+    
+    <string name="emu_n64_control_opt_title">Controls Mode</string>
+    <string name="emu_n64_control_opt_original">Original</string>
+    <string name="emu_n64_control_opt_swapped">Analog controls swapped</string>
+    <string name="emu_n64_control_opt_goldeneye">Optimized for Golden Eye</string>
+    
+    <string name="emu_n64_control_original">Using ORIGINAL controls mode</string>
+    <string name="emu_n64_control_swapped">Using SWAPPED controls mode</string>
+    <string name="emu_n64_control_goldeneye">Using GOLDEN EYE optimized controls mode</string>
+    
+    <string name="emu_amiga_more_height">Increase Height</string>
+    <string name="emu_amiga_less_height">Decrease Height</string>
+    
+    <string name="emu_screenshot_taken">Screenshot taken</string>
+    <string name="emu_screenshot_failed">Screenshot failed</string>
+    <string name="emu_screenshot_failed_max">Unable to take screenshot (max of {n} files reached)</string>
+    
+</resources>

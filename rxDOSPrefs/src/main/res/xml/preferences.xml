@@ -1,0 +1,93 @@
+<!-- Copyright (c) 2012 Gene Ruebsamen (Fishstix) -->
+
+<!-- This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:my="http://schemas.android.com/apk/res/"
+  android:key="prefMainScreen">
+  <PreferenceCategory android:title="Advanced DosBox Config">
+  	 <PreferenceScreen
+		android:key="detail"
+		android:title="DosBox Settings"
+		android:summary="Advanced DosBox configuration">
+	    <EditTextPreference
+      		android:key="dosmanualconf_file"
+      		android:title="Config Location"
+      		android:defaultValue="/sdcard/dosbox.conf"    		
+      		android:summary="Choose name/location of the dosbox config file" />
+	    <Preference
+	        android:key="doseditconf_file"
+	        android:title="Edit Config File"
+	        android:summary="Edit with system text editor (if installed)" />
+	 </PreferenceScreen>
+  </PreferenceCategory>
+  <PreferenceCategory android:title="Input Preferences">
+      <ListPreference
+      	android:key="confinputmode"
+      	android:title="Select Input Mode"
+	  	android:entries="@array/confinputmode"
+      	android:entryValues="@array/confinputmode_values"
+      	android:defaultValue="0"
+      	android:summary="Select Joystick, Mouse or Scroll input" />
+      <ListPreference
+      	android:key="confmousetracking"
+      	android:title="Mouse Tracking"
+	  	android:entries="@array/confmousetracking"
+      	android:entryValues="@array/confmousetracking_values"
+      	android:defaultValue="1"
+      	android:summary="Choose Absolute or Relative mouse tracking" />   	  
+  </PreferenceCategory>
+   	  	
+	<PreferenceCategory android:title="Screen and Rotation Settings">
+  	  <CheckBoxPreference
+      	android:key="confscale"
+      	android:title="Screen Scaling"
+      	android:defaultValue="false"
+      	android:summary="Enable Screen Scaling" />  	  
+  	  <ListPreference
+     	android:key="confrotation"
+      	android:title="Rotation Settings"
+   		android:entries="@array/confrotation"
+	    android:entryValues="@array/confrotation_values"
+      	android:defaultValue="0"      	
+      	android:summary="Configure Auto/Portrait/Landscape rotation" />
+    </PreferenceCategory>
+
+  <PreferenceCategory 
+      android:key="prefCatOther"
+      android:title="Other">
+    <Preference
+        android:key="confprofile_manager"
+        android:title="Install Profile Manager"
+        android:summary="Download the free DosBox Profile Manager">
+        <!-- <intent
+        	android:action="android.intent.action.VIEW"
+        	android:data="market://details?id=com.fishstix.dosboxlauncher" /> -->
+    </Preference>
+    <Preference
+        android:key="help"
+        android:title="Help"
+        android:summary="View the FAQ and get Help">
+        <intent
+        	android:action="android.intent.action.VIEW"
+        	android:data="http://sites.google.com/site/dosboxturbo/" />
+    </Preference>
+    <Preference
+        android:key="version"
+        android:title="Version"
+        android:summary=""/>
+  </PreferenceCategory>
+  
+</PreferenceScreen>

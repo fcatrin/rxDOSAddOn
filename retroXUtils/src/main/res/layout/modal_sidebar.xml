@@ -1,0 +1,50 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/modal_sidebar"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#00000000"
+    android:orientation="horizontal"
+    android:clickable="true"
+    android:visibility="invisible" >
+
+    <LinearLayout
+        android:id="@+id/sidebar"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="2"
+        android:background="@drawable/sidebar_background"
+        android:orientation="vertical" >
+            <ListView
+                android:id="@+id/lstSidebarList"
+                android:nextFocusLeft="@id/lstSidebarList"
+                android:nextFocusRight="@id/lstSidebarList"
+                android:nextFocusUp="@id/lstSidebarList"
+                android:nextFocusDown="@+id/lstSidebarBottom"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:listSelector="@drawable/listitem_selector"
+                />
+            <ListView
+                android:id="@id/lstSidebarBottom"
+                style="@style/NormalFont"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nextFocusLeft="@id/lstSidebarBottom"
+                android:nextFocusRight="@id/lstSidebarBottom"
+                android:nextFocusUp="@id/lstSidebarList"
+                android:nextFocusDown="@id/lstSidebarBottom"
+                android:listSelector="@drawable/listitem_selector"
+                android:textColor="@color/pal_text2" />
+            </LinearLayout>
+
+    <TextView
+        android:id="@+id/sidebar_spacer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="6" />
+
+</LinearLayout>

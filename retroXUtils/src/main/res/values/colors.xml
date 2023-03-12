@@ -1,0 +1,66 @@
+<resources>
+		
+    <color name="button_bar_normal_top">#F0202020</color>
+    <color name="button_bar_normal_center">#F0282828</color>
+    <color name="button_bar_normal_bottom">#F0202020</color>
+    <color name="button_bar_stroke_color_normal">#20E0E0E0</color>
+    
+    <color name="button_bar_focused_top">#F0202020</color>
+    <color name="button_bar_focused_center">#F0303030</color>
+    <color name="button_bar_focused_bottom">#F0202020</color>
+    <color name="button_bar_stroke_color_focused">#C0FF5500</color>
+    
+    <color name="button_bar_selected_top">#F0303030</color>
+    <color name="button_bar_selected_center">#F0404040</color>
+    <color name="button_bar_selected_bottom">#F0303030</color>
+    <color name="button_bar_stroke_color_selected">#80E0E0E0</color>
+    
+	<color name="button_bar_selected_focused_top">#A0FF5500</color>
+	<color name="button_bar_selected_focused_center">#C0FF5500</color>
+	<color name="button_bar_selected_focused_bottom">#FFFF5500</color>
+	
+	<color name="modal_background">#D0000000</color>
+	<color name="modal_background_gamepad">#FF141414</color>
+	
+	<color name="sidebar_background_start">#FF141414</color>
+	<color name="sidebar_background_center">#F8141414</color>
+	<color name="sidebar_background_end">#E8141414</color>
+
+	<!-- new color pallette -->
+	
+	<color name="pal_base1">#FF141414</color>
+	<color name="pal_base15">#FF1C1C1C</color>
+	<color name="pal_base2">#FF242424</color>
+	<color name="pal_base3">#FF2C2C2C</color>
+   <color name="pal_base4">#FF3C3C3C</color>
+	<color name="pal_base5">#FF4C4C4C</color>
+   	
+	<color name="pal_text_disabled">#30FFFFFF</color>
+	<color name="pal_text_dim3">#40FFFFFF</color>
+	<color name="pal_text_dim2">#80FFFFFF</color>
+	<color name="pal_text_dim">#90FFFFFF</color>
+	<color name="pal_text1">#B0FFFFFF</color>
+	<color name="pal_text2">#D0FFFFFF</color>
+	<color name="pal_text3">#E8FFFFFF</color>
+	<color name="pal_text_hl">#F0FFCC66</color>
+		
+	<color name="pal_hl_background">#D0FF6600</color>
+	
+    <color name="gamepad_press_end">#E0F0F0F0</color>
+    <color name="gamepad_press_center">#E0FF0000</color>
+    <color name="gamepad_press_start">#E0E0E0E0</color>
+    <color name="gamepad_press_border">#E0E04040</color>
+
+    <color name="gamepad_press_analog_end">#E0F0F0F0</color>
+    <color name="gamepad_press_analog_center">#E00000FF</color>
+    <color name="gamepad_press_analog_start">#E0E0E0E0</color>
+    <color name="gamepad_press_analog_border">#E04040E0</color>
+			
+    <color name="loading_bar_bg_start">#30FFFFFF</color>
+	<color name="loading_bar_bg_center">#30FFFFFF</color>
+	<color name="loading_bar_bg_end">#30FFFFFF</color>
+	<color name="loading_bar_start">#FFCA7A26</color>
+	<color name="loading_bar_center">#FFCA7A26</color>
+	<color name="loading_bar_end">#FFCA7A26</color>
+    	
+</resources>

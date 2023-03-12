@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DosBox Turbo</string>
+    <string name="debug">WARNING: DEBUG Mode is Enabled</string>
+    <string name="restart">Restart for changes to take effect</string>
+    <string name="manual">Manually edit /sdcard/dosbox.conf to set configuration</string>
+    <string name="error">An unknown error occured</string>
+    <string name="cont">Continue</string>
+    <string name="cycles">DosBox Cycles: </string>
+    <string name="select_dos_key">Select DOS Key Mapping</string>
+    <string name="select_controller_key">Press hardware key to map</string>
+	<string name="undefined">undefined</string>    
+	<string name="clear">Clear</string>
+	<string name="keyboard">Keyboard</string>
+	<string name="noeditor">No system text editor installed.</string>
+	<string name="confirmreset">Confirm reset to default?</string>
+	<string name="confirmclear">Confirm clear all button maps?</string>
+	<string name="duplicatemap">Error: Duplicate Button Map. Try again.</string>
+	<string name="nomoremaps">No more hardware keymaps availiable.</string>
+<!--    <string name="absdefault">Absolute Tracking Calibration Reset</string>
+    <string name="abscalibrate">Tap visible DOS pointer to calibrate</string>
+    <string name="abscalibrate_success">Mouse Pointer Calibrated</string> -->
+  		
+  	<!--  APP CONFIGURATION  -->
+	<!--  ORIENTATION  -->
+  	<string-array name="confrotation">
+  		<item>Auto</item>
+  		<item>Portrait</item>
+  		<item>Landscape</item>
+  	</string-array>
+  	<string-array name="confrotation_values">
+  		<item>0</item>
+  		<item>1</item>
+  		<item>2</item>
+  	</string-array>  	
+    <string-array name="confinputmode">
+  		<item>TouchScreen Mouse</item>
+  		<item>TouchScreen Joystick</item>
+  		<item>Physical Mouse</item>
+  		<item>Physical Joystick</item>
+  		<item>Scroll Screen</item>
+  	</string-array>
+  	<string-array name="confinputmode_values">
+  		<item>0</item>
+  		<item>1</item>
+  		<item>2</item>
+  		<item>3</item>
+  		<item>4</item>
+   	</string-array>
+    <string-array name="confmousetracking">
+  		<item>Absolute (experimental)</item>
+  		<item>Relative</item>
+  	</string-array>
+  	<string-array name="confmousetracking_values">
+  		<item>0</item>
+  		<item>1</item>
+   	</string-array>
+
+
+</resources>

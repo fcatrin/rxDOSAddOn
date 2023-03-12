@@ -1,0 +1,23 @@
+<resources>
+
+    <!-- Title for error alert when a video cannot be played.  it can be used by any app. -->
+    <string name="VideoView_error_title">No se puede reproducir el video</string>
+    <!-- Text for error alert when a video container is not valid for progressive download/playback. -->
+    <string name="VideoView_error_text_invalid_progressive_playback">El video no es compatible con este dispositivo</string>
+    <!-- Text for error alert when a video cannot be played. it can be used by any app. -->
+    <string name="VideoView_error_text_unknown">No se puede reproducir el video</string>
+    <!-- Button to close error alert when a video cannot be played -->
+    <string name="VideoView_error_button">OK</string>
+    <string name="mc_previous">Anterior</string>
+    <string name="mc_rewind">Atrás</string>
+    <string name="mc_playpause">Iniciar/Pausa</string>
+    <string name="mc_fforward">Adelante</string>
+    <string name="mc_next">Siguiente</string>
+    
+    <string name="msg_default_ok">Aceptar</string>
+    <string name="msg_default_cancel">Cancelar</string>
+    <string name="no_share_title">No se puede compartir</string>
+    <string name="no_share_msg">No se encontraron aplicaciones para compartir.  Por favor instale Twitter, Facebook u otra aplicación para compartir contenido</string>
+    <string name="title_share_default">Compartir en&#8230;</string>
+    
+</resources>

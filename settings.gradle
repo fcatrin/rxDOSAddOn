@@ -1,0 +1,5 @@
+include ':rxDOSPrefs'
+include ':xtvApps'
+include ':xtvVirtualFile'
+include ':retroXUtils'
+include ':rxDOSAddOn'

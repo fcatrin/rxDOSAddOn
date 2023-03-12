@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="progress_info">24dp</dimen>
+    <dimen name="progress_padding">12dp</dimen>
+    <dimen name="progress_gap">8dp</dimen>
+    <dimen name="progress_height">14dp</dimen>
+</resources>

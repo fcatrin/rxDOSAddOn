@@ -1,0 +1,41 @@
+<resources>
+
+    <string name="cancel">Cancelar</string>
+    
+    <string name="folder_loading">Carregando pasta</string>
+    
+    <string name="folder_elements_0">Pasta vazia</string>
+    <string name="folder_elements_1">1 elemento</string>
+    <string name="folder_elements_n">{n} elementos</string>
+    
+    <string name="folder_free">livre {free} de {total} ({percent}%)</string>
+    <string name="folder_parent">Ir para a pasta inicial</string>
+    <string name="folder_select">Selecione esta pasta</string>
+    
+    <string name="addon_installed">O addon {addon} para RetroX foi instalado com sucesso</string>
+    <string name="addon_rbx_missing_msg">RetroX não está instalado</string>
+    <string name="addon_rbx_missing_yes">Visite a Google Play Store</string>
+    <string name="addon_rbx_missing_no">Cancelar</string>
+    
+    <string name="no_browser">Seu dispositivo não parece ter um navegador Web \n\n Por favor, acesse o endereço \n {url} \n em qualquer outro dispositivo</string>
+    <!--  TODO TRANSLATE -->
+    <string name="browser_required">This action requires a web browser like Google Chrome or Firefox to be installed in your device</string>
+    
+    <string name="slot_empty">VAZIO</string>
+    <string name="slot_latest">mais recentes</string>
+    <string name="slot_latest_n">mais recente - {n}</string>
+    
+    <string name="slot_v_empty">V\nA\nZ\nI\nO</string>
+    <string name="slot_v_latest">R\nE\nC\nE\nN\nT\nE\nS</string>
+    <string name="slot_v_latest_n">-\n-\n-\n-\n-\n-\n-\n</string>
+    
+    <string name="quit_title">Sair do jogo?</string>
+    <string name="quit_msg">Confirme se você quiser sair deste jogo</string>
+    <string name="quit_yes">Sim, sair</string>
+    <string name="quit_no">Não</string>
+    
+    <string name="login_user">Usuário</string>
+    <string name="login_pass">Senha</string>
+    <string name="login_yes">Entrar</string>
+    <string name="login_no">Cancelar</string>
+</resources>

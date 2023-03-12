@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/rootContainer" >
+
+    <FrameLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/root" ></FrameLayout>
+    <TextView
+        android:id="@+id/txtFPS"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_small"
+        android:layout_marginTop="@dimen/spacing_small"
+        android:layout_marginLeft="@dimen/spacing_small"
+        android:textSize="@dimen/text_medium"
+        android:textColor="#F0C2FF0D"
+        android:text="XX"
+        android:visibility="gone"
+        />
+
+    <include layout="@layout/modal_dialog_gamepad" />
+    <include layout="@layout/modal_dialog_list" />
+    
+    <retrobox.keyboard.KeyboardView
+        android:id="@+id/keyboard_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:padding="@dimen/spacing_tiny"
+        android:background="#404040"
+        android:visibility="gone"
+        android:focusable="false"
+        android:nextFocusDown="@id/keyboard_view"
+        android:nextFocusLeft="@id/keyboard_view"
+        android:nextFocusRight="@id/keyboard_view"
+        android:nextFocusUp="@id/keyboard_view" >
+    </retrobox.keyboard.KeyboardView>
+    
+    <include layout="@layout/keyboard_mapping_view" />
+    
+</FrameLayout>

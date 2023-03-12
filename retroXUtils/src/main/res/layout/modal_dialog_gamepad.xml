@@ -1,0 +1,92 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/modal_dialog_gamepad"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/modal_background_gamepad"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:visibility="gone" >
+
+    <TextView
+        android:id="@+id/txtGamepadInfoTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/spacing_big"
+        android:textColor="@color/pal_text1"
+        android:textSize="@dimen/text_normal" />
+
+    <FrameLayout
+        android:id="@+id/gamepadDialogFrame"
+        android:layout_width="@dimen/gamepad_width"
+        android:layout_height="@dimen/gamepad_height"
+        android:layout_gravity="center" >
+
+        <ImageView
+            android:id="@+id/gamepadDialogImage"
+            android:layout_width="@dimen/gamepad_width"
+            android:layout_height="@dimen/gamepad_height"
+            android:alpha="0.8"
+            android:src="@drawable/gamepad" />
+
+        <TextView
+            android:id="@+id/gamepadLabelL2"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelL1"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelR2"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelR1"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelSELECT"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelSTART"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelL3"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelR3"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelA"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelB"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelX"
+            style="@style/GamepadLabel" />
+
+        <TextView
+            android:id="@+id/gamepadLabelY"
+            style="@style/GamepadLabel" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/txtGamepadInfoBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/spacing_big"
+        android:textColor="@color/pal_text1"
+        android:textSize="@dimen/text_normal" />
+
+</LinearLayout>

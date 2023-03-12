@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/progress_panel"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/progress_bg"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <TextView
+        android:id="@+id/loading_info"
+        style="@style/DialogProgressTitle"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/progress_padding"/>
+
+       <ProgressBar
+           android:id="@+id/loading_progress"
+           style="@style/DialogProgressBar"
+           android:layout_gravity="center"/>
+
+       <Button
+           android:id="@+id/btnCancel"
+           style="@style/SmallButton"
+           android:layout_gravity="center"
+           android:layout_marginTop="@dimen/progress_gap"
+           android:text="Cancel" />
+
+</LinearLayout>
