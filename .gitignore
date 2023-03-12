@@ -1,7 +1,4 @@
-/gen/
-/bin/
-/obj/
-/libs/
-/build/
+obj
+build
 .gradle
 .idea
