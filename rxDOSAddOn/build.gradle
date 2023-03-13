@@ -16,6 +16,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+}
+
+task jniBuild(type:Exec) {
+    workingDir 'src/main/jni'
+    commandLine './build_with_ndk8e'
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name.equals("generateDebugAssets")) {
+        task.dependsOn(jniBuild)
+    }
 }
 
 dependencies {
