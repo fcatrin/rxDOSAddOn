@@ -247,7 +247,8 @@ public class DosBoxLauncher extends Activity {
 			// if not manual mode
 			if (prefs.getString("doscycles", "auto").contentEquals("auto")) {	
 				// quick system
-				DosBoxMenuUtility.mPrefCycleString = "max";			
+				DosBoxMenuUtility.mPrefCycleString = "max";
+				Log.d("DosBoxTurbo", "mPrefCycleString = max");
 			}
 		}
 
@@ -519,10 +520,20 @@ public class DosBoxLauncher extends Activity {
 		turboVGA    = DosBoxCustomConfig.getBoolean("turboVGA", turboVGA);
 		turboAudio  = DosBoxCustomConfig.getBoolean("turboAudio", turboAudio);
 		mPrefAutoCPUOn = DosBoxCustomConfig.getBoolean("autocpu", mPrefAutoCPUOn);
-		
-		// this now come from dosbox.conf or rbx menu
-		// DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CYCLES, mPrefCycles, null, true);
-		
+
+
+		String prefCycles = DosBoxCustomConfig.getString("cycles", "auto");
+		Log.d("DosBoxTurbo", "Cycles on loadCustomPreferences:" + prefCycles);
+
+		if (prefCycles.equals("auto")) {
+			uiAutoCycles(false);
+		} else if (prefCycles.equals("max")) {
+			uiCPUMaxCycles(false);
+		} else {
+			mPrefCycles = DosBoxCustomConfig.getInt("cycles", mPrefCycles);
+			uiUpdateCycles(false);
+		}
+
 		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_FRAMESKIP, mPrefFrameskip ,null, true);		
 		
 		// TURBO CYCLE
@@ -987,20 +998,32 @@ public class DosBoxLauncher extends Activity {
 		if (mPrefCycles<1000) mPrefCycles = 1000;
 		uiUpdateCycles();
 	}
-	
+
 	protected void uiAutoCycles() {
-		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CPU_AUTO, 1,null,true);
-		toastMessage("Auto CPU is ON");
-	}
+		uiAutoCycles(true);
+	};
 
 	protected void uiCPUMaxCycles() {
-		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CPU_MAX, 1,null,true);
-		toastMessage("CPU set as max cycles");
+		uiCPUMaxCycles(true);
 	}
 
 	protected void uiUpdateCycles() {
+		uiUpdateCycles(true);
+	}
+
+	protected void uiAutoCycles(boolean toast) {
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CPU_AUTO, 1,null,true);
+		if (toast) toastMessage("Auto CPU is ON");
+	}
+
+	protected void uiCPUMaxCycles(boolean toast) {
+		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CPU_MAX, 1,null,true);
+		if (toast) toastMessage("CPU set as max cycles");
+	}
+
+	protected void uiUpdateCycles(boolean toast) {
 		DosBoxLauncher.nativeSetOption(DosBoxMenuUtility.DOSBOX_OPTION_ID_CPU_FIXED, mPrefCycles,null,true);
-		toastMessage("CPU Cycles: " + mPrefCycles);
+		if (toast) toastMessage("CPU Cycles: " + mPrefCycles);
 	}
 	
 	protected void uiTurboCycles() {

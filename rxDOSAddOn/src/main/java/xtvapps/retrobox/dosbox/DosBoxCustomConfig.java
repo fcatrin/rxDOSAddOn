@@ -42,7 +42,6 @@ public class DosBoxCustomConfig {
 	public static String getString(String key, String defaultValue) {
 		String value = properties.get(key);
 		return value!=null?value:defaultValue;
-		
 	}
 	
 	public static int getInt(String key, int defaultValue) {

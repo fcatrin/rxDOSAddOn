@@ -19,6 +19,11 @@
 #define CPU_AUTODETERMINE_NONE		0x00
 #define CPU_AUTODETERMINE_CORE		0x01
 #define CPU_AUTODETERMINE_CYCLES	0x02
+
+#define CPU_CYCLES_AUTO  0x00
+#define CPU_CYCLES_MAX   0x01
+#define CPU_CYCLES_FIXED 0x02
+
 #define LOGD(LOG_TAG, ...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 /*
 #define LOGV(LOG_TAG, ...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
@@ -36,6 +41,8 @@ void swapInNextDisk(bool pressed);
 void DOSBOX_UnlockSpeed( bool pressed );
 void CPU_CycleIncrease(bool pressed);
 void CPU_CycleDecrease(bool pressed);
+
+int cpu_cycles_mode = CPU_CYCLES_AUTO;
 
 char arg_start_command[256]="";
 char arg_start_conf_default[256]="";
@@ -80,9 +87,10 @@ extern bool ticksLocked;
 
 extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeSetOption(JNIEnv * env, jobject obj, jint option, jint value, jobject value2, jboolean extra)
 {
-	LOGD("CPU", "PRE  CPU_AutoDetermineMode: %d, CPU_Cycles: %d, CPU_CycleMax: %d, "
+    LOGD("DosBoxTurbo", "nativeSetOption option=%d value=%d", option, value);
+	LOGD("DosBoxTurbo", "PRE  CPU_AutoDetermineMode: %d, CPU_Cycles: %d, CPU_CycleMax: %d, "
 			"CPU_CycleAutoAdjust: %s, CPU_OldCycleMax: %d, CPU_CycleLimit: %d",
-			CPU_AutoDetermineMode & CPU_AUTODETERMINE_CYCLES, CPU_Cycles, CPU_CycleMax,
+			CPU_AutoDetermineMode, CPU_Cycles, CPU_CycleMax,
 			CPU_CycleAutoAdjust?"true":"false", CPU_OldCycleMax, CPU_CycleLimit);
 
 	switch (option) {
@@ -166,6 +174,7 @@ extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeSetOption(JNIE
 			CPU_OldCycleMax=3000;
 			CPU_CyclePercUsed=100;
 			CPU_CycleLimit=-1;
+			cpu_cycles_mode = CPU_CYCLES_AUTO;
 			break;
 		case 61: // cpu=max
 			CPU_SkipCycleAutoAdjust=false;
@@ -175,6 +184,7 @@ extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeSetOption(JNIE
 			CPU_CyclePercUsed=100;
 			CPU_CycleAutoAdjust=true;
 			CPU_CycleLimit=-1;
+			cpu_cycles_mode = CPU_CYCLES_MAX;
 			break;
 		case 62: // cpu=fixed
 			CPU_SkipCycleAutoAdjust=false;
@@ -184,15 +194,14 @@ extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeSetOption(JNIE
 			CPU_CycleAutoAdjust = false;
 			CPU_OldCycleMax = value;
 			CPU_CycleLimit = value;
+			cpu_cycles_mode = CPU_CYCLES_FIXED;
 			break;
 	}
 
-	LOGD("CPU", "POST CPU_AutoDetermineMode: %d, CPU_Cycles: %d, CPU_CycleMax: %d, "
+	LOGD("DosBoxTurbo", "POST CPU_AutoDetermineMode: %d, CPU_Cycles: %d, CPU_CycleMax: %d, "
 			"CPU_CycleAutoAdjust: %s, CPU_OldCycleMax: %d, CPU_CycleLimit: %d",
-			CPU_AutoDetermineMode & CPU_AUTODETERMINE_CYCLES, CPU_Cycles, CPU_CycleMax,
+			CPU_AutoDetermineMode, CPU_Cycles, CPU_CycleMax,
 			CPU_CycleAutoAdjust?"true":"false", CPU_OldCycleMax, CPU_CycleLimit);
-
-
 }
 
 /*
@@ -203,12 +212,12 @@ extern "C" void Java_xtvapps_retrobox_dosbox_DosBoxLauncher_nativeSetOption(JNIE
  */
 
 extern "C" jint Java_xtvapps_retrobox_dosbox_DosBoxControl_nativeGetCPUCycles(JNIEnv * env, jobject obj) {
-	if (CPU_AutoDetermineMode == CPU_AUTODETERMINE_NONE) {
-		// max or fixed
-		return CPU_CycleLimit;
-	} else {
-		// auto
+	if (cpu_cycles_mode == CPU_CYCLES_AUTO) {
 		return 0;
+	} else if (cpu_cycles_mode == CPU_CYCLES_MAX) {
+		return -1;
+	} else {
+		return CPU_CycleLimit;
 	}
 }
 
